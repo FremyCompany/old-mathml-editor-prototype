@@ -18,7 +18,7 @@
         Return GetSelectedElements().Select(Function(el) el.Clone())
     End Function
 
-    Private Sub DeleteContents()
+    Public Sub DeleteContents()
         For Each el In GetSelectedElements().ToArray()
             CommonAncestror.RemoveChild(el)
         Next
@@ -26,19 +26,56 @@
 
     Private Sub SetSelection(ByVal StartPoint As Selection, ByVal EndPoint As Selection)
         ' Compute _Selection
+        ' TODO: Compute selection
+
+        Throw New NotImplementedException("The algorithm behind the selection finder is not implemented at this time.")
+
         _StartPoint = StartPoint
         _EndPoint = EndPoint
     End Sub
 
-    Private Sub SetSelection(ByVal CommonAncestror As MathElement, ByVal SelectionStart As MathElement, ByVal SelectionEnd As MathElement)
+    Public Sub SetSelection(ByVal Point As Selection, Optional ByVal PointToChange As SelectionPointType = SelectionPointType.Selection)
+        Select Case PointToChange
+            Case SelectionPointType.Selection
+                SetSelection(Point.CommonAncestror, Point.SelectionStart, Point.SelectionEnd)
+            Case SelectionPointType.StartPoint
+                SetSelection(Point, EndPoint)
+            Case SelectionPointType.EndPoint
+                SetSelection(StartPoint, Point)
+            Case Else
+                Throw New ArgumentException("Unknown value for the selection point type", "PointToChange")
+        End Select
+    End Sub
+
+    Public Function GetSelection(ByVal PointToRetreive As SelectionPointType) As Selection
+        Select Case PointToRetreive
+            Case SelectionPointType.Selection
+                Return _Selection
+            Case SelectionPointType.StartPoint
+                Return _StartPoint
+            Case SelectionPointType.EndPoint
+                Return _EndPoint
+            Case Else
+                Throw New ArgumentException("Unknown value for the selection point type", "PointToRetreive")
+        End Select
+    End Function
+
+    Public Sub SetSelection(ByVal CommonAncestror As MathElement, ByVal SelectionStart As MathElement, ByVal SelectionEnd As MathElement)
         ' Check if the selection is valid
         If (CommonAncestror.ParentDocument Is This) AndAlso (SelectionStart.Parent Is CommonAncestror) AndAlso (SelectionEnd.Parent Is CommonAncestror) Then
 
+            SetSelection_Internal(
+                New Selection(CommonAncestror, SelectionStart, SelectionEnd),
+                New Selection(CommonAncestror, SelectionStart, CommonAncestror.Children.After(SelectionStart)),
+                New Selection(CommonAncestror, CommonAncestror.Children.Before(SelectionEnd), SelectionEnd)
+            )
 
         End If
     End Sub
 
     Private Sub SetSelection_Internal(ByVal Selection As Selection, ByVal StartPoint As Selection, ByVal EndPoint As Selection)
+
+        ' Verify the direction of the selection
         If Selection.SelectionEnd.IsBefore(SelectionStart) Then
             Dim Temp = Selection.SelectionEnd
             Selection.SelectionEnd = Selection.SelectionStart
@@ -53,13 +90,17 @@
             RaiseEvent BeforeSelectionChanged(Me, EventArgs.Empty)
         End If
 
-        ' Perform the change
-        _StartPoint = New Selection() With {.CommonAncestror = CommonAncestror, .SelectionStart = SelectionStart, .SelectionEnd = CommonAncestror.Children.After(SelectionStart)}
-        _EndPoint = New Selection() With {.CommonAncestror = CommonAncestror, .SelectionStart = CommonAncestror.Children.Before(SelectionEnd), .SelectionEnd = SelectionEnd}
+        ' Perform the changes
+        _Selection = Selection
+        _StartPoint = StartPoint
+        _EndPoint = EndPoint
 
     End Sub
 
     Public Sub ReverseSelection()
+        Dim Temp = _StartPoint
+        _StartPoint = _EndPoint
+        _EndPoint = Temp
         _Dir = Not _Dir
     End Sub
 

@@ -40,7 +40,7 @@
     Public MustOverride ReadOnly Property ElementType As MathElement.Type
     Public ReadOnly Property IsLayoutEngine As Boolean
         Get
-            Return ElementType = MathElement.Type.LayoutEngine
+            Return (ElementType And MathElement.Type.LayoutEngine) = MathElement.Type.LayoutEngine
         End Get
     End Property
     Public ReadOnly Property IsTextEdit As Boolean

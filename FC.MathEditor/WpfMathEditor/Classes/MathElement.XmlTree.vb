@@ -105,6 +105,53 @@
         Children.Replace(OldChild, NewChild)
     End Sub
 
+    Public ReadOnly Property FirstChild As MathElement
+        Get
+            Return Children.First
+        End Get
+    End Property
+
+    Public ReadOnly Property LastChild As MathElement
+        Get
+            Return Children.Last
+        End Get
+    End Property
+
+    Public ReadOnly Property TreeDepht As Integer
+        Get
+            TreeDepht = 0 : Dim P As MathElement = Me
+            While P.Parent IsNot Nothing
+                TreeDepht += 1 : P = P.Parent
+            End While
+            Return TreeDepht
+        End Get
+    End Property
+
+    Public Function GetCommonAncestrorWith(ByVal el1 As MathElement) As MathElement
+        Return GetCommonAncestrorBetween(el1, Me)
+    End Function
+
+    Public Shared Function GetCommonAncestrorBetween(ByVal el1 As MathElement, ByVal el2 As MathElement)
+
+        Dim Delta As Integer = el2.TreeDepht - el1.TreeDepht
+        If Delta > 0 Then
+            For x = 1 To Delta
+                el2 = el2.Parent
+            Next
+        ElseIf Delta < 0 Then
+            For x = 1 To -Delta
+                el1 = el1.Parent
+            Next
+        End If
+
+        While el2 IsNot el1
+            el1 = el1.Parent : el2 = el2.Parent
+        End While
+
+        Return el1
+
+    End Function
+
     ''' <summary>
     ''' Risen when a property of the current element changed, or a property of one of its children
     ''' </summary>

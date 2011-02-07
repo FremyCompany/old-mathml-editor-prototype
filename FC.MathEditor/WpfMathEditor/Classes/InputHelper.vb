@@ -48,70 +48,119 @@
     End Sub
 
     Public Function ProcessChar_FromLeft(ByVal InputChar As Char) As Boolean
-
+        Return ProcessChar_FromLeft_Internal(InputChar)
     End Function
 
     Public Function ProcessChar_FromRight(ByVal InputChar As Char) As Boolean
-
+        Return ProcessChar_FromRight(InputChar)
     End Function
 
-    Public Function ProcessDelete() As Boolean
+    Public Sub ProcessDelete()
 
-    End Function
+        If This.Selection.IsEmpty Then
+            Dim RightElement = This.Selection.SelectionEnd
+            If RightElement.Input.ProcessDelete_FromLeft() Then
+                Exit Sub
+            End If
+        End If
 
-    Public Function ProcessBackSpace() As Boolean
+        If ProcessDelete_Internal() Then
+            Exit Sub
+        End If
 
-    End Function
+        If This.Selection.SelectionEnd Is Nothing Then
+            This.Selection.MoveNext()
+            This.Selection.CommonAncestror.Input.ProcessDelete()
+            Exit Sub
+        End If
+
+        Exit Sub
+
+    End Sub
+
+    Public Sub ProcessBackSpace()
+
+        If This.Selection.IsEmpty Then
+            Dim RightElement = This.Selection.SelectionEnd
+            If RightElement.Input.ProcessDelete_FromLeft() Then
+                Exit Sub
+            End If
+        End If
+
+        If ProcessDelete_Internal() Then
+            Exit Sub
+        End If
+
+        If This.Selection.SelectionEnd Is Nothing Then
+            This.Selection.MoveNext()
+            This.Selection.CommonAncestror.Input.ProcessDelete()
+            Exit Sub
+        End If
+
+        Exit Sub
+
+    End Sub
 
     Public Function ProcessDelete_FromLeft() As Boolean
-
+        Return ProcessDelete_FromLeft_Internal()
     End Function
 
     Public Function ProcessBackSpace_FromRight() As Boolean
-
+        Return ProcessBackSpace_FromRight_Internal()
     End Function
 
     Public Function ProcessLeftKey() As Boolean
-
+        Return ProcessLeftKey_Internal()
     End Function
 
     Public Function ProcessRightKey() As Boolean
-
+        Return ProcessRightKey_Internal()
     End Function
 
     Public Function ProcessLeftKey_FormRight() As Boolean
-
+        Return ProcessLeftKey_FormRight()
     End Function
 
     Public Function ProcessRightKey_FromLeft() As Boolean
-
+        Return ProcessRightKey_FromLeft_Internal()
     End Function
 
     Public Function ProcessUpKey() As Boolean
-
+        Return ProcessUpKey_Internal()
     End Function
 
     Public Function ProcessDownKey() As Boolean
-
+        Return ProcessDownKey_Internal()
     End Function
 
     Public Function ProcessHat_FromRight() As Boolean
-
+        Return ProcessHat_FromRight_Internal()
     End Function
 
     Public Function ProcessUnderscore_FromRight() As Boolean
-
+        Return ProcessUnderscore_FromRight_Internal()
     End Function
 
     Public Function ProcessFraction_FromRight() As Boolean
-
+        Return ProcessFraction_FromRight_Internal()
     End Function
 
     Public MustOverride Function ProcessChar_Internal(ByVal InputChar As Char) As Boolean
-    Public MustOverride Function ProcessChar_FromLeft_Internal(ByVal InputChar As Char) As Boolean
-    Public MustOverride Function ProcessChar_FromRight_Internal(ByVal InputChar As Char) As Boolean
+    Public Overridable Function ProcessChar_FromLeft_Internal(ByVal InputChar As Char) As Boolean
+        Return False
+    End Function
+    Public Overridable Function ProcessChar_FromRight_Internal(ByVal InputChar As Char) As Boolean
+        Return False
+    End Function
 
-    Public MustOverride Function ProcessDelete_Internal() As Boolean
+    Public Function ProcessDelete_Internal() As Boolean
+        If This.Selection.IsEmpty Then
+            This.Selection.DeleteContents()
+            Return True
+        ElseIf This.Selection.SelectionEnd Is Nothing Then
+            This.Selection.SetSelection(This.Selection.CommonAncestror, This.Selection.SelectionStart, This.Selection.SelectionEnd)
+        End If
+    End Function
     Public MustOverride Function ProcessBackSpace_Internal() As Boolean
     Public MustOverride Function ProcessDelete_FromLeft_Internal() As Boolean
     Public MustOverride Function ProcessBackSpace_FromRight_Internal() As Boolean
