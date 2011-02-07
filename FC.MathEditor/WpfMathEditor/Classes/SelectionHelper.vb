@@ -25,13 +25,33 @@
     End Sub
 
     Private Sub SetSelection(ByVal StartPoint As Selection, ByVal EndPoint As Selection)
+
         ' Compute _Selection
-        ' TODO: Compute selection
+        Dim CA = StartPoint.SelectionStart.GetCommonAncestrorWith(EndPoint.SelectionEnd)
+        Dim SS = StartPoint.SelectionStart
+        Dim SE = StartPoint.SelectionEnd
 
-        Throw New NotImplementedException("The algorithm behind the selection finder is not implemented at this time.")
+        While SS.Parent IsNot CA
+            SS = SS.Parent
+        End While
 
-        _StartPoint = StartPoint
-        _EndPoint = EndPoint
+        While SE.Parent IsNot SE
+            SE = SE.Parent
+        End While
+
+        ' Insert StartPoint and EndPoint if needed
+        Dim Dir = SelectionDirection.LTR
+
+        If SE.IsBefore(SS) Then
+            Dir = SelectionDirection.RTL
+            Dim Temp = StartPoint
+            StartPoint = EndPoint
+            EndPoint = Temp
+        End If
+
+        ' Set the selection
+        SetSelection_Internal(New Selection(CA, SS, SE), StartPoint, EndPoint)
+
     End Sub
 
     Public Sub SetSelection(ByVal Point As Selection, Optional ByVal PointToChange As SelectionPointType = SelectionPointType.Selection)

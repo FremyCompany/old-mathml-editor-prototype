@@ -101,6 +101,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\ChildrenHelper.vb" />
+    <Compile Include="Classes\ExportHelper.vb" />
     <Compile Include="Classes\InputHelper.vb" />
     <Compile Include="Classes\MathDocument.vb" />
     <Compile Include="Classes\MathElement.Input.vb" />
