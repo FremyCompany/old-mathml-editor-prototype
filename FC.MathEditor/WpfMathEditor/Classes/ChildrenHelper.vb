@@ -10,14 +10,22 @@
     REM Fundamental traps
     REM
 
+    Public Sub Remove(ByVal OldChild As MathElement)
+        Remove_Internal(OldChild)
+    End Sub
+
     Public MustOverride Sub Add(ByVal NewChild As MathElement)
-    Public MustOverride Sub Remove(ByVal OldChild As MathElement)
+    Public MustOverride Sub Remove_Internal(ByVal OldChild As MathElement)
     Public MustOverride Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
 
     Public MustOverride Function After(ByVal OldChild As MathElement) As MathElement
     Public MustOverride Function Before(ByVal OldChild As MathElement) As MathElement
 
     Public MustOverride ReadOnly Property First() As MathElement
+
+    Public Function IsChild(ByVal Elm As MathElement) As Boolean
+        Return Elm.Parent Is Me
+    End Function
 
     REM
     REM Operational traps

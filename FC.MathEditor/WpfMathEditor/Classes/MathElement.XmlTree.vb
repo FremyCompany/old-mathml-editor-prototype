@@ -165,4 +165,12 @@
         If _Parent IsNot Nothing Then Parent.RaiseChanged()
     End Sub
 
+    ' TODO: RemovedFromParent
+    Public Event RemovedFromParent As EventHandler
+
+    Private Sub MathElement_RemovedFromParent(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.RemovedFromParent
+        _Parent = Nothing
+        _ParentDocument = Nothing
+        _Selection = Nothing
+    End Sub
 End Class
