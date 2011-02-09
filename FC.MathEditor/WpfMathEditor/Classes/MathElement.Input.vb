@@ -23,6 +23,16 @@
     Public Event GotFocus As EventHandler
     Public Event LostFocus As EventHandler
 
+    Private _Export As ExportHelper
+    Public Property Export As ExportHelper
+        Get
+            Return _Export
+        End Get
+        Set(ByVal value As ExportHelper)
+            _Export = value
+        End Set
+    End Property
+
     Public Overridable Function GetNextInputElement(ByVal CurrentElement As MathElement) As MathElement
         If CurrentElement Is Nothing Then Return Children.First
         Return Children.After(CurrentElement)

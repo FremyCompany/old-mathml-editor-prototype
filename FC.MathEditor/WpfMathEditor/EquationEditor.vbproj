@@ -111,6 +111,9 @@
     <Compile Include="Classes\MathElement.Type.vb" />
     <Compile Include="Classes\SelectionHelper.Actions.vb" />
     <Compile Include="Classes\SelectionHelper.vb" />
+    <Compile Include="LayoutEngines\LayoutEngineChildrenHelper.vb" />
+    <Compile Include="LayoutEngines\RowLayoutEngine.vb" />
+    <Compile Include="LayoutEngines\RowLayoutEngineExportHelper.vb" />
     <Compile Include="UserControl\GlyphDisplayer.xaml.vb">
       <DependentUpon>GlyphDisplayer.xaml</DependentUpon>
     </Compile>
@@ -190,5 +193,6 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

@@ -85,7 +85,7 @@
     REM XML Children
     REM
 
-    Private _Children As ChildrenHelper
+    Protected _Children As ChildrenHelper
     Public ReadOnly Property Children As ChildrenHelper
         Get
             If _Children Is Nothing Then _Children = Nothing
