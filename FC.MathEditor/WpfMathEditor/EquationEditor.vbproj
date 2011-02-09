@@ -111,6 +111,8 @@
     <Compile Include="Classes\MathElement.Type.vb" />
     <Compile Include="Classes\SelectionHelper.Actions.vb" />
     <Compile Include="Classes\SelectionHelper.vb" />
+    <Compile Include="Glyphs\GlyphChildrenHelper.vb" />
+    <Compile Include="Glyphs\UnicodeGlyph.vb" />
     <Compile Include="LayoutEngines\LayoutEngineChildrenHelper.vb" />
     <Compile Include="LayoutEngines\RowLayoutEngine.vb" />
     <Compile Include="LayoutEngines\RowLayoutEngineExportHelper.vb" />

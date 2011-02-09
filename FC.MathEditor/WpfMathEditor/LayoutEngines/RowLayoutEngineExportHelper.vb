@@ -1,8 +1,7 @@
 ﻿Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
 
-    Protected This As MathElement
     Public Sub New(ByVal This As MathElement)
-        Me.This = This
+        MyBase.New(This)
     End Sub
 
     Public Overrides Sub AppendKeyboardInput(ByVal SB As System.Text.StringBuilder)
@@ -28,5 +27,13 @@
     Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
         ' TODO: Draw element list
     End Sub
+
+    Public Overrides Sub GenerateLayout()
+
+    End Sub
+
+    Public Overrides Function GetChildLocation(ByVal El As MathElement) As System.Windows.Rect
+
+    End Function
 
 End Class
