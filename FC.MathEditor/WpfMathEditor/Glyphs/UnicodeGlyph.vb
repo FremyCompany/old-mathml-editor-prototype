@@ -1,12 +1,12 @@
-﻿Public Class UnicodeGlyph : Inherits MathElement
+﻿Partial Public Class UnicodeGlyph : Inherits MathElement
 
     Public Sub New(ByVal C As Char)
         Me.New(C, Nothing)
     End Sub
 
-    Public Sub New(ByVal C As Char, ByVal F As Typeface)
+    Public Sub New(ByVal C As Char, ByVal F As Typeface, Optional ByVal S As Double = 14.5)
         ' Field initialization
-        Me.C = C : Me.Font = F
+        Me.C = C : Me.F = F : Me.S = S
 
         ' MathElement properties
         Export = Nothing
@@ -29,63 +29,32 @@
     Private GlyphHeight As Double
     Private GlyphMargin As Thickness
 
-    Private F As Typeface
-    Public Property Font As Typeface
+    Private GlyphRun As GlyphRun
+
+    Private F As Typeface, S As Double
+    Public ReadOnly Property Font As Typeface
         Get
             Return If(F, DefaultFont)
         End Get
-        Set(ByVal value As Typeface)
-            F = value
-
-            Font.TryGetGlyphTypeface(GlyphFont)
-            GlyphIndex = GlyphFont.CharacterToGlyphMap(Char.ConvertToUtf32(C.ToString(), 0))
-            GlyphAvWidth = GlyphFont.AdvanceWidths(GlyphIndex)
-
-            GlyphMargin = New Thickness(
-                GlyphFont.LeftSideBearings(GlyphIndex),
-                GlyphFont.TopSideBearings(GlyphIndex),
-                GlyphFont.RightSideBearings(GlyphIndex),
-                GlyphFont.BottomSideBearings(GlyphIndex)
-            )
-
-            GlyphWidth = GlyphAvWidth - GlyphMargin.Left - GlyphMargin.Right
-            GlyphHeight = GlyphFont.AdvanceHeights(GlyphIndex) - GlyphMargin.Top - GlyphMargin.Bottom
-
-        End Set
     End Property
 
+    Public Sub GenerateData()
+        Font.TryGetGlyphTypeface(GlyphFont)
+        GlyphIndex = GlyphFont.CharacterToGlyphMap(Char.ConvertToUtf32(C.ToString(), 0))
+        GlyphAvWidth = S * GlyphFont.AdvanceWidths(GlyphIndex)
+
+        GlyphMargin = New Thickness(
+            S * GlyphFont.LeftSideBearings(GlyphIndex),
+            S * GlyphFont.TopSideBearings(GlyphIndex),
+            S * GlyphFont.RightSideBearings(GlyphIndex),
+            S * GlyphFont.BottomSideBearings(GlyphIndex)
+        )
+
+        GlyphWidth = GlyphAvWidth - GlyphMargin.Left - GlyphMargin.Right
+        GlyphHeight = S * GlyphFont.AdvanceHeights(GlyphIndex) - GlyphMargin.Top - GlyphMargin.Bottom
+    End Sub
+
     Public Overrides Function Clone() As MathElement
-        Return New UnicodeGlyph(C)
-    End Function
-End Class
-
-Public Class UnicodeGlyphExportHelper : Inherits ExportHelper
-
-    Public Sub New(ByVal This As MathElement)
-        MyBase.New(This)
-    End Sub
-
-    Public Overrides Sub AppendKeyboardInput(ByVal SB As System.Text.StringBuilder)
-
-    End Sub
-
-    Public Overrides Sub AppendLaTeX(ByVal SB As System.Text.StringBuilder)
-
-    End Sub
-
-    Public Overrides Sub AppendMathML(ByVal SB As System.Text.StringBuilder)
-
-    End Sub
-
-    Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
-
-    End Sub
-
-    Public Overrides Sub GenerateLayout()
-
-    End Sub
-
-    Public Overrides Function GetChildLocation(ByVal El As MathElement) As System.Windows.Rect
-
+        Return New UnicodeGlyph(C, F, S)
     End Function
 End Class
