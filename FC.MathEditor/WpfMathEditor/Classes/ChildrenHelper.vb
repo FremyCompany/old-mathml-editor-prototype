@@ -139,7 +139,7 @@ Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
     End Property
 
     Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
-        If (NextEl Is Nothing) OrElse (Current Is LastEl) Then
+        If (NextEl Is Nothing) OrElse (LastEl IsNot Nothing AndAlso Current Is LastEl) Then
             CurrentEl = Nothing
             Return False
         Else

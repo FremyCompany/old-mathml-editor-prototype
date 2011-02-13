@@ -19,11 +19,11 @@
     End Sub
 
     Public Overrides Function After(ByVal OldChild As MathElement) As MathElement
-        If OldChild Is Nothing Then Return First
+        If OldChild Is Nothing Then Return Last
         For X As Integer = 0 To All.Count
             If OldChild Is All(X) Then
-                If X <> 0 Then
-                    Return All(X - 1)
+                If X <> All.Count - 1 Then
+                    Return All(X + 1)
                 Else
                     Return Nothing
                 End If
@@ -33,11 +33,11 @@
     End Function
 
     Public Overrides Function Before(ByVal OldChild As MathElement) As MathElement
-        If OldChild Is Nothing Then Return Last
+        If OldChild Is Nothing Then Return First
         For X As Integer = 0 To All.Count
             If OldChild Is All(X) Then
-                If X <> All.Count - 1 Then
-                    Return All(X + 1)
+                If X <> 0 Then
+                    Return All(X - 1)
                 Else
                     Return Nothing
                 End If

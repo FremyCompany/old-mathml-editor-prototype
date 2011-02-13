@@ -26,14 +26,52 @@
 
     Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
         ' TODO: Draw element list
+        PerformLayout()
+        For Each G In This.Children
+
+            DG.PushTransform(New TranslateTransform(G.Export.LocationInParent.X, G.Export.LocationInParent.Y))
+
+            Dim ScaleX As Double = G.Export.LocationInParent.Width / G.Export.Width
+            Dim ScaleY As Double = G.Export.LocationInParent.Height / G.Export.Height
+
+            If ScaleX <> 1 OrElse ScaleY <> 1 Then
+                DG.PushTransform(New ScaleTransform(
+                    ScaleX,
+                    ScaleY
+                ))
+                G.Export.Draw(DG)
+                DG.Pop()
+            Else
+                G.Export.Draw(DG)
+            End If
+
+            DG.Pop()
+        Next
+
     End Sub
 
     Public Overrides Sub GenerateLayout()
 
+        Dim BBH As Double = 0
+        Dim ABH As Double = 0
+
+        For Each C In This.Children
+            BBH = Math.Max(BBH, C.Export.BelowBaseLineHeight)
+            ABH = Math.Max(ABH, C.Export.AboveBaseLineHeight)
+        Next
+
+        W = 0
+        H = BBH + ABH
+        BH = BBH
+
+        For Each C In This.Children
+            C.Export.SetLocationInParent(New Rect(New Point(W, ABH - C.Export.AboveBaseLineHeight), C.Export.Size))
+            Me.W += C.Export.Width
+        Next
+
+        Me.IM = New Thickness(0)
+        Me.OM = New Thickness(0)
+
     End Sub
-
-    Public Overrides Function GetChildLocation(ByVal El As MathElement) As System.Windows.Rect
-
-    End Function
 
 End Class

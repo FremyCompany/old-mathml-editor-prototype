@@ -21,20 +21,34 @@
         End Sub
 
         Public Overrides Sub AppendMathML(ByVal SB As System.Text.StringBuilder)
-            ' TODO
+            ' TODO: AppendMathML for unicode chars
         End Sub
 
         Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
-            DG.DrawGlyphRun(Brushes.Black, This.GlyphRun)
+            ' IM is used to modify the drawing zone
+            ' DG.PushTransform(New TranslateTransform(IM.Left, IM.Top))
+            Dim FT = New FormattedText(This.C.ToString(), Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, This.Font, This.S, Brushes.Black)
+            DG.PushTransform(New TranslateTransform(0, H - BH - FT.Baseline))
+
+            DG.DrawText(FT, New Point(0, This.S * This.GlyphFont.Baseline - FT.Baseline))
+
+            'DG.DrawGlyphRun(Brushes.Black, This.GlyphRun)
+            DG.Pop()
         End Sub
 
         Public Overrides Sub GenerateLayout()
-            ' Nothing to do, everything is already computed
+
+            Dim TopExtension = If(This.GlyphMargin.Top < 0, -This.GlyphMargin.Top, 0)
+            Dim BottomExtension = If(This.GlyphMargin.Bottom < 0, -This.GlyphMargin.Bottom, 0)
+
+            W = This.GlyphAvWidth
+            H = This.GlyphHeight + TopExtension + BottomExtension
+            BH = This.GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(This.GlyphIndex) * This.S + BottomExtension
+            IM = New Thickness(This.GlyphMargin.Left, This.GlyphMargin.Top + TopExtension, This.GlyphMargin.Right, This.GlyphMargin.Bottom + BottomExtension)
+            OM = New Thickness(0)
+
         End Sub
 
-        Public Overrides Function GetChildLocation(ByVal El As MathElement) As System.Windows.Rect
-            Throw New InvalidOperationException()
-        End Function
     End Class
 
 End Class

@@ -1,5 +1,9 @@
 ﻿Public Class GlyphChildrenHelper : Inherits ChildrenHelper
 
+    Public Sub New(ByVal This As MathElement)
+        MyBase.New(This)
+    End Sub
+
     Public Function InvalidCall() As Object
         Throw New NotSupportedException("This element don't accept children. Please refer to the CanHave property before calling the Children methods.")
     End Function

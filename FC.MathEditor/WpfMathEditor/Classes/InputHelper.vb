@@ -159,6 +159,9 @@
             Return True
         ElseIf This.Selection.SelectionEnd Is Nothing Then
             This.Selection.SetSelection(This.Selection.CommonAncestror, This.Selection.SelectionStart, This.Selection.SelectionEnd)
+            Return True
+        Else
+            Return False
         End If
     End Function
     Public MustOverride Function ProcessBackSpace_Internal() As Boolean

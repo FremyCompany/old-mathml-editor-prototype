@@ -36,36 +36,96 @@
 
     Public MustOverride Sub Draw(ByVal DG As DrawingContext)
 
-    Private IsLayoutToDate As Boolean = False
+    Private Property _IsLayoutToDate As Boolean
+    Protected Overridable ReadOnly Property IsLayoutToDate As Boolean
+        Get
+            Return _IsLayoutToDate
+        End Get
+    End Property
+
     Public Sub InvalidateLayout()
-        IsLayoutToDate = False
+        _IsLayoutToDate = False
     End Sub
 
     Public Property LayoutOptions As LayoutOptions
 
-    Private Sub PerformLayout()
-        If IsLayoutToDate Then
-            GenerateLayout()
+    Protected Sub PerformLayout()
+        If Not IsLayoutToDate Then
+            GenerateLayout() : _IsLayoutToDate = True
         End If
     End Sub
 
     ' Fields to be filled by GenerateLayout !
     Protected W As Double
     Protected H As Double
+    Protected BH As Double
+
+    Protected IM As Thickness
+    Protected OM As Thickness
 
     Public ReadOnly Property Width As Double
         Get
+            PerformLayout()
             Return W
         End Get
     End Property
 
     Public ReadOnly Property Height As Double
         Get
+            PerformLayout()
             Return H
         End Get
     End Property
 
-    Public MustOverride Function GetChildLocation(ByVal El As MathElement) As Rect
+    Public ReadOnly Property DrawWidth As Double
+        Get
+            PerformLayout()
+            Return W - IM.Left - IM.Right
+        End Get
+    End Property
+
+    Public ReadOnly Property DrawHeight As Double
+        Get
+            PerformLayout()
+            Return H - IM.Top - IM.Bottom
+        End Get
+    End Property
+
+    Public ReadOnly Property BaseLine As Double
+        Get
+            PerformLayout()
+            Return BH
+        End Get
+    End Property
+
+    Public ReadOnly Property AboveBaseLineHeight As Double
+        Get
+            PerformLayout()
+            Return Math.Max(0, H - BH)
+        End Get
+    End Property
+
+    Public ReadOnly Property BelowBaseLineHeight As Double
+        Get
+            PerformLayout()
+            Return Math.Max(0, BH)
+        End Get
+    End Property
+
+    Public ReadOnly Property DrawRectangle() As Rect
+        Get
+            PerformLayout()
+            Return New Rect(IM.Left, IM.Top, DrawWidth, DrawHeight)
+        End Get
+    End Property
+
+    Public ReadOnly Property OuterMargin As Thickness
+        Get
+            PerformLayout()
+            Return OM
+        End Get
+    End Property
+
     Private Shared Function FitRect(ByVal ChildRect As Rect, ByVal InitalParentRect As Rect, ByVal FinalParentRect As Rect) As Rect
         ChildRect.Offset(-CType(InitalParentRect.Location, Vector))
         ChildRect.Scale(FinalParentRect.Width / InitalParentRect.Width, FinalParentRect.Height / InitalParentRect.Height)
@@ -75,6 +135,7 @@
 
     Public ReadOnly Property Size As Size
         Get
+            PerformLayout()
             Return New Size(W, H)
         End Get
     End Property
@@ -85,21 +146,28 @@
         End Get
     End Property
 
+    Private _LocationInParent As Rect
     Public ReadOnly Property LocationInParent As Rect
         Get
+            PerformLayout()
             If This.Parent Is Nothing Then
                 Return SizeRect
             Else
-                Return This.Parent.Export.GetChildLocation(This)
+                Return _LocationInParent 'This.Parent.Export.GetChildLocation(This)
             End If
         End Get
     End Property
+
+    Public Sub SetLocationInParent(ByVal value As Rect)
+        _LocationInParent = value
+    End Sub
 
     Public ReadOnly Property LocationInRoot As Rect
         Get
             If This.Parent Is Nothing Then Return LocationInParent
 
             Dim L = LocationInParent
+            Return FitRect(LocationInParent, This.Parent.Export.SizeRect, This.Parent.Export.LocationInRoot)
 
         End Get
     End Property
