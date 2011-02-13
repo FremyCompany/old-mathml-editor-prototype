@@ -26,29 +26,29 @@
 
         Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
             ' IM is used to modify the drawing zone
-            ' DG.PushTransform(New TranslateTransform(IM.Left, IM.Top))
-            Dim FT = New FormattedText(This.C.ToString(), Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, This.Font, This.S, Brushes.Black)
-            DG.PushTransform(New TranslateTransform(0, H - BH - FT.Baseline))
+            DG.PushTransform(New TranslateTransform(IM.Left, IM.Top))
+            'Dim FT = New FormattedText(This.C.ToString(), Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, This.Font, This.S, Brushes.Black)
+            'DG.PushTransform(New TranslateTransform(0, H - BH - FT.Baseline))
 
-            DG.DrawText(FT, New Point(0, This.S * This.GlyphFont.Baseline - FT.Baseline))
+            'DG.DrawText(FT, New Point(0, This.S * This.GlyphFont.Baseline - FT.Baseline))
 
-            'DG.DrawGlyphRun(Brushes.Black, This.GlyphRun)
+            DG.DrawGlyphRun(Brushes.Black, This.GlyphRun)
             DG.Pop()
         End Sub
 
         Public Overrides Sub GenerateLayout()
 
             '
-            ' TODO: Fix glyph positioonning !
+            ' TODO: Check glyph positionning
             '
 
-            Dim TopExtension = 0 'If(This.GlyphMargin.Top < 0, -This.GlyphMargin.Top, 0)
-            Dim BottomExtension = 0 ' If(This.GlyphMargin.Bottom < 0, -This.GlyphMargin.Bottom, 0)
+            Dim TopExtension = If(This.GlyphMargin.Top < 0, -This.GlyphMargin.Top, 0)
+            Dim BottomExtension = If(This.GlyphMargin.Bottom < 0, -This.GlyphMargin.Bottom, 0)
 
             W = This.GlyphAvWidth
             H = This.GlyphHeight + TopExtension + BottomExtension
-            BH = This.GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(This.GlyphIndex) * This.S + BottomExtension
-            IM = New Thickness(This.GlyphMargin.Left, This.GlyphMargin.Top + TopExtension, This.GlyphMargin.Right, This.GlyphMargin.Bottom + BottomExtension)
+            BH = This.GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(This.GlyphIndex) * This.S + BottomExtension + TopExtension
+            IM = New Thickness(This.GlyphMargin.Left, 0, This.GlyphMargin.Right, 0)
             OM = New Thickness(0)
 
         End Sub
