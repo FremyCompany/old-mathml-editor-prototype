@@ -28,7 +28,8 @@
     '    End Set
     'End Property
 
-    Dim X As New RowLayoutEngine(New MathElement() {New UnicodeGlyph("x", Nothing), New UnicodeGlyph("y", Nothing), New UnicodeGlyph("f", Nothing), New UnicodeGlyph(Char.ConvertFromUtf32(8747)(0), Nothing)})
+    Dim F As New Typeface(New FontFamily("Candara"), FontStyles.Italic, FontWeights.Normal, FontStretches.Normal)
+    Dim X As New RowLayoutEngine(New MathElement() {New UnicodeGlyph("x", F), New UnicodeGlyph("y", F), New UnicodeGlyph("f", F), New UnicodeGlyph(" ", F), New UnicodeGlyph(Char.ConvertFromUtf32(8747)(0), Nothing), New UnicodeGlyph("s", F), New UnicodeGlyph("i", F), New UnicodeGlyph("n", F), New UnicodeGlyph(" ", F), New UnicodeGlyph("x", Nothing)})
     Protected Overrides Sub OnRender(ByVal drawingContext As System.Windows.Media.DrawingContext)
         X.Export.Draw(drawingContext)
 

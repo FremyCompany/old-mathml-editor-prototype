@@ -38,8 +38,12 @@
 
         Public Overrides Sub GenerateLayout()
 
-            Dim TopExtension = If(This.GlyphMargin.Top < 0, -This.GlyphMargin.Top, 0)
-            Dim BottomExtension = If(This.GlyphMargin.Bottom < 0, -This.GlyphMargin.Bottom, 0)
+            '
+            ' TODO: Fix glyph positioonning !
+            '
+
+            Dim TopExtension = 0 'If(This.GlyphMargin.Top < 0, -This.GlyphMargin.Top, 0)
+            Dim BottomExtension = 0 ' If(This.GlyphMargin.Bottom < 0, -This.GlyphMargin.Bottom, 0)
 
             W = This.GlyphAvWidth
             H = This.GlyphHeight + TopExtension + BottomExtension
