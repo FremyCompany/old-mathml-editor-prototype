@@ -55,10 +55,17 @@
         Dim BBH As Double = 0
         Dim ABH As Double = 0
 
+        Dim OMT, OMB As Double
+
         For Each C In This.Children
             BBH = Math.Max(BBH, C.Export.BelowBaseLineHeight)
             ABH = Math.Max(ABH, C.Export.AboveBaseLineHeight)
+            OMT = Math.Max(OMT, C.Export.OuterMargin.Top)
+            OMB = Math.Max(OMB, C.Export.OuterMargin.Bottom)
         Next
+
+        ABH = Math.Ceiling(ABH)
+        BBH = Math.Floor(ABH)
 
         W = 0
         H = BBH + ABH
@@ -67,10 +74,13 @@
         For Each C In This.Children
             C.Export.SetLocationInParent(New Rect(New Point(W, ABH - C.Export.AboveBaseLineHeight), C.Export.Size))
             Me.W += C.Export.Width
+            If C.NextSibling IsNot Nothing Then
+                Me.W += Math.Max(C.Export.OuterMargin.Right, C.NextSibling.Export.OuterMargin.Left)
+            End If
         Next
 
         Me.IM = New Thickness(0)
-        Me.OM = New Thickness(0)
+        Me.OM = New Thickness(0, OMT, 0, OMB)
 
     End Sub
 

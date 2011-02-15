@@ -1,7 +1,10 @@
-﻿Public Class TextEdit : Inherits MathElement
+﻿Public MustInherit Class TextEdit : Inherits MathElement
 
-    Public Overrides Function Clone() As MathElement
+    Public Sub New()
+        _Children = New TextEditChildrenHelper(Me)
+        Export = New RowLayoutEngineExportHelper(Me)
+    End Sub
 
-    End Function
+    Public MustOverride ReadOnly Property ElementName As String
 
 End Class

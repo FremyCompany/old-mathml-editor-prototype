@@ -119,4 +119,8 @@
         All(SCI) = FirstChild
     End Sub
 
+    Public Overrides Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement)
+        Return All.GetEnumerator()
+    End Function
+
 End Class

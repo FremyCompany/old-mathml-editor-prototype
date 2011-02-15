@@ -119,6 +119,7 @@
     <Compile Include="LayoutEngines\RowLayoutEngineExportHelper.vb" />
     <Compile Include="TextEdit\IdentifierTextEdit.vb" />
     <Compile Include="TextEdit\TextEdit.vb" />
+    <Compile Include="TextEdit\TextEditChildrenHelper.vb" />
     <Compile Include="UserControl\GlyphDisplayer.xaml.vb">
       <DependentUpon>GlyphDisplayer.xaml</DependentUpon>
     </Compile>
