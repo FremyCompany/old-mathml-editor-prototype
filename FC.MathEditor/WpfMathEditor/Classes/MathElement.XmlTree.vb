@@ -81,7 +81,10 @@
 
     Public Function Clone() As MathElement
         Clone = Me.Clone_Internal()
-        If _IsFontDefined Then Clone.Font = Me.Font
+        If _IsFontStretchDefined Then Clone.FontStretch = Me.FontStretch
+        If _IsFontWeightDefined Then Clone.FontWeight = Me.FontWeight
+        If _IsFontStyleDefined Then Clone.FontStyle = Me.FontStyle
+        If _IsFontFamilyDefined Then Clone.FontFamily = Me.FontFamily
         If _IsFontSizeDefined Then Clone.FontSize = Me.FontSize
         If _IsForegroundDefined Then Clone.Foreground = Me.Foreground
         If _IsBackgroundDefined Then Clone.Background = Me.Background

@@ -29,12 +29,12 @@
     'End Property
 
     Dim F As New Typeface(New FontFamily("Candara"), FontStyles.Italic, FontWeights.Normal, FontStretches.Normal)
-    Dim X As New RowLayoutEngine(New MathElement() {New UnicodeGlyph("x", F), New UnicodeGlyph("y", F), New UnicodeGlyph("f", F), New UnicodeGlyph(" ", F), New UnicodeGlyph(Char.ConvertFromUtf32(8747)(0), Nothing), New UnicodeGlyph("s", F), New UnicodeGlyph("i", F), New UnicodeGlyph("n", F), New UnicodeGlyph(" ", F), New UnicodeGlyph("x", Nothing)})
+    Dim X As New RowLayoutEngine(New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)})
     Protected Overrides Sub OnRender(ByVal drawingContext As System.Windows.Media.DrawingContext)
         X.Export.Draw(drawingContext)
 
-        Dim C = 3
-        drawingContext.DrawText(New FormattedText("xyf∫", Globalization.CultureInfo.CurrentCulture, Windows.FlowDirection.LeftToRight, UnicodeGlyph.DefaultFont, C * (14 + 2 / 3), Brushes.Black), New Point(0, 20 * C))
+        'Dim C = 3
+        'drawingContext.DrawText(New FormattedText("xyf∫", Globalization.CultureInfo.CurrentCulture, Windows.FlowDirection.LeftToRight, UnicodeGlyph.DefaultFont, C * (14 + 2 / 3), Brushes.Black), New Point(0, 20 * C))
 
     End Sub
 

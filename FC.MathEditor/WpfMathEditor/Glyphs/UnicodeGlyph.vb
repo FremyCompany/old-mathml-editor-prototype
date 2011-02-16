@@ -1,14 +1,14 @@
 ﻿Partial Public Class UnicodeGlyph : Inherits MathElement
 
-    Public Sub New(ByVal C As Char)
+    Public Sub New(ByVal C As Integer)
         Me.New(C, Nothing, Nothing)
     End Sub
 
-    Public Sub New(ByVal C As Char, ByVal F As Typeface)
+    Public Sub New(ByVal C As Integer, ByVal F As Typeface)
         Me.New(C, F, Nothing)
     End Sub
 
-    Public Sub New(ByVal C As Char, ByVal F As Typeface, ByVal S As Double?)
+    Public Sub New(ByVal C As Integer, ByVal F As Typeface, ByVal S As Double?)
         ' Field initialization
         Me.C = C
 
@@ -18,7 +18,7 @@
 
         ' End init
         If F IsNot Nothing Then
-            Me._Font = F : Me._IsFontDefined = True
+            Me.Font = F
         End If
 
         If S IsNot Nothing Then
@@ -29,10 +29,10 @@
 
     End Sub
 
-    Private C As Char
-    Public ReadOnly Property DisplayCharacter() As Char
+    Private C As Integer ' UnicodeGlyphChar
+    Public ReadOnly Property DisplayCharacter() As String
         Get
-            Return C
+            Return Char.ConvertFromUtf32(C)
         End Get
     End Property
 
@@ -49,8 +49,13 @@
 
         Dim S = FontSize
 
+        ' Find the first (fallback, if needed) typeface that contains a valid glyph for the current char
         Font.TryGetGlyphTypeface(GlyphFont)
-        GlyphIndex = GlyphFont.CharacterToGlyphMap(Char.ConvertToUtf32(C.ToString(), 0))
+        If Not GlyphFont.CharacterToGlyphMap.ContainsKey(C) Then
+            DefaultMathFontFamily.GetTypefaces().First().TryGetGlyphTypeface(GlyphFont)
+        End If
+
+        GlyphIndex = GlyphFont.CharacterToGlyphMap(C)
         GlyphAvWidth = S * GlyphFont.AdvanceWidths(GlyphIndex)
 
         GlyphMargin = New Thickness(
