@@ -69,7 +69,7 @@
         Get
             If _FontSize Is Nothing Then
                 If Parent Is Nothing Then
-                    Return 14 + 2 / 3
+                    Return 20
                 Else
                     _FontSize = Parent.FontSize
                     Return _FontSize

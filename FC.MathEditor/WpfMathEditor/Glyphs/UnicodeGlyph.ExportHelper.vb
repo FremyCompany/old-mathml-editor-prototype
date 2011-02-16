@@ -26,11 +26,12 @@
 
         Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
             ' IM is used to modify the drawing zone
-            DG.PushTransform(New TranslateTransform(IM.Left, IM.Top))
-            'Dim FT = New FormattedText(This.C.ToString(), Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, This.Font, This.S, Brushes.Black)
-            'DG.PushTransform(New TranslateTransform(0, H - BH - FT.Baseline))
+            DG.PushTransform(New TranslateTransform(0 * IM.Left, IM.Top))
 
-            'DG.DrawText(FT, New Point(0, This.S * This.GlyphFont.Baseline - FT.Baseline))
+            ' OLD CODE WHICH IS NOT WORKING PROPERLY BUT HAS MORE BEAUTIFUL OUTPUT
+            'Dim FT = New FormattedText(This.C.ToString(), Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, This.Font, This.FontSize, Brushes.Black)
+            'DG.PushTransform(New TranslateTransform(0, H - BH - FT.Baseline))
+            'DG.DrawText(FT, New Point(0, This.FontSize * This.GlyphFont.Baseline - FT.Baseline))
 
             DG.DrawGlyphRun(Brushes.Black, This.GlyphRun)
             DG.Pop()

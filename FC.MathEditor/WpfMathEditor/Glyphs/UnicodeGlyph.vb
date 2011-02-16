@@ -10,14 +10,23 @@
 
     Public Sub New(ByVal C As Char, ByVal F As Typeface, ByVal S As Double?)
         ' Field initialization
-        Me.C = C : Me.Font = F : Me.FontSize = S
+        Me.C = C
 
         ' MathElement properties
         Export = New UnicodeGlyphExportHelper(Me)
         _Children = New GlyphChildrenHelper(Me)
 
         ' End init
+        If F IsNot Nothing Then
+            Me._Font = F : Me._IsFontDefined = True
+        End If
+
+        If S IsNot Nothing Then
+            Me._FontSize = S : Me._IsFontSizeDefined = True
+        End If
+
         GenerateData()
+
     End Sub
 
     Private C As Char
