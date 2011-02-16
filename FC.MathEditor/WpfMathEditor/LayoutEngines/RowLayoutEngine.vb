@@ -12,14 +12,11 @@
         Next
     End Sub
 
-    Public Overrides Function Clone() As MathElement
-        Clone = New RowLayoutEngine()
-
+    Public Overrides Function Clone_Internal() As MathElement
+        Dim Clone As New RowLayoutEngine()
         For Each Child In Children
             Clone.AddChild(Child.Clone())
-        Next
-
-        Return Clone
+        Next : Return Clone
     End Function
 
 End Class

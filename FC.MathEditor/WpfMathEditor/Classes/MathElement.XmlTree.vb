@@ -79,7 +79,15 @@
 
     End Function
 
-    Public MustOverride Function Clone() As MathElement
+    Public Function Clone() As MathElement
+        Clone = Me.Clone_Internal()
+        If _IsFontDefined Then Clone.Font = Me.Font
+        If _IsFontSizeDefined Then Clone.FontSize = Me.FontSize
+        If _IsForegroundDefined Then Clone.Foreground = Me.Foreground
+        If _IsBackgroundDefined Then Clone.Background = Me.Background
+        Return Clone
+    End Function
+    Public MustOverride Function Clone_Internal() As MathElement
 
     REM
     REM XML Children

@@ -1,12 +1,16 @@
 ﻿Partial Public Class UnicodeGlyph : Inherits MathElement
 
     Public Sub New(ByVal C As Char)
-        Me.New(C, Nothing)
+        Me.New(C, Nothing, Nothing)
     End Sub
 
-    Public Sub New(ByVal C As Char, ByVal F As Typeface, Optional ByVal S As Double = 14 + 2 / 3)
+    Public Sub New(ByVal C As Char, ByVal F As Typeface)
+        Me.New(C, F, Nothing)
+    End Sub
+
+    Public Sub New(ByVal C As Char, ByVal F As Typeface, ByVal S As Double?)
         ' Field initialization
-        Me.C = C : Me.F = F : Me.S = 3 * S
+        Me.C = C : Me.Font = F : Me.FontSize = S
 
         ' MathElement properties
         Export = New UnicodeGlyphExportHelper(Me)
@@ -23,9 +27,6 @@
         End Get
     End Property
 
-    ' Palatino Linotype, 
-    Public Shared DefaultFont As New Typeface(New FontFamily("Cambria Math"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal)
-
     Private GlyphFont As GlyphTypeface
     Private GlyphIndex As Integer
     Private GlyphAvWidth As Double
@@ -35,14 +36,10 @@
 
     Private GlyphRun As GlyphRun
 
-    Private F As Typeface, S As Double
-    Public ReadOnly Property Font As Typeface
-        Get
-            Return If(F, DefaultFont)
-        End Get
-    End Property
-
     Public Sub GenerateData()
+
+        Dim S = FontSize
+
         Font.TryGetGlyphTypeface(GlyphFont)
         GlyphIndex = GlyphFont.CharacterToGlyphMap(Char.ConvertToUtf32(C.ToString(), 0))
         GlyphAvWidth = S * GlyphFont.AdvanceWidths(GlyphIndex)
@@ -68,8 +65,8 @@
 
     End Sub
 
-    Public Overrides Function Clone() As MathElement
-        Return New UnicodeGlyph(C, F, S)
+    Public Overrides Function Clone_Internal() As MathElement
+        Return New UnicodeGlyph(C)
     End Function
 
     Public Overrides Function ToString() As String

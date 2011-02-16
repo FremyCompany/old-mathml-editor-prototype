@@ -1,10 +1,10 @@
 ﻿Public Class IdentifierTextEdit : Inherits TextEdit
 
-    Public Overrides Function Clone() As MathElement
-        Clone = New IdentifierTextEdit()
+    Public Overrides Function Clone_Internal() As MathElement
+        Dim Clone As New IdentifierTextEdit()
         For Each C In Children
             Clone.Children.Add(C.Clone())
-        Next
+        Next : Return Clone
     End Function
 
     Public Overrides ReadOnly Property ElementName As String

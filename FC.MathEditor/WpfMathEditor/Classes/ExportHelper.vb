@@ -146,6 +146,42 @@
         End Get
     End Property
 
+    Public Property Font As Typeface
+        Get
+            Return This.Font
+        End Get
+        Set(ByVal value As Typeface)
+            This.Font = value
+        End Set
+    End Property
+
+    Public Property FontSize As Double
+        Get
+            Return This.FontSize
+        End Get
+        Set(ByVal value As Double)
+            This.FontSize = value
+        End Set
+    End Property
+
+    Public Property Foreground As Color
+        Get
+            Return This.Foreground
+        End Get
+        Set(ByVal value As Color)
+            This.Foreground = value
+        End Set
+    End Property
+
+    Public Property Background As Color
+        Get
+            Return This.Background
+        End Get
+        Set(ByVal value As Color)
+            This.Background = value
+        End Set
+    End Property
+
     Private _LocationInParent As Rect
     Public ReadOnly Property LocationInParent As Rect
         Get

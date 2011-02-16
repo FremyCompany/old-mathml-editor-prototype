@@ -1,6 +1,6 @@
 ﻿Public Class MathDocument : Inherits MathElement
 
-    Public Overrides Function Clone() As MathElement
+    Public Overrides Function Clone_Internal() As MathElement
         Dim X As New MathDocument()
 
         For Each Child In Me.Children

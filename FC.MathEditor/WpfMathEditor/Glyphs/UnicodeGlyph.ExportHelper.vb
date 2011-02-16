@@ -38,16 +38,12 @@
 
         Public Overrides Sub GenerateLayout()
 
-            '
-            ' TODO: Check glyph positionning
-            '
-
             Dim TopExtension = If(This.GlyphMargin.Top < 0, -This.GlyphMargin.Top, 0)
             Dim BottomExtension = If(This.GlyphMargin.Bottom < 0, -This.GlyphMargin.Bottom, 0)
 
             W = This.GlyphAvWidth
             H = This.GlyphHeight + TopExtension + BottomExtension
-            BH = This.GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(This.GlyphIndex) * This.S + BottomExtension + TopExtension
+            BH = This.GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(This.GlyphIndex) * This.FontSize + BottomExtension + TopExtension
             IM = New Thickness(This.GlyphMargin.Left, 0, This.GlyphMargin.Right, 0)
             OM = New Thickness(0)
 
