@@ -44,7 +44,7 @@
             Return _Font
         End Get
         Set(ByVal value As Typeface)
-
+            ' TODO: Implement font setting
         End Set
     End Property
 
@@ -74,6 +74,7 @@
             For Each C In Me.Children
                 C.SetFontFamily(value, False)
             Next
+            Export.InvalidateLayout()
         End If
     End Sub
 
@@ -103,6 +104,7 @@
             For Each C In Me.Children
                 C.SetFontStretch(value, False)
             Next
+            Export.InvalidateLayout()
         End If
     End Sub
 
@@ -132,6 +134,7 @@
             For Each C In Me.Children
                 C.SetFontStyle(value, False)
             Next
+            Export.InvalidateLayout()
         End If
     End Sub
 
@@ -161,6 +164,7 @@
             For Each C In Me.Children
                 C.SetFontWeight(value, False)
             Next
+            Export.InvalidateLayout()
         End If
     End Sub
 
@@ -191,6 +195,7 @@
             For Each C In Me.Children
                 C.SetForeground(value, False)
             Next
+            Export.InvalidateLayout()
         End If
     End Sub
 
@@ -220,6 +225,7 @@
             For Each C In Me.Children
                 C.SetFontSize(value, False)
             Next
+            Export.InvalidateLayout()
         End If
     End Sub
 
@@ -249,6 +255,7 @@
             For Each C In Me.Children
                 C.SetBackground(value, False)
             Next
+            Export.InvalidateLayout()
         End If
     End Sub
 

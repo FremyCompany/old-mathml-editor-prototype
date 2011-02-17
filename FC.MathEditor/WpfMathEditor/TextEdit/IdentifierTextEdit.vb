@@ -2,8 +2,14 @@
 
     Public Shared Shadows DefaultFontStyle As FontStyle = FontStyles.Italic
     Public Sub New()
-        ' TODO: Split the Font property in a set of smaller properties
         Me.FontStyle = DefaultFontStyle
+    End Sub
+
+    Public Sub New(ByVal Children As IEnumerable(Of MathElement))
+        Call Me.New()
+        For Each C In Children
+            Me.Children.Add(C)
+        Next
     End Sub
 
     Public Overrides Function Clone_Internal() As MathElement

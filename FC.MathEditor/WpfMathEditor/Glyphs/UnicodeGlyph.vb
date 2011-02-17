@@ -25,8 +25,6 @@
             Me._FontSize = S : Me._IsFontSizeDefined = True
         End If
 
-        GenerateData()
-
     End Sub
 
     Private C As Integer ' UnicodeGlyphChar
@@ -35,49 +33,6 @@
             Return Char.ConvertFromUtf32(C)
         End Get
     End Property
-
-    Private GlyphFont As GlyphTypeface
-    Private GlyphIndex As Integer
-    Private GlyphAvWidth As Double
-    Private GlyphWidth As Double
-    Private GlyphHeight As Double
-    Private GlyphMargin As Thickness
-
-    Private GlyphRun As GlyphRun
-
-    Public Sub GenerateData()
-
-        Dim S = FontSize
-
-        ' Find the first (fallback, if needed) typeface that contains a valid glyph for the current char
-        Font.TryGetGlyphTypeface(GlyphFont)
-        If Not GlyphFont.CharacterToGlyphMap.ContainsKey(C) Then
-            DefaultMathFontFamily.GetTypefaces().First().TryGetGlyphTypeface(GlyphFont)
-        End If
-
-        GlyphIndex = GlyphFont.CharacterToGlyphMap(C)
-        GlyphAvWidth = S * GlyphFont.AdvanceWidths(GlyphIndex)
-
-        GlyphMargin = New Thickness(
-            S * GlyphFont.LeftSideBearings(GlyphIndex),
-            S * GlyphFont.TopSideBearings(GlyphIndex),
-            S * GlyphFont.RightSideBearings(GlyphIndex),
-            S * GlyphFont.BottomSideBearings(GlyphIndex)
-        )
-
-        GlyphWidth = GlyphAvWidth - GlyphMargin.Left - GlyphMargin.Right
-        GlyphHeight = S * GlyphFont.AdvanceHeights(GlyphIndex) - GlyphMargin.Top - GlyphMargin.Bottom
-
-        GlyphRun = New GlyphRun(
-            GlyphFont, 0, False, S,
-            New UShort() {GlyphIndex},
-            New Point(0, GlyphHeight - S * GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(GlyphIndex)),
-            New Double() {GlyphAvWidth},
-            Nothing, Nothing, Nothing,
-            Nothing, Nothing, Nothing
-        )
-
-    End Sub
 
     Public Overrides Function Clone_Internal() As MathElement
         Return New UnicodeGlyph(C)
