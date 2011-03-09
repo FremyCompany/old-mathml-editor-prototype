@@ -3,6 +3,7 @@
     Public Shared Shadows DefaultFontStyle As FontStyle = FontStyles.Italic
     Public Sub New()
         Me.FontStyle = DefaultFontStyle
+        Me.Input = New TextEditInputHelper(Me, Function(C) Char.IsLetter(Char.ConvertFromUtf32(C)))
     End Sub
 
     Public Sub New(ByVal Children As IEnumerable(Of MathElement))

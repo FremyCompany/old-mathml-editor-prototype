@@ -24,6 +24,21 @@
         Next
     End Sub
 
+    Public Sub ReplaceContents(ByVal NewChilds As IEnumerable(Of MathElement))
+        Me.DeleteContents()
+        For Each el In NewChilds
+            CommonAncestror.Children.InsertBefore(el, SelectionEnd)
+        Next
+        SetSelection(CommonAncestror, CommonAncestror.Children.Before(SelectionEnd), SelectionEnd)
+    End Sub
+
+    Public Sub ReplaceContents(ByVal NewChild As MathElement)
+        Me.DeleteContents()
+        CommonAncestror.Children.InsertBefore(NewChild, SelectionEnd)
+        SetSelection(CommonAncestror, NewChild, SelectionEnd)
+    End Sub
+
+
     Private Sub SetSelection(ByVal StartPoint As Selection, ByVal EndPoint As Selection)
 
         ' Compute _Selection

@@ -18,12 +18,11 @@
             Console.WriteLine("TODO: TextEdit.ProcessChar_Internal")
             This.Selection.DeleteContents()
             This.Selection.CommonAncestror.Children.InsertAfter(New UnicodeGlyph(InputChar), This.Selection.SelectionStart)
+
             Return True
 
         Else
-
             Return False
-
         End If
     End Function
 
