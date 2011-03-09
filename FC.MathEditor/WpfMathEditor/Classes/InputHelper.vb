@@ -26,32 +26,60 @@
     End Property
 
     Public Sub ProcessString(ByVal InputString As String)
-        For Each InputChar In InputString
-            CurrentInput.ProcessChar(InputChar)
+        For X As Integer = 0 To InputString.Length
+            Dim InputChar = InputString(X)
+            If AscW(InputChar) >= 899072 AndAlso AscW(InputChar) <= 901119 Then
+                CurrentInput.ProcessChar(Char.ConvertToUtf32(InputChar, InputString(X + 1)))
+                X += 1
+            Else
+                CurrentInput.ProcessChar(AscW(InputChar))
+            End If
         Next
     End Sub
 
-    Public Sub ProcessChar(ByVal InputChar As Char)
+    Shared StartBlockChars As String = "├([{"
+    Shared EndBlockChars As String = "┤)]}"
+
+    Public Sub ProcessChar(ByVal InputChar As Integer)
 
         ' Can't process char if not currently selected
         If This.Selection.CommonAncestror IsNot Me Then
             Throw New InvalidOperationException("Sending text input can be done only to the element who host the selection. Modify your code to change the selection before sending any input.")
         End If
 
+        '
         ' TODO: Implement ProcessChar logic
+        '
+
+        ' Preprocessing (first bubling phase)
+        If PreProcessChar(InputChar) Then Exit Sub
+
+        ' Block characters
+        If StartBlockChars.Contains(InputChar) Then
+            If ProcessStartOfBlock(InputChar) Then Exit Sub
+        ElseIf EndBlockChars.Contains(InputChar) Then
+            If ProcessEndOfBlock(InputChar) Then Exit Sub
+        End If
+
+        This.Selection.DeleteContents()
+
+        ' Handle chars by right, by left, or by this input helper
+        If This.Selection.SelectionStart.Input.ProcessChar_FromRight(InputChar) Then Exit Sub
+        If This.Selection.SelectionEnd.Input.ProcessChar_FromLeft(InputChar) Then Exit Sub
+        If ProcessChar_Internal(InputChar) Then Exit Sub
 
         ' When a char wasn't handled neither by right, by left or by current element:
         If This.Selection.SelectionEnd Is Nothing Then
-            This.Selection.MoveNext()
+            This.Selection.MoveNext() : This.Selection.CommonAncestror.Input.ProcessChar(InputChar)
         End If
 
     End Sub
 
-    Public Function ProcessChar_FromLeft(ByVal InputChar As Char) As Boolean
+    Public Function ProcessChar_FromLeft(ByVal InputChar As Integer) As Boolean
         Return ProcessChar_FromLeft_Internal(InputChar)
     End Function
 
-    Public Function ProcessChar_FromRight(ByVal InputChar As Char) As Boolean
+    Public Function ProcessChar_FromRight(ByVal InputChar As Integer) As Boolean
         Return ProcessChar_FromRight(InputChar)
     End Function
 
@@ -145,11 +173,58 @@
         Return ProcessFraction_FromRight_Internal()
     End Function
 
-    Public MustOverride Function ProcessChar_Internal(ByVal InputChar As Char) As Boolean
-    Public Overridable Function ProcessChar_FromLeft_Internal(ByVal InputChar As Char) As Boolean
+    Public Function PreProcessChar(ByVal InputChar As Integer) As Boolean
+        Return PreProcessChar_Internal(InputChar)
+    End Function
+
+    Public Overridable Function PreProcessChar_Internal(ByVal InputChar As Integer) As Boolean
+
+        ' WaitChar (default pre-process)
+        If IsWaitingForChar Then
+            If InputChar = WaitChar Then
+                If ProcessWaitChar(InputChar) Then
+                    Return True
+                End If
+            End If
+        End If
+
+        ' The parent may want to pre-process, too
+        If This.Parent IsNot Nothing Then
+            This.Parent.Input.PreProcessChar(InputChar)
+        End If
+
+        ' No pre-process
+        Return False
+
+    End Function
+
+    Public Overridable Function ProcessWaitChar(ByVal InputChar As Integer) As Boolean
+        ' Default wait char processing : eat, and walk to next child
+        WaitChar = Nothing : This.Selection.SetSelection(This.Parent, This, This.NextSibling)
+        Return True
+    End Function
+
+    Public Function ProcessStartOfBlock(ByVal InputChar As Integer) As Boolean
+        Return ProcessStartOfBlock_Internal(InputChar)
+    End Function
+
+    Public Overridable Function ProcessStartOfBlock_Internal(ByVal InputChar As Integer) As Boolean
         Return False
     End Function
-    Public Overridable Function ProcessChar_FromRight_Internal(ByVal InputChar As Char) As Boolean
+
+    Public Function ProcessEndOfBlock(ByVal InputChar As Integer) As Boolean
+        Return ProcessEndOfBlock_Internal(InputChar)
+    End Function
+
+    Public Overridable Function ProcessEndOfBlock_Internal(ByVal InputChar As Integer) As Boolean
+        Return False
+    End Function
+
+    Public MustOverride Function ProcessChar_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overridable Function ProcessChar_FromLeft_Internal(ByVal InputChar As Integer) As Boolean
+        Return False
+    End Function
+    Public Overridable Function ProcessChar_FromRight_Internal(ByVal InputChar As Integer) As Boolean
         Return False
     End Function
 
@@ -158,27 +233,82 @@
             This.Selection.DeleteContents()
             Return True
         ElseIf This.Selection.SelectionEnd Is Nothing Then
-            This.Selection.SetSelection(This.Selection.CommonAncestror, This.Selection.SelectionStart, This.Selection.SelectionEnd)
+            This.Selection.SetSelection(
+                This.Selection.CommonAncestror,
+                This.Selection.SelectionStart,
+                This.Selection.CommonAncestror.Children.After(This.Selection.SelectionEnd)
+            )
+            This.Selection.DeleteContents()
             Return True
         Else
             Return False
         End If
     End Function
-    Public MustOverride Function ProcessBackSpace_Internal() As Boolean
-    Public MustOverride Function ProcessDelete_FromLeft_Internal() As Boolean
-    Public MustOverride Function ProcessBackSpace_FromRight_Internal() As Boolean
 
-    Public MustOverride Function ProcessLeftKey_Internal() As Boolean
-    Public MustOverride Function ProcessRightKey_Internal() As Boolean
-    Public MustOverride Function ProcessLeftKey_FromRight_Internal() As Boolean
-    Public MustOverride Function ProcessRightKey_FromLeft_Internal() As Boolean
+    Public Function ProcessBackSpace_Internal() As Boolean
+        If This.Selection.IsEmpty Then
+            This.Selection.DeleteContents()
+            Return True
+        ElseIf This.Selection.SelectionEnd Is Nothing Then
+            This.Selection.SetSelection(
+                This.Selection.CommonAncestror,
+                This.Selection.CommonAncestror.Children.Before(This.Selection.SelectionStart),
+                This.Selection.SelectionEnd
+            )
+            This.Selection.DeleteContents()
+            Return True
+        Else
+            Return False
+        End If
+    End Function
 
-    Public MustOverride Function ProcessUpKey_Internal() As Boolean
-    Public MustOverride Function ProcessDownKey_Internal() As Boolean
+    Public Overridable Function ProcessDelete_FromLeft_Internal() As Boolean
+        Return False
+    End Function
 
-    Public MustOverride Function ProcessHat_FromRight_Internal() As Boolean
-    Public MustOverride Function ProcessUnderscore_FromRight_Internal() As Boolean
-    Public MustOverride Function ProcessFraction_FromRight_Internal() As Boolean
+    Public Overridable Function ProcessBackSpace_FromRight_Internal() As Boolean
+        Return False
+    End Function
+
+    Public Overridable Function ProcessLeftKey_Internal() As Boolean
+        This.Selection.MoveLeft() : Return True
+    End Function
+
+    Public Overridable Function ProcessRightKey_Internal() As Boolean
+        This.Selection.MoveRight() : Return True
+    End Function
+
+    ' TODO: Check those functions (LeftKey, from right) are actually used
+    Public Overridable Function ProcessLeftKey_FromRight_Internal() As Boolean
+        Return False
+    End Function
+
+    Public Overridable Function ProcessRightKey_FromLeft_Internal() As Boolean
+        Return False
+    End Function
+
+    Public Overridable Function ProcessUpKey_Internal() As Boolean
+        Return False
+    End Function
+
+    Public Overridable Function ProcessDownKey_Internal() As Boolean
+        Return False
+    End Function
+
+    Public Overridable Function ProcessHat_FromRight_Internal() As Boolean
+        ' TODO: ProcessHat
+        Return True
+    End Function
+
+    Public Overridable Function ProcessUnderscore_FromRight_Internal() As Boolean
+        ' TODO: ProcessUnderscore
+        Return True
+    End Function
+
+    Public Overridable Function ProcessFraction_FromRight_Internal() As Boolean
+        ' TODO: ProcessFraction
+        Return True
+    End Function
 
     Public Event BeforeProcessChar As EventHandler(Of InputEventArgs)
 
@@ -200,7 +330,7 @@
         End Set
     End Property
 
-    Public Property WaitChar As Char
+    Public Property WaitChar As Integer
     Public ReadOnly Property IsWaitingForChar As Boolean
         Get
             Return WaitChar <> Nothing

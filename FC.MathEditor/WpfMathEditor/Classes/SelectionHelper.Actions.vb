@@ -6,7 +6,11 @@
         Selection
     End Enum
 
-    Property IsEmpty As Boolean
+    Public ReadOnly Property IsEmpty As Boolean
+        Get
+            Return SelectionEnd Is CommonAncestror.Children.After(SelectionStart)
+        End Get
+    End Property
 
     Public Sub MoveNext(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
         Dim Sel As Selection = GetSelection(MovedPoint)
