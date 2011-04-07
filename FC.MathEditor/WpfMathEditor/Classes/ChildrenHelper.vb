@@ -10,11 +10,16 @@
     REM Fundamental traps
     REM
 
+    Public Sub Add(ByVal NewChild As MathElement)
+        Add_Internal(NewChild)
+        This.RaiseChanged()
+    End Sub
+
     Public Sub Remove(ByVal OldChild As MathElement)
         Remove_Internal(OldChild)
     End Sub
 
-    Public MustOverride Sub Add(ByVal NewChild As MathElement)
+    Public MustOverride Sub Add_Internal(ByVal NewChild As MathElement)
     Public MustOverride Sub Remove_Internal(ByVal OldChild As MathElement)
     Public MustOverride Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
 
@@ -100,7 +105,7 @@
 
     Public Overridable ReadOnly Property Last() As MathElement
         Get
-            Return CType(Me, IEnumerable(Of MathElement)).Last()
+            Return CType(Me, IEnumerable(Of MathElement)).LastOrDefault()
         End Get
     End Property
 

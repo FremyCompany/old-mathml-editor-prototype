@@ -9,11 +9,12 @@
 
     Public Overrides ReadOnly Property Last As MathElement
         Get
+            If All.Count = 0 Then Return Nothing
             Return All(All.Count - 1)
         End Get
     End Property
 
-    Public Overrides Sub Add(ByVal NewChild As MathElement)
+    Public Overrides Sub Add_Internal(ByVal NewChild As MathElement)
         NewChild.Parent = This
         All.Add(NewChild)
     End Sub
@@ -72,6 +73,7 @@
 
     Public Overrides ReadOnly Property First As MathElement
         Get
+            If All.Count = 0 Then Return Nothing
             Return All(0)
         End Get
     End Property

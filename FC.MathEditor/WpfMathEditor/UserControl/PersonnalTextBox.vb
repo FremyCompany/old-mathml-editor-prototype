@@ -2,8 +2,6 @@
 
     Public Sub New()
         MyBase.New()
-        'Me.Text = Char.ConvertFromUtf32(120008) & "afg1" & Char.ConvertFromUtf32(10765) & Char.ConvertFromUtf32(8747) & Char.ConvertFromUtf32(9183)
-        'Me.Font = New Typeface(New FontFamily("Cambria Math"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, New FontFamily("Cambria Math, DejaVu Serif, Arial Unicode MS"))
         Me.Focusable = True
         Me.Focus()
     End Sub
@@ -29,13 +27,21 @@
     'End Property
 
     Dim F As New Typeface(New FontFamily("Candara"), FontStyles.Italic, FontWeights.Normal, FontStretches.Normal)
-    Dim X As New IdentifierTextEdit(New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)})
+    Dim X As New MathDocument()
+
     Protected Overrides Sub OnRender(ByVal drawingContext As System.Windows.Media.DrawingContext)
+        Me.Focus()
+        Keyboard.Focus(Me)
         X.Export.Draw(drawingContext)
 
         'Dim C = 3
         'drawingContext.DrawText(New FormattedText("xyf∫", Globalization.CultureInfo.CurrentCulture, Windows.FlowDirection.LeftToRight, UnicodeGlyph.DefaultFont, C * (14 + 2 / 3), Brushes.Black), New Point(0, 20 * C))
 
+    End Sub
+
+    Private Sub PersonnalTextBox_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
+        X.AddChild(New IdentifierTextEdit(New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}))
+        Me.InvalidateVisual()
     End Sub
 
     'Const fontSize = 14 + 2 / 3
@@ -126,4 +132,8 @@
     '        Me.Text &= e.Text
     '    End If
     'End Sub
+
+    Private Sub PersonnalTextBox_TextInput(ByVal sender As Object, ByVal e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput
+        X.Input.ProcessString(e.Text)
+    End Sub
 End Class

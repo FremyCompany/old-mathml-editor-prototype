@@ -210,7 +210,9 @@
 
     Public MustOverride Sub GenerateLayout()
 
-
+    Private Sub This_Changed(ByVal sender As Object, ByVal e As System.EventArgs) Handles This.Changed
+        _IsLayoutToDate = False
+    End Sub
 End Class
 
 Public Enum LayoutOptions

@@ -1,6 +1,6 @@
 ﻿Partial Public Class MathElement
 
-    Private _Input As InputHelper
+    Private _Input As InputHelper = GetInitialInputHelper()
     Public Property Input As InputHelper
         Get
             If Me.ParentDocument Is Nothing Then Return Nothing
@@ -10,6 +10,10 @@
             _Input = value
         End Set
     End Property
+
+    Protected MustOverride Function GetInitialInputHelper() As InputHelper
+    Protected MustOverride Function GetInitialExportHelper() As ExportHelper
+    Protected MustOverride Function GetInitialChildrenHelper() As ChildrenHelper
 
     Private _Selection As SelectionHelper
     Public Overridable ReadOnly Property Selection As SelectionHelper
@@ -23,7 +27,7 @@
     Public Event GotFocus As EventHandler
     Public Event LostFocus As EventHandler
 
-    Private _Export As ExportHelper
+    Private _Export As ExportHelper = GetInitialExportHelper()
     Public Property Export As ExportHelper
         Get
             Return _Export
@@ -81,5 +85,9 @@
         End Get
     End Property
 
-
+    Public Sub New()
+        _Children = GetInitialChildrenHelper()
+        _Export = GetInitialExportHelper()
+        _Input = GetInitialInputHelper()
+    End Sub
 End Class

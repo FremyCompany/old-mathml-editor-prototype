@@ -12,7 +12,7 @@
         P = New LayoutEngineChildrenHelper(This)
     End Sub
 
-    Public Overrides Sub Add(ByVal NewChild As MathElement)
+    Public Overrides Sub Add_Internal(ByVal NewChild As MathElement)
         If IsNothing(TryCast(NewChild, UnicodeGlyph)) Then
             Throw New ArgumentException("Only UnicodeGlyph instances can bee added as children of a TextEdit element.")
         Else

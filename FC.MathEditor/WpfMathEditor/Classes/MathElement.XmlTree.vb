@@ -36,6 +36,8 @@
             If _ParentDocument Is Nothing Then
                 If Parent IsNot Nothing Then
                     _ParentDocument = Parent.ParentDocument
+                ElseIf TryCast(Me, MathDocument) IsNot Nothing Then
+                    _ParentDocument = DirectCast(Me, MathDocument)
                 End If
             End If
 
@@ -168,7 +170,7 @@
     ''' </summary>
     ''' <remarks></remarks>
     Public Event Changed As EventHandler
-    Private Sub RaiseChanged()
+    Public Sub RaiseChanged()
         RaiseEvent Changed(Me, EventArgs.Empty)
     End Sub
 

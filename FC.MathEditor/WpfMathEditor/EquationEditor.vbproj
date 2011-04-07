@@ -118,7 +118,7 @@
     <Compile Include="LayoutEngines\LayoutEngineChildrenHelper.vb" />
     <Compile Include="LayoutEngines\RowLayoutEngine.vb" />
     <Compile Include="LayoutEngines\RowLayoutEngineExportHelper.vb" />
-    <Compile Include="LayoutEngines\RowLayoutEngineInputHelper.vb" />
+    <Compile Include="LayoutEngines\RowLayoutInputHelper.vb" />
     <Compile Include="TextEdit\IdentifierTextEdit.vb" />
     <Compile Include="TextEdit\NumberTextEdit.vb" />
     <Compile Include="TextEdit\OperatorTextEdit.vb" />

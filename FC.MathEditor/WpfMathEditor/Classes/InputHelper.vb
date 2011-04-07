@@ -43,7 +43,7 @@
     Public Sub ProcessChar(ByVal InputChar As Integer)
 
         ' Can't process char if not currently selected
-        If This.Selection.CommonAncestror IsNot Me Then
+        If This.Selection.CommonAncestror IsNot This Then
             Throw New InvalidOperationException("Sending text input can be done only to the element who host the selection. Modify your code to change the selection before sending any input.")
         End If
 
@@ -86,46 +86,64 @@
     Public Sub ProcessDelete()
 
         If This.Selection.IsEmpty Then
+
+            ' If the selection is emtpy, try to give the priority to the left element
             Dim RightElement = This.Selection.SelectionEnd
             If RightElement.Input.ProcessDelete_FromLeft() Then
                 Exit Sub
             End If
+
+        Else
+
+            ' If the selection is not empty, we just need to delete its content
+            This.Selection.DeleteContents()
+            Exit Sub
+
         End If
 
+        ' Perform the classical action for Delete for this element
         If ProcessDelete_Internal() Then
             Exit Sub
         End If
 
+        ' If this element didn't respond to the keypress, we may forward the event to another one
         If This.Selection.SelectionEnd Is Nothing Then
             This.Selection.MoveNext()
             This.Selection.CommonAncestror.Input.ProcessDelete()
             Exit Sub
         End If
-
-        Exit Sub
 
     End Sub
 
     Public Sub ProcessBackSpace()
 
         If This.Selection.IsEmpty Then
-            Dim RightElement = This.Selection.SelectionEnd
-            If RightElement.Input.ProcessDelete_FromLeft() Then
+
+            ' If the selection is emtpy, try to give the priority to the left element
+            Dim LeftElement = This.Selection.SelectionStart
+            If (LeftElement IsNot Nothing) AndAlso (LeftElement.Input.ProcessBackSpace_FromRight()) Then
                 Exit Sub
             End If
+
+        Else
+
+            ' If the selection is not empty, we just need to delete its content
+            This.Selection.DeleteContents()
+            Exit Sub
+
         End If
 
-        If ProcessDelete_Internal() Then
+        ' Perform the classical action for Backspace for this element
+        If ProcessBackSpace_Internal() Then
             Exit Sub
         End If
 
-        If This.Selection.SelectionEnd Is Nothing Then
-            This.Selection.MoveNext()
-            This.Selection.CommonAncestror.Input.ProcessDelete()
+        ' If this element didn't respond to the keypress, we may forward the event to another one
+        If This.Selection.SelectionStart Is Nothing Then
+            This.Selection.MovePrevious()
+            This.Selection.CommonAncestror.Input.ProcessBackSpace()
             Exit Sub
         End If
-
-        Exit Sub
 
     End Sub
 
@@ -228,38 +246,32 @@
         Return False
     End Function
 
-    Public Function ProcessDelete_Internal() As Boolean
-        If This.Selection.IsEmpty Then
-            This.Selection.DeleteContents()
-            Return True
-        ElseIf This.Selection.SelectionEnd Is Nothing Then
-            This.Selection.SetSelection(
-                This.Selection.CommonAncestror,
-                This.Selection.SelectionStart,
-                This.Selection.CommonAncestror.Children.After(This.Selection.SelectionEnd)
-            )
-            This.Selection.DeleteContents()
-            Return True
-        Else
-            Return False
-        End If
+    Public Overridable Function ProcessDelete_Internal() As Boolean
+
+        ' In case there's no element to delete, forward the call
+        If This.Selection.SelectionStart Is Nothing Then Return False
+
+        ' If there's one element to delete, delete it
+        This.Selection.MoveLeft(SelectionHelper.SelectionPointType.StartPoint)
+        This.Selection.DeleteContents()
+
+        ' Inform that the delete key was handled
+        Return True
+
     End Function
 
-    Public Function ProcessBackSpace_Internal() As Boolean
-        If This.Selection.IsEmpty Then
-            This.Selection.DeleteContents()
-            Return True
-        ElseIf This.Selection.SelectionEnd Is Nothing Then
-            This.Selection.SetSelection(
-                This.Selection.CommonAncestror,
-                This.Selection.CommonAncestror.Children.Before(This.Selection.SelectionStart),
-                This.Selection.SelectionEnd
-            )
-            This.Selection.DeleteContents()
-            Return True
-        Else
-            Return False
-        End If
+    Public Overridable Function ProcessBackSpace_Internal() As Boolean
+
+        ' In case there's no element to delete, forward the call
+        If This.Selection.SelectionEnd Is Nothing Then Return False
+
+        ' If there's one element to delete, delete it
+        This.Selection.MoveRight(SelectionHelper.SelectionPointType.EndPoint)
+        This.Selection.DeleteContents()
+
+        ' Inform that the delete key was handled
+        Return True
+
     End Function
 
     Public Overridable Function ProcessDelete_FromLeft_Internal() As Boolean

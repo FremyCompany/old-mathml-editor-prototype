@@ -12,11 +12,6 @@
         ' Field initialization
         Me.C = C
 
-        ' MathElement properties
-        Export = New UnicodeGlyphExportHelper(Me)
-        _Children = New GlyphChildrenHelper(Me)
-
-        ' End init
         If F IsNot Nothing Then
             Me.Font = F
         End If
@@ -42,4 +37,16 @@
         Return C
     End Function
 
+    Protected Overrides Function GetInitialChildrenHelper() As ChildrenHelper
+        Return New GlyphChildrenHelper(Me)
+    End Function
+
+    Protected Overrides Function GetInitialExportHelper() As ExportHelper
+        Return New UnicodeGlyphExportHelper(Me)
+    End Function
+
+    Protected Overrides Function GetInitialInputHelper() As InputHelper
+        ' TODO: InputHelper for UnicodeGlyph!
+        Return Nothing
+    End Function
 End Class

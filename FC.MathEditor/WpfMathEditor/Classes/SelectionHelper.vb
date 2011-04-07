@@ -97,7 +97,11 @@
 
     Public Sub SetSelection(ByVal CommonAncestror As MathElement, ByVal SelectionStart As MathElement, ByVal SelectionEnd As MathElement)
         ' Check if the selection is valid
-        If (CommonAncestror.ParentDocument Is This) AndAlso (SelectionStart.Parent Is CommonAncestror) AndAlso (SelectionEnd.Parent Is CommonAncestror) Then
+        If (
+            (CommonAncestror.ParentDocument Is This) _
+            AndAlso (SelectionStart Is Nothing OrElse SelectionStart.Parent Is CommonAncestror) _
+            AndAlso (SelectionEnd Is Nothing OrElse SelectionEnd.Parent Is CommonAncestror)
+        ) Then
 
             SetSelection_Internal(
                 New Selection(CommonAncestror, SelectionStart, SelectionEnd),
@@ -111,7 +115,7 @@
     Private Sub SetSelection_Internal(ByVal Selection As Selection, ByVal StartPoint As Selection, ByVal EndPoint As Selection)
 
         ' Verify the direction of the selection
-        If Selection.SelectionEnd.IsBefore(SelectionStart) Then
+        If Selection.SelectionEnd IsNot Nothing AndAlso Selection.SelectionEnd.IsBefore(SelectionStart) Then
             Dim Temp = Selection.SelectionEnd
             Selection.SelectionEnd = Selection.SelectionStart
             Selection.SelectionStart = Temp

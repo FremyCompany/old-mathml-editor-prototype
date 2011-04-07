@@ -1,8 +1,6 @@
 ﻿Public Class RowLayoutEngine : Inherits MathElement
 
     Public Sub New()
-        Me._Children = New LayoutEngineChildrenHelper(Me)
-        Me.Export = New RowLayoutEngineExportHelper(Me)
     End Sub
 
     Public Sub New(ByVal Children As IEnumerable(Of MathElement))
@@ -19,4 +17,15 @@
         Next : Return Clone
     End Function
 
+    Protected Overrides Function GetInitialChildrenHelper() As ChildrenHelper
+        Return New LayoutEngineChildrenHelper(Me)
+    End Function
+
+    Protected Overrides Function GetInitialExportHelper() As ExportHelper
+        Return New RowLayoutEngineExportHelper(Me)
+    End Function
+
+    Protected Overrides Function GetInitialInputHelper() As InputHelper
+        Return New RowLayoutEngineInputHelper(Me)
+    End Function
 End Class

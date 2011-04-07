@@ -8,7 +8,7 @@
         Throw New NotSupportedException("This element don't accept children. Please refer to the CanHave property before calling the Children methods.")
     End Function
 
-    Public Overrides Sub Add(ByVal NewChild As MathElement)
+    Public Overrides Sub Add_Internal(ByVal NewChild As MathElement)
         InvalidCall()
     End Sub
 
