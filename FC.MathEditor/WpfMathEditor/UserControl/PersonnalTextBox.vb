@@ -27,7 +27,7 @@
     'End Property
 
     Dim F As New Typeface(New FontFamily("Candara"), FontStyles.Italic, FontWeights.Normal, FontStretches.Normal)
-    Dim X As New MathDocument()
+    Dim WithEvents X As New MathDocument()
 
     Protected Overrides Sub OnRender(ByVal drawingContext As System.Windows.Media.DrawingContext)
         Me.Focus()
@@ -136,4 +136,9 @@
     Private Sub PersonnalTextBox_TextInput(ByVal sender As Object, ByVal e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput
         X.Input.ProcessString(e.Text)
     End Sub
+
+    Private Sub X_Changed(ByVal sender As Object, ByVal e As System.EventArgs) Handles X.Changed
+        Me.InvalidateVisual()
+    End Sub
+
 End Class

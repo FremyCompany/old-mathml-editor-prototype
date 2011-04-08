@@ -8,7 +8,16 @@
 
     Public ReadOnly Property IsEmpty As Boolean
         Get
-            Return SelectionEnd Is CommonAncestror.Children.After(SelectionStart)
+            If SelectionStart Is Nothing Then
+                If SelectionEnd Is Nothing Then
+                    ' TODO: Implement HasChildren.... in ChildrenHelper
+                    Return CommonAncestror.Children.First Is Nothing
+                Else
+                    Return False
+                End If
+            Else
+                Return SelectionStart.NextSibling Is SelectionEnd
+            End If
         End Get
     End Property
 

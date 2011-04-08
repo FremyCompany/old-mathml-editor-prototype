@@ -8,7 +8,7 @@
         Throw New NotSupportedException("This element don't accept children. Please refer to the CanHave property before calling the Children methods.")
     End Function
 
-    Public Overrides Sub Add_Internal(ByVal NewChild As MathElement)
+    Protected Overrides Sub Add_Internal(ByVal NewChild As MathElement)
         InvalidCall()
     End Sub
 
@@ -50,11 +50,11 @@
         End Get
     End Property
 
-    Public Overrides Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overrides Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
         InvalidCall()
     End Sub
 
-    Public Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
+    Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
         InvalidCall()
     End Sub
 

@@ -26,7 +26,7 @@
     End Property
 
     Public Sub ProcessString(ByVal InputString As String)
-        For X As Integer = 0 To InputString.Length
+        For X As Integer = 0 To InputString.Length - 1
             Dim InputChar = InputString(X)
             If AscW(InputChar) >= 899072 AndAlso AscW(InputChar) <= 901119 Then
                 CurrentInput.ProcessChar(Char.ConvertToUtf32(InputChar, InputString(X + 1)))
@@ -64,8 +64,8 @@
         This.Selection.DeleteContents()
 
         ' Handle chars by right, by left, or by this input helper
-        If This.Selection.SelectionStart.Input.ProcessChar_FromRight(InputChar) Then Exit Sub
-        If This.Selection.SelectionEnd.Input.ProcessChar_FromLeft(InputChar) Then Exit Sub
+        If This.Selection.SelectionStart IsNot Nothing AndAlso This.Selection.SelectionStart.Input.ProcessChar_FromRight(InputChar) Then Exit Sub
+        If This.Selection.SelectionEnd IsNot Nothing AndAlso This.Selection.SelectionEnd.Input.ProcessChar_FromLeft(InputChar) Then Exit Sub
         If ProcessChar_Internal(InputChar) Then Exit Sub
 
         ' When a char wasn't handled neither by right, by left or by current element:

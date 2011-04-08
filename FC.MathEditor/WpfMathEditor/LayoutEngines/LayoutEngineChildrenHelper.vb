@@ -14,14 +14,14 @@
         End Get
     End Property
 
-    Public Overrides Sub Add_Internal(ByVal NewChild As MathElement)
+    Protected Overrides Sub Add_Internal(ByVal NewChild As MathElement)
         NewChild.Parent = This
         All.Add(NewChild)
     End Sub
 
     Public Overrides Function After(ByVal OldChild As MathElement) As MathElement
         If OldChild Is Nothing Then Return Last
-        For X As Integer = 0 To All.Count
+        For X As Integer = 0 To All.Count - 1
             If OldChild Is All(X) Then
                 If X <> All.Count - 1 Then
                     Return All(X + 1)
@@ -78,11 +78,9 @@
         End Get
     End Property
 
-    Public Overrides Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overrides Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
 
-        NewChild.Parent = This
-
-        If NewChild Is Nothing Then
+        If OldChild Is Nothing Then
             All.Insert(0, NewChild)
         Else
             All.Insert(All.IndexOf(OldChild) + 1, NewChild)
@@ -90,9 +88,7 @@
 
     End Sub
 
-    Public Overrides Sub InsertBefore(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
-
-        NewChild.Parent = This
+    Protected Overrides Sub InsertBefore_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
 
         If OldChild Is Nothing Then
             Add(NewChild)
@@ -102,7 +98,7 @@
 
     End Sub
 
-    Public Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
+    Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
         All.Remove(OldChild)
     End Sub
 

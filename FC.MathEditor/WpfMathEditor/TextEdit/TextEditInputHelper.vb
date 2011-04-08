@@ -1,6 +1,6 @@
 ﻿Public Class TextEditInputHelper : Inherits InputHelper
 
-    Private IsAccepted As Func(Of Integer, Boolean)
+    Private IsAccepted As Func(Of Integer, Boolean) = Function() True
     Public Sub New(ByVal This As TextEdit, ByVal IsAccepted As Func(Of Integer, Boolean))
         MyBase.New(This)
     End Sub
@@ -15,15 +15,19 @@
 
         If IsAccepted(InputChar) Then
 
+            Dim NewElement = New UnicodeGlyph(InputChar)
+
             Console.WriteLine("TODO: TextEdit.ProcessChar_Internal")
             This.Selection.DeleteContents()
-            This.Selection.CommonAncestror.Children.InsertAfter(New UnicodeGlyph(InputChar), This.Selection.SelectionStart)
+            This.Selection.CommonAncestror.Children.InsertAfter(NewElement, This.Selection.SelectionStart)
+            This.Selection.SetSelection(This, NewElement, This.Selection.SelectionEnd)
 
             Return True
 
         Else
 
             Return False
+
         End If
     End Function
 

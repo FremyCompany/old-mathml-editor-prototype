@@ -11,11 +11,19 @@
         End Get
         Set(ByVal value As MathElement)
             If _Parent IsNot Nothing Then
-                Throw New InvalidOperationException("Unable to modify the parent of an element after it has been set. Use Clone() to get a parent-free copy of this element.")
-            Else
-                If value IsNot Nothing Then
-                    _Parent = value
+                If value Is Nothing Then
+                    If Parent.Children.Contains(Me) Then
+                        _Parent = Nothing
+                        _ParentDocument = Nothing
+                        _Selection = Nothing
+                    Else
+                        Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
+                    End If
+                Else
+                    Throw New InvalidOperationException("Unable to modify the parent of an element after it has been set. Use Clone() to get a parent-free copy of this element.")
                 End If
+            Else
+                _Parent = value
             End If
         End Set
     End Property
@@ -144,7 +152,7 @@
         Return GetCommonAncestrorBetween(el1, Me)
     End Function
 
-    Public Shared Function GetCommonAncestrorBetween(ByVal el1 As MathElement, ByVal el2 As MathElement)
+    Public Shared Function GetCommonAncestrorBetween(ByVal el1 As MathElement, ByVal el2 As MathElement) As MathElement
 
         Dim Delta As Integer = el2.TreeDepht - el1.TreeDepht
         If Delta > 0 Then

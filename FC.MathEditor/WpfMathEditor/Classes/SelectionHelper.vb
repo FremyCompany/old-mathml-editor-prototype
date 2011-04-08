@@ -11,7 +11,8 @@
     Public Event SelectionChanged As EventHandler
 
     Private Function GetSelectedElements() As IEnumerable(Of MathElement)
-        Return New SiblingEnumerator(CommonAncestror.Children.After(SelectionStart), CommonAncestror.Children.Before(SelectionEnd))
+        If IsEmpty Then Return New MathElement() {}
+        Return New SiblingEnumeratorGenerator(CommonAncestror.Children.After(SelectionStart), CommonAncestror.Children.Before(SelectionEnd))
     End Function
 
     Private Function CloneSelectedElements() As IEnumerable(Of MathElement)

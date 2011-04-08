@@ -11,17 +11,33 @@
     REM
 
     Public Sub Add(ByVal NewChild As MathElement)
+
+        NewChild.Parent = This
         Add_Internal(NewChild)
         This.RaiseChanged()
+
     End Sub
 
     Public Sub Remove(ByVal OldChild As MathElement)
+
+        If OldChild.Parent IsNot This Then _
+            Throw New ArgumentException("OldChild was not a child of this element.")
         Remove_Internal(OldChild)
+        This.RaiseChanged()
+
     End Sub
 
-    Public MustOverride Sub Add_Internal(ByVal NewChild As MathElement)
-    Public MustOverride Sub Remove_Internal(ByVal OldChild As MathElement)
-    Public MustOverride Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Public Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+
+        NewChild.Parent = This
+        InsertAfter_Internal(NewChild, OldChild)
+        This.RaiseChanged()
+
+    End Sub
+
+    Protected MustOverride Sub Add_Internal(ByVal NewChild As MathElement)
+    Protected MustOverride Sub Remove_Internal(ByVal OldChild As MathElement)
+    Protected MustOverride Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
 
     Public MustOverride Function After(ByVal OldChild As MathElement) As MathElement
     Public MustOverride Function Before(ByVal OldChild As MathElement) As MathElement
@@ -72,7 +88,15 @@
     REM Derived traps
     REM
 
-    Public Overridable Sub InsertBefore(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Public Sub InsertBefore(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+
+        NewChild.Parent = This
+        InsertBefore_Internal(NewChild, OldChild)
+        This.RaiseChanged()
+
+    End Sub
+
+    Protected Overridable Sub InsertBefore_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
         InsertAfter(NewChild, Before(OldChild))
     End Sub
 
@@ -114,6 +138,27 @@
     End Function
 
     Private Function GetUntypedEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+        Return GetEnumerator()
+    End Function
+
+End Class
+
+Public Class SiblingEnumeratorGenerator : Implements IEnumerable(Of MathElement)
+
+    Private FirstEl, LastEl As MathElement
+    Public Sub New(ByVal FirstEl As MathElement)
+        Me.New(FirstEl, Nothing)
+    End Sub
+
+    Public Sub New(ByVal FirstEl As MathElement, ByVal LastEl As MathElement)
+        Me.FirstEl = FirstEl : Me.LastEl = LastEl
+    End Sub
+
+    Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement) Implements System.Collections.Generic.IEnumerable(Of MathElement).GetEnumerator
+        Return New SiblingEnumerator(FirstEl, LastEl)
+    End Function
+
+    Public Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
         Return GetEnumerator()
     End Function
 

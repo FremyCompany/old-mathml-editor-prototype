@@ -1,4 +1,7 @@
-﻿Public Class TextEditChildrenHelper : Inherits ChildrenHelper
+﻿' TODO:     Update the class to remove the use of a shadow LEChildrenHelper
+' Reason:   Causes the ChangedEvent to be triggered twice, not dirty
+
+Public Class TextEditChildrenHelper : Inherits ChildrenHelper
 
     Protected P As LayoutEngineChildrenHelper
     Protected Shadows ReadOnly Property This As TextEdit
@@ -12,7 +15,7 @@
         P = New LayoutEngineChildrenHelper(This)
     End Sub
 
-    Public Overrides Sub Add_Internal(ByVal NewChild As MathElement)
+    Protected Overrides Sub Add_Internal(ByVal NewChild As MathElement)
         If IsNothing(TryCast(NewChild, UnicodeGlyph)) Then
             Throw New ArgumentException("Only UnicodeGlyph instances can bee added as children of a TextEdit element.")
         Else
@@ -58,16 +61,16 @@
         End Get
     End Property
 
-    Public Overrides Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overrides Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
         If TryCast(NewChild, UnicodeGlyph) Is Nothing Then Throw New ArgumentException("")
         P.InsertAfter(NewChild, OldChild)
     End Sub
 
-    Public Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
-        P.Remove_Internal(OldChild)
+    Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
+        P.Remove(OldChild)
     End Sub
 
-    Public Overrides Sub InsertBefore(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overrides Sub InsertBefore_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
         If TryCast(NewChild, UnicodeGlyph) Is Nothing Then Throw New ArgumentException("")
         P.InsertBefore(NewChild, OldChild)
     End Sub

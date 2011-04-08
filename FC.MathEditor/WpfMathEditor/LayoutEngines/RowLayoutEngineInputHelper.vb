@@ -1,4 +1,4 @@
-﻿Public Class RowLayoutInputHelper : Inherits InputHelper
+﻿Public Class RowLayoutEngineInputHelper : Inherits InputHelper
 
     Public Sub New(ByVal This As RowLayoutEngine)
         MyBase.New(This)
@@ -23,8 +23,6 @@
     Public Overrides Function ProcessChar_Internal(ByVal InputChar As Integer) As Boolean
 
         ' [[Assumption]] When we reach this function, the adjacent textedits refused the char.
-        This.Selection.DeleteContents()
-
         ' Create a new textedit to host the new char
         Dim TextEdit As TextEdit
 
