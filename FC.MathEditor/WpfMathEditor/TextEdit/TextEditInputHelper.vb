@@ -13,7 +13,7 @@
         ' or by splitting itself in two parts and by inserting the unaccepted
         ' char in a new text-edit between the two
 
-        If IsAccepted(InputChar) Then
+        If IsAccepted(InputChar) AndAlso This.Children.CanAdd Then
 
             Dim NewElement = New UnicodeGlyph(InputChar)
 
@@ -32,7 +32,8 @@
     End Function
 
     Public Overrides Function ProcessChar_FromLeft_Internal(ByVal InputChar As Integer) As Boolean
-        If IsAccepted(Char.ConvertFromUtf32(InputChar)) Then
+
+        If IsAccepted(Char.ConvertFromUtf32(InputChar)) AndAlso This.Children.CanAdd Then
 
             This.Selection.DeleteContents()
 
@@ -43,12 +44,14 @@
 
         Else
 
-            Return MyBase.ProcessChar_FromLeft_Internal(InputChar)
+            Return False
 
         End If
+
     End Function
 
     Public Overrides Function ProcessChar_FromRight_Internal(ByVal InputChar As Integer) As Boolean
+
         If IsAccepted(Char.ConvertFromUtf32(InputChar)) Then
 
             This.Selection.DeleteContents()
@@ -60,9 +63,10 @@
 
         Else
 
-            Return MyBase.ProcessChar_FromRight_Internal(InputChar)
+            Return False
 
         End If
+
     End Function
 
     Public Overrides Function ProcessBackSpace_FromRight_Internal() As Boolean

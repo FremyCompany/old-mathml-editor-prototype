@@ -1,8 +1,12 @@
-﻿Partial Public MustInherit Class MathElement
+﻿'?
+'? Split MathElement into two classes: MathNode and MathElement (ME inherits from MN)
+'?
 
-    REM 
-    REM XML Hierarchy
-    REM
+Partial Public MustInherit Class MathElement
+
+    '++ 
+    '++ XML Hierarchy
+    '++
 
     Private _Parent As MathElement
     Public Property Parent As MathElement
@@ -11,19 +15,40 @@
         End Get
         Set(ByVal value As MathElement)
             If _Parent IsNot Nothing Then
+                ' REMOVING THE CURRENT PARENT
                 If value Is Nothing Then
                     If Parent.Children.Contains(Me) Then
+                        Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
+                    Else
+
+                        ' Perform some cleanup
                         _Parent = Nothing
                         _ParentDocument = Nothing
                         _Selection = Nothing
-                    Else
-                        Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
+
+                        ' Raise the corresponding event
+                        RaiseEvent RemovedFromParent(Me, EventArgs.Empty)
+
                     End If
                 Else
-                    Throw New InvalidOperationException("Unable to modify the parent of an element after it has been set. Use Clone() to get a parent-free copy of this element.")
+                    ' TODO: Maybe we can check if value is _Parent before throwing
+                    ' For now, we shall not do so, in order to find duplicate
+                    ' code errors
+                    Throw New InvalidOperationException("Unable to modify the parent of an element after it has been set. Use Clone() to get a parent-free copy of this element, or remove it from its current parent.")
                 End If
             Else
-                _Parent = value
+                ' ADDING A NEW PARENT
+                If value.Children.IsValidChild(Me) Then
+
+                    ' Perform the change
+                    _Parent = value
+
+                    ' Raise the corresponding event
+                    RaiseEvent AttachedToParent(Me, EventArgs.Empty)
+
+                Else
+                    Throw New ArgumentException("This element is not recognised as a valid child of its new parent.", "Parent")
+                End If
             End If
         End Set
     End Property
@@ -102,9 +127,9 @@
     End Function
     Public MustOverride Function Clone_Internal() As MathElement
 
-    REM
-    REM XML Children
-    REM
+    '++
+    '++ XML Children
+    '++
 
     Protected _Children As ChildrenHelper
     Public ReadOnly Property Children As ChildrenHelper
@@ -173,25 +198,64 @@
 
     End Function
 
+    '++
+    '++ XML Events
+    '++
+
     ''' <summary>
     ''' Risen when a property of the current element changed, or a property of one of its children
     ''' </summary>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' When this event is risen, the layout of the current element should be recomputed.
+    ''' </remarks>
     Public Event Changed As EventHandler
     Public Sub RaiseChanged()
-        RaiseEvent Changed(Me, EventArgs.Empty)
+        If ShouldRaiseChanged = 0 Then
+            RaiseEvent Changed(Me, EventArgs.Empty)
+        Else
+            ChangePendings += 1
+        End If
     End Sub
 
+    ' TODO: Use StartBatchProcess in the current code
+    Private ShouldRaiseChanged, ChangePendings As Integer
+    Public Sub StartBatchProcess()
+        ShouldRaiseChanged += 1
+    End Sub
+
+    Public Sub StopBatchProcess()
+        ShouldRaiseChanged = 0
+        If ChangePendings <> 0 Then
+            ChangePendings = 0
+            RaiseChanged()
+        End If
+    End Sub
+
+#If DEBUG Then
+    Public LastChangeTimestamp As Date
+#End If
+
     Private Sub MathElement_Changed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Changed
+#If DEBUG Then
+        LastChangeTimestamp = Date.Now
+#End If
         If _Parent IsNot Nothing Then Parent.RaiseChanged()
     End Sub
 
     ' TODO: RemovedFromParent
+    Public Event AttachedToParent As EventHandler
     Public Event RemovedFromParent As EventHandler
 
-    Private Sub MathElement_RemovedFromParent(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.RemovedFromParent
-        _Parent = Nothing
-        _ParentDocument = Nothing
-        _Selection = Nothing
-    End Sub
+    Public Event ChildAdded As EventHandler(Of TreeEventArgs)
+    Public Event ChildRemoved As EventHandler(Of TreeEventArgs)
+
+    Public Class TreeEventArgs : Inherits EventArgs
+
+        Public Property Argument As MathElement
+        Public Sub New(ByVal Argument As MathElement)
+            Me.Argument = Argument
+        End Sub
+
+    End Class
+
 End Class

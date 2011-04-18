@@ -1,37 +1,81 @@
-﻿' TODO:     Update the class to remove the use of a shadow LEChildrenHelper
-' Reason:   Causes the ChangedEvent to be triggered twice, not dirty
+﻿Public Class TextEditChildrenHelper : Inherits ChildrenHelper
 
-Public Class TextEditChildrenHelper : Inherits ChildrenHelper
 
-    Protected P As LayoutEngineChildrenHelper
+    ''' <summary>
+    ''' Gets the element for which this children list is maintained
+    ''' </summary>
     Protected Shadows ReadOnly Property This As TextEdit
         Get
-            Return MyBase.This
+            Return DirectCast(MyBase.This, TextEdit)
         End Get
     End Property
 
-    Public Sub New(ByVal This As TextEdit)
+    ''' <summary>
+    ''' Initializes a new instance of the <see cref="TextEditChildrenHelper" /> class.
+    ''' </summary>
+    ''' <param name="This">The base element</param>
+    Sub New(ByVal This As TextEdit)
         MyBase.New(This)
-        P = New LayoutEngineChildrenHelper(This)
     End Sub
 
+    ''' <summary>
+    ''' The list of all children maintained by this instance
+    ''' </summary>
+    Protected All As New List(Of UnicodeGlyph)
+
+    ''' <summary>
+    ''' Get the indexes the of specified element
+    ''' </summary>
+    ''' <param name="Element">The element to search for</param><returns></returns>
+    Public Overrides Function IndexOf(ByVal Element As MathElement) As Integer
+        Return All.IndexOf(Element)
+    End Function
+
+    ''' <summary>
+    ''' Determines whether this children list contains the specified element.
+    ''' </summary>
+    ''' <param name="Element">The element to search for</param>
+    Public Overrides Function Contains(ByVal Element As MathElement) As Boolean
+        Return All.Contains(Element)
+    End Function
+
+    ''' <summary>
+    ''' Gets the last child of this list.
+    ''' </summary>
+    Public Overrides ReadOnly Property Last As MathElement
+        Get
+            If All.Count = 0 Then Return Nothing
+            Return All(All.Count - 1)
+        End Get
+    End Property
+
     Protected Overrides Sub Add_Internal(ByVal NewChild As MathElement)
-        If IsNothing(TryCast(NewChild, UnicodeGlyph)) Then
-            Throw New ArgumentException("Only UnicodeGlyph instances can bee added as children of a TextEdit element.")
-        Else
-            P.Add(NewChild)
-        End If
+        All.Add(NewChild)
     End Sub
 
     Public Overrides Function After(ByVal OldChild As MathElement) As MathElement
-        Return P.After(OldChild)
+        If OldChild Is Nothing Then Return Last
+        Dim X As Integer = All.IndexOf(OldChild)
+        If X = -1 Then Throw New ArgumentException("OldChild was not a child of this element.", "OldChild")
+        If X <> All.Count - 1 Then Return All(X + 1)
+        Return Nothing
     End Function
 
     Public Overrides Function Before(ByVal OldChild As MathElement) As MathElement
-        Return P.Before(OldChild)
+        If OldChild Is Nothing Then Return First
+        Dim X As Integer = All.IndexOf(OldChild)
+        If X = -1 Then Throw New ArgumentException("OldChild was not a child of this element.", "OldChild")
+        If X <> 0 Then Return All(X - 1)
+        Return Nothing
     End Function
 
     Public Overrides ReadOnly Property CanAdd As Boolean
+        Get
+            Return (True) AndAlso (HasNo OrElse This.CanHaveMultipleChild())
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property CanReplace As Boolean
         Get
             Return True
         End Get
@@ -51,47 +95,67 @@ Public Class TextEditChildrenHelper : Inherits ChildrenHelper
 
     Public Overrides ReadOnly Property ElementType As MathElement.Type
         Get
-            Return MathElement.Type.TextEdit
+            Return MathElement.Type.LayoutEngine
         End Get
     End Property
 
     Public Overrides ReadOnly Property First As MathElement
         Get
-            Return P.First
+            If All.Count = 0 Then Return Nothing
+            Return All(0)
         End Get
     End Property
 
     Protected Overrides Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
-        If TryCast(NewChild, UnicodeGlyph) Is Nothing Then Throw New ArgumentException("")
-        P.InsertAfter(NewChild, OldChild)
-    End Sub
 
-    Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
-        P.Remove(OldChild)
+        If OldChild Is Nothing Then
+            All.Insert(0, NewChild)
+        Else
+            All.Insert(All.IndexOf(OldChild) + 1, NewChild)
+        End If
+
     End Sub
 
     Protected Overrides Sub InsertBefore_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
-        If TryCast(NewChild, UnicodeGlyph) Is Nothing Then Throw New ArgumentException("")
-        P.InsertBefore(NewChild, OldChild)
+
+        If OldChild Is Nothing Then
+            All.Add(NewChild)
+        Else
+            All.Insert(All.IndexOf(OldChild) - 1, NewChild)
+        End If
+
     End Sub
 
-    Public Overrides ReadOnly Property Last As MathElement
-        Get
-            Return P.Last
-        End Get
-    End Property
+    Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
+        All.Remove(OldChild)
+    End Sub
 
-    Public Overrides Sub Replace(ByVal OldChild As MathElement, ByVal NewChild As MathElement)
-        If TryCast(NewChild, UnicodeGlyph) Is Nothing Then Throw New ArgumentException("")
-        P.Replace(OldChild, NewChild)
+    Protected Overrides Sub Replace_Internal(ByVal OldChild As MathElement, ByVal newchild As MathElement)
+        newchild.Parent = This
+        All(All.IndexOf(OldChild)) = newchild
+        OldChild.Parent = Nothing
     End Sub
 
     Public Overrides Sub Swap(ByVal FirstChild As MathElement, ByVal SecondChild As MathElement)
-        P.Swap(FirstChild, SecondChild)
+
+        Dim FCI = All.IndexOf(FirstChild)
+        Dim SCI = All.IndexOf(SecondChild)
+
+        If FCI = -1 OrElse SCI = -1 Then Throw New ArgumentException("The elements to swap are not child of this element.")
+
+        All(FCI) = SecondChild
+        All(SCI) = FirstChild
+
     End Sub
 
     Public Overrides Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement)
-        Return P.GetEnumerator()
+        Return All.GetEnumerator()
     End Function
 
+
+    Public Overrides ReadOnly Property Count As Integer
+        Get
+            Return All.Count
+        End Get
+    End Property
 End Class

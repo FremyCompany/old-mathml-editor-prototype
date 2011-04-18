@@ -20,6 +20,20 @@
         Return InvalidCall()
     End Function
 
+    Public Overrides Function Contains(ByVal Element As MathElement) As Boolean
+        Return False
+    End Function
+
+    Public Overrides Function IndexOf(ByVal Element As MathElement) As Integer
+        Return -1
+    End Function
+
+    Public Overrides ReadOnly Property Count As Integer
+        Get
+            Return 0
+        End Get
+    End Property
+
     Public Overrides ReadOnly Property CanAdd As Boolean
         Get
             Return False

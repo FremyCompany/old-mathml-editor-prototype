@@ -3,8 +3,6 @@
     Public Shared Shadows DefaultFontStyle As FontStyle = FontStyles.Italic
     Public Sub New()
         Me.FontStyle = DefaultFontStyle
-        ' TODO: Remove this and use standard method
-        Me.Input = New TextEditInputHelper(Me, Function(C) Char.IsLetter(Char.ConvertFromUtf32(C)))
     End Sub
 
     Public Sub New(ByVal Children As IEnumerable(Of MathElement))
@@ -26,5 +24,9 @@
             Return "mi"
         End Get
     End Property
+
+    Public Overrides Function IsAccepted(ByVal C As Integer) As Boolean
+        Return Char.IsLetter(Char.ConvertFromUtf32(C))
+    End Function
 
 End Class
