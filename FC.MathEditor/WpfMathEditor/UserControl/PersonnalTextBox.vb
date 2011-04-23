@@ -30,18 +30,19 @@
     Dim WithEvents X As New MathDocument()
 
     Protected Overrides Sub OnRender(ByVal drawingContext As System.Windows.Media.DrawingContext)
-        Me.Focus()
-        Keyboard.Focus(Me)
+        For Each El In X.Selection
+            drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 0, 148, 255)), Nothing, El.Export.LocationInRoot)
+        Next
         X.Export.Draw(drawingContext)
-
-        'Dim C = 3
-        'drawingContext.DrawText(New FormattedText("xyf∫", Globalization.CultureInfo.CurrentCulture, Windows.FlowDirection.LeftToRight, UnicodeGlyph.DefaultFont, C * (14 + 2 / 3), Brushes.Black), New Point(0, 20 * C))
-
     End Sub
 
     Private Sub PersonnalTextBox_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
         X.AddChild(New IdentifierTextEdit(New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}))
         Me.InvalidateVisual()
+    End Sub
+
+    Private Sub PersonnalTextBox_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseDown
+        Me.Focus() : Keyboard.Focus(Me)
     End Sub
 
     'Const fontSize = 14 + 2 / 3

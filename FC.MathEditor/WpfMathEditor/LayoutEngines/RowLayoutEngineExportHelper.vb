@@ -50,10 +50,22 @@
 
     End Sub
 
+    Public Overridable ReadOnly Property InitialAboveBaseLineHeight() As Double
+        Get
+            Return 0
+        End Get
+    End Property
+
+    Public Overridable ReadOnly Property InitialBelowBaseLineHeight() As Double
+        Get
+            Return 0
+        End Get
+    End Property
+
     Public Overrides Sub GenerateLayout()
 
-        Dim BBH As Double = 0
-        Dim ABH As Double = 0
+        Dim BBH As Double = InitialBelowBaseLineHeight
+        Dim ABH As Double = InitialAboveBaseLineHeight
 
         Dim OMT, OMB As Double
 
@@ -65,7 +77,7 @@
         Next
 
         ABH = Math.Ceiling(ABH)
-        BBH = Math.Floor(ABH)
+        BBH = Math.Ceiling(BBH)
 
         W = 0
         H = BBH + ABH

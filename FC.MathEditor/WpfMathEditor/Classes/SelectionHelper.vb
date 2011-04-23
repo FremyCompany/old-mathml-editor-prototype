@@ -1,4 +1,5 @@
 ﻿Partial Public Class SelectionHelper
+    Implements IEnumerable(Of MathElement)
 
     Private This As MathDocument
     Public Sub New(ByVal This As MathDocument)
@@ -38,7 +39,6 @@
         CommonAncestror.Children.InsertBefore(NewChild, SelectionEnd)
         SetSelection(CommonAncestror, NewChild, SelectionEnd)
     End Sub
-
 
     Private Sub SetSelection(ByVal StartPoint As Selection, ByVal EndPoint As Selection)
 
@@ -207,4 +207,11 @@
         RTL = -1
     End Enum
 
+    Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement) Implements System.Collections.Generic.IEnumerable(Of MathElement).GetEnumerator
+        Return GetSelectedElements().GetEnumerator()
+    End Function
+
+    Private Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+        Return GetEnumerator()
+    End Function
 End Class

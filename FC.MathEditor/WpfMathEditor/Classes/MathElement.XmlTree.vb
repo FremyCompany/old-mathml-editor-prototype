@@ -9,50 +9,111 @@ Partial Public MustInherit Class MathElement
     '++
 
     Private _Parent As MathElement
-    Public Property Parent As MathElement
+
+    ''' <summary>
+    ''' Returns the element which attached this element.
+    ''' </summary>
+    Public ReadOnly Property Parent As MathElement
         Get
             Return _Parent
         End Get
-        Set(ByVal value As MathElement)
-            If _Parent IsNot Nothing Then
-                ' REMOVING THE CURRENT PARENT
-                If value Is Nothing Then
-                    If Parent.Children.Contains(Me) Then
-                        Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
-                    Else
-
-                        ' Perform some cleanup
-                        _Parent = Nothing
-                        _ParentDocument = Nothing
-                        _Selection = Nothing
-
-                        ' Raise the corresponding event
-                        RaiseEvent RemovedFromParent(Me, EventArgs.Empty)
-
-                    End If
-                Else
-                    ' TODO: Maybe we can check if value is _Parent before throwing
-                    ' For now, we shall not do so, in order to find duplicate
-                    ' code errors
-                    Throw New InvalidOperationException("Unable to modify the parent of an element after it has been set. Use Clone() to get a parent-free copy of this element, or remove it from its current parent.")
-                End If
-            Else
-                ' ADDING A NEW PARENT
-                If value.Children.IsValidChild(Me) Then
-
-                    ' Perform the change
-                    _Parent = value
-
-                    ' Raise the corresponding event
-                    RaiseEvent AttachedToParent(Me, EventArgs.Empty)
-
-                Else
-                    Throw New ArgumentException("This element is not recognised as a valid child of its new parent.", "Parent")
-                End If
-            End If
-        End Set
     End Property
 
+    ''' <summary>
+    ''' Changes the Parent of NewChild to this element
+    ''' </summary>
+    ''' <param name="NewChild">The element to attach to this element</param>
+    Public Sub Attach(ByVal NewChild As MathElement)
+        If NewChild Is Nothing Then Throw New ArgumentNullException("NewChild", "The Attach method can't be used with a null argument.")
+        NewChild.SetParent(Me)
+    End Sub
+
+    ''' <summary>
+    ''' Reset the Parent of Child to null.
+    ''' </summary>
+    ''' <param name="Child"></param>
+    ''' <remarks></remarks>
+    Public Sub Detach(ByVal Child As MathElement)
+        If Child.Parent Is Me Then Child.ResetParent() _
+            Else Throw New ArgumentException("Child must be a child of this element.")
+    End Sub
+
+    ''' <summary>
+    ''' Changes the value of the Parent property of this element.
+    ''' </summary>
+    ''' <param name="value">The new value for the Parent property</param>
+    ''' <exception cref="InvalidOperationException">This functions throws an InvalidOperationException when this element already have a parent.</exception>
+    ''' <exception cref="ArgumentException">This functions throws an ArgumentException when this element can't have 'value' as parent.</exception>
+    Private Sub SetParent(ByVal value As MathElement)
+        If _Parent IsNot Nothing Then
+
+            If value Is _Parent Then
+
+#If DEBUG Then
+                ' DON'T DO ANYTHING
+                Trace.TraceWarning("Multiple refefinition of the Parent property of an element. Spaghetti code suspected.")
+#End If
+
+            Else
+
+                ' REMOVE THE CURRENT PARENT, AND RETRY
+                Try
+
+                    ResetParent()
+                    SetParent(value)
+
+                Catch ex As Exception
+
+                    Throw New InvalidOperationException("Unable to modify the parent of an element after it has been added to a children list. Please remove this element from its parent, or use the Clone() function to get a parent-free copy of this element.", ex)
+
+                End Try
+
+            End If
+
+        Else
+
+            ' ADD THE NEW PARENT
+            If value.Children.CanContains(Me) Then
+
+                ' Perform the change
+                _Parent = value
+
+                ' Raise the corresponding event
+                RaiseEvent AttachedToParent(Me, EventArgs.Empty)
+
+            Else
+                Throw New ArgumentException("This element is not recognised as a valid child of its new parent.", "Parent")
+            End If
+
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Resets the Parent property for this element.
+    ''' </summary>
+    Private Sub ResetParent()
+
+        If Parent.Children.Contains(Me) Then
+
+            Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
+
+        Else
+
+            ' Perform some cleanup
+            _Parent = Nothing
+            _ParentDocument = Nothing
+            _Selection = Nothing
+
+            ' Raise the corresponding event
+            RaiseDetachedFromParent()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' Returns the last element in the Parent chain. If this element is hosted in a document, this function returns the same as ParentDocument.
+    ''' </summary>
     Public ReadOnly Property Root As MathElement
         Get
             If _ParentDocument IsNot Nothing Then Return _ParentDocument
@@ -62,6 +123,10 @@ Partial Public MustInherit Class MathElement
     End Property
 
     Private _ParentDocument As MathDocument
+
+    ''' <summary>
+    ''' Returns the document that host this element, or Nothing if this element is not currently hosted.
+    ''' </summary>
     Public ReadOnly Property ParentDocument As MathDocument
         Get
 
@@ -134,7 +199,6 @@ Partial Public MustInherit Class MathElement
     Protected _Children As ChildrenHelper
     Public ReadOnly Property Children As ChildrenHelper
         Get
-            If _Children Is Nothing Then _Children = Nothing
             Return _Children
         End Get
     End Property
@@ -244,18 +308,64 @@ Partial Public MustInherit Class MathElement
 
     ' TODO: RemovedFromParent
     Public Event AttachedToParent As EventHandler
+    Public Sub RaiseAttachedToParent()
+        RaiseEvent AttachedToParent(Me, EventArgs.Empty)
+    End Sub
+
+    Public Event AddedToParent As EventHandler
+    Public Sub RaiseAddedToParent()
+        RaiseEvent AddedToParent(Me, EventArgs.Empty)
+    End Sub
+
     Public Event RemovedFromParent As EventHandler
+    Public Sub RaiseRemovedFromParent()
+        RaiseEvent RemovedFromParent(Me, EventArgs.Empty)
+    End Sub
+
+    Public Event DetachedFromParent As EventHandler
+    Public Sub RaiseDetachedFromParent()
+        RaiseEvent DetachedFromParent(Me, EventArgs.Empty)
+    End Sub
+
+    Public Event DetachedFromDocument As EventHandler
+    Public Sub RaiseDetachedFromDocument()
+        RaiseEvent DetachedFromDocument(Me, EventArgs.Empty)
+    End Sub
 
     Public Event ChildAdded As EventHandler(Of TreeEventArgs)
+    Public Sub RaiseChildAdded(ByVal Child As MathElement)
+        RaiseEvent ChildAdded(Me, New TreeEventArgs(Child))
+    End Sub
+
     Public Event ChildRemoved As EventHandler(Of TreeEventArgs)
+    Public Sub RaiseChildRemoved(ByVal Child As MathElement)
+        RaiseEvent ChildRemoved(Me, New TreeEventArgs(Child))
+    End Sub
 
     Public Class TreeEventArgs : Inherits EventArgs
-
         Public Property Argument As MathElement
         Public Sub New(ByVal Argument As MathElement)
             Me.Argument = Argument
         End Sub
-
     End Class
 
+    Private Sub MathElement_ChildAdded(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.ChildAdded
+        e.Argument.RaiseAddedToParent()
+    End Sub
+
+    Private Sub MathElement_ChildRemoved(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.ChildRemoved
+        e.Argument.RaiseRemovedFromParent()
+    End Sub
+
+    Private Sub MathElement_DetachedFromDocument(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.DetachedFromDocument
+        _ParentDocument = Nothing
+        _Selection = Nothing
+    End Sub
+
+    Private Sub MathElement_DetachedFromParent(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.DetachedFromParent
+        RaiseDetachedFromDocument()
+        For Each Child In Children
+            Child.RaiseDetachedFromDocument()
+        Next
+    End Sub
 End Class

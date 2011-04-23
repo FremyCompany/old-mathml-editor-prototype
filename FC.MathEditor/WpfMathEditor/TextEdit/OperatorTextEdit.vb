@@ -29,4 +29,8 @@
         Return Not (Children.HasAny OrElse Char.IsLetter(Char.ConvertFromUtf32(C)))
     End Function
 
+    Public Overrides Function CanHaveMultipleChild() As Boolean
+        Return False
+    End Function
+
 End Class

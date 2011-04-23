@@ -8,7 +8,7 @@
     End Function
 
     Protected Overrides Function GetInitialExportHelper() As ExportHelper
-        Return New RowLayoutEngineExportHelper(Me)
+        Return New TextEditExportHelper(Me)
     End Function
 
     Public MustOverride Function IsAccepted(ByVal C As Integer) As Boolean

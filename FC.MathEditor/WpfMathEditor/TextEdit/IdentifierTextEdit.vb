@@ -26,7 +26,11 @@
     End Property
 
     Public Overrides Function IsAccepted(ByVal C As Integer) As Boolean
-        Return Char.IsLetter(Char.ConvertFromUtf32(C))
+        Return Char.IsLetter(Char.ConvertFromUtf32(C)) OrElse C = Asc("_")
+    End Function
+
+    Public Overrides Function CanHaveMultipleChild() As Boolean
+        Return True
     End Function
 
 End Class

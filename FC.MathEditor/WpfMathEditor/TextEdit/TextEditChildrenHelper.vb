@@ -35,7 +35,7 @@
     ''' Determines whether this children list contains the specified element.
     ''' </summary>
     ''' <param name="Element">The element to search for</param>
-    Public Overrides Function Contains(ByVal Element As MathElement) As Boolean
+    Protected Overrides Function Contains_Internal(ByVal Element As MathElement) As Boolean
         Return All.Contains(Element)
     End Function
 
@@ -130,13 +130,13 @@
         All.Remove(OldChild)
     End Sub
 
-    Protected Overrides Sub Replace_Internal(ByVal OldChild As MathElement, ByVal newchild As MathElement)
-        newchild.Parent = This
-        All(All.IndexOf(OldChild)) = newchild
-        OldChild.Parent = Nothing
+    Protected Overrides Sub Replace_Internal(ByVal OldChild As MathElement, ByVal NewChild As MathElement)
+        This.Attach(NewChild)
+        All(All.IndexOf(OldChild)) = NewChild
+        This.Detach(OldChild)
     End Sub
 
-    Public Overrides Sub Swap(ByVal FirstChild As MathElement, ByVal SecondChild As MathElement)
+    Protected Overrides Sub Swap_Internal(ByVal FirstChild As MathElement, ByVal SecondChild As MathElement)
 
         Dim FCI = All.IndexOf(FirstChild)
         Dim SCI = All.IndexOf(SecondChild)
@@ -152,10 +152,10 @@
         Return All.GetEnumerator()
     End Function
 
-
     Public Overrides ReadOnly Property Count As Integer
         Get
             Return All.Count
         End Get
     End Property
+
 End Class

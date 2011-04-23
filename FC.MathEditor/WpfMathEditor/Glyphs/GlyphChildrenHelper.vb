@@ -20,10 +20,6 @@
         Return InvalidCall()
     End Function
 
-    Public Overrides Function Contains(ByVal Element As MathElement) As Boolean
-        Return False
-    End Function
-
     Public Overrides Function IndexOf(ByVal Element As MathElement) As Integer
         Return -1
     End Function
@@ -71,5 +67,15 @@
     Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
         InvalidCall()
     End Sub
+
+    Protected Overrides Function Contains_Internal(ByVal Element As MathElement) As Boolean
+        Return False
+    End Function
+
+    Public Overrides ReadOnly Property Last As MathElement
+        Get
+            Return Nothing
+        End Get
+    End Property
 
 End Class

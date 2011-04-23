@@ -89,5 +89,8 @@
         _Children = GetInitialChildrenHelper()
         _Export = GetInitialExportHelper()
         _Input = GetInitialInputHelper()
+        If _Input Is Nothing Then
+            Trace.TraceError("Bug!")
+        End If
     End Sub
 End Class

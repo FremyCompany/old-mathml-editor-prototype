@@ -80,7 +80,7 @@
     End Function
 
     Public Function ProcessChar_FromRight(ByVal InputChar As Integer) As Boolean
-        Return ProcessChar_FromRight(InputChar)
+        Return ProcessChar_FromRight_Internal(InputChar)
     End Function
 
     Public Sub ProcessDelete()

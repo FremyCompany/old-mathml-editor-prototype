@@ -40,7 +40,7 @@
         End If
 
         ' Append the newly created char to the textedit
-        Dim X As New UnicodeGlyph(AscW(InputChar))
+        Dim X As New UnicodeGlyph(InputChar)
         TextEdit.AddChild(X)
         This.AddChild(TextEdit)
 

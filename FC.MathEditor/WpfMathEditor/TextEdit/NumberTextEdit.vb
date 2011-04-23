@@ -18,4 +18,11 @@
         End Get
     End Property
 
+    Public Overrides Function CanHaveMultipleChild() As Boolean
+        Return True
+    End Function
+
+    Public Overrides Function IsAccepted(ByVal C As Integer) As Boolean
+        Return Char.IsDigit(Char.ConvertFromUtf32(C)) OrElse C = Asc("."c) OrElse C = Asc("-"c) OrElse C = Asc("+"c)
+    End Function
 End Class

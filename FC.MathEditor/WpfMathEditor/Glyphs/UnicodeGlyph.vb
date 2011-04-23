@@ -46,7 +46,6 @@
     End Function
 
     Protected Overrides Function GetInitialInputHelper() As InputHelper
-        ' TODO: InputHelper for UnicodeGlyph!
-        Return Nothing
+        Return New UnicodeGlyphInputHelper(Me)
     End Function
 End Class
