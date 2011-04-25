@@ -21,6 +21,16 @@
         End Get
     End Property
 
+    Public Sub CollapseToEnd()
+        Dim NewPoint = New Selection(EndPoint.CommonAncestror, EndPoint.CommonAncestror.Children.Before(EndPoint.SelectionStart), EndPoint.SelectionStart)
+        SetSelection(NewPoint, PointToChange:=SelectionHelper.SelectionPointType.StartPoint)
+    End Sub
+
+    Public Sub CollapseToStart()
+        ' TODO: Implement CollapseToStart
+        Throw New NotImplementedException()
+    End Sub
+
     Public Sub MoveNext(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
         Dim Sel As Selection = GetSelection(MovedPoint)
         Dim E = Sel.CommonAncestror.ParentLayoutEngineChild

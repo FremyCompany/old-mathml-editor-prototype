@@ -156,7 +156,7 @@
         If OldChild Is Nothing Then
             All.Add(NewChild)
         Else
-            All.Insert(All.IndexOf(OldChild) - 1, NewChild)
+            All.Insert(All.IndexOf(OldChild), NewChild)
         End If
 
     End Sub

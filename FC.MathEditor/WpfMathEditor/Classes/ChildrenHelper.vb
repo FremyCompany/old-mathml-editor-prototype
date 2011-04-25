@@ -42,9 +42,10 @@
 
             This.StartBatchProcess()
 
+            Dim Index = Count + 1
             This.Attach(NewChild)
             Add_Internal(NewChild)
-            This.RaiseChildAdded(NewChild)
+            This.RaiseChildAdded(NewChild, Index)
 
             This.RaiseChanged()
 
@@ -68,8 +69,9 @@
 
             This.StartBatchProcess()
 
+            Dim Index = IndexOf(OldChild)
             Remove_Internal(OldChild)
-            This.RaiseChildRemoved(OldChild)
+            This.RaiseChildRemoved(OldChild, Index)
             This.Detach(OldChild)
             This.RaiseChanged()
 
@@ -91,9 +93,10 @@
 
             This.StartBatchProcess()
 
+            Dim Index = IndexOf(OldChild) + 1
             This.Attach(NewChild)
             InsertAfter_Internal(NewChild, OldChild)
-            This.RaiseChildAdded(NewChild)
+            This.RaiseChildAdded(NewChild, Index)
             This.RaiseChanged()
 
 

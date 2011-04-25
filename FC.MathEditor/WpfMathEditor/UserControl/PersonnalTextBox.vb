@@ -36,8 +36,24 @@
         X.Export.Draw(drawingContext)
     End Sub
 
+    Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
+        Select Case e.Key
+            Case Key.Left
+                If Not (Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)) Then
+                    X.Selection.CollapseToEnd()
+                End If
+                X.Selection.MoveLeft(SelectionHelper.SelectionPointType.EndPoint)
+            Case Key.Right
+                If Not (Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)) Then
+                    X.Selection.SetSelection(X.Selection.GetSelection(SelectionHelper.SelectionPointType.EndPoint), SelectionHelper.SelectionPointType.StartPoint)
+                End If
+                X.Selection.MoveRight(SelectionHelper.SelectionPointType.EndPoint)
+        End Select
+    End Sub
+
     Private Sub PersonnalTextBox_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
-        X.AddChild(New IdentifierTextEdit(New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}))
+        Dim CHL = New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}
+        X.AddChild(New IdentifierTextEdit(CHL))
         Me.InvalidateVisual()
     End Sub
 

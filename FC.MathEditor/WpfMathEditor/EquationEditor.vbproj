@@ -116,6 +116,7 @@
     <Compile Include="Classes\QualityControl.vb" />
     <Compile Include="Classes\SelectionHelper.Actions.vb" />
     <Compile Include="Classes\SelectionHelper.vb" />
+    <Compile Include="Classes\SelectionHelper2.vb" />
     <Compile Include="Glyphs\GlyphChildrenHelper.vb" />
     <Compile Include="Glyphs\UnicodeGlyph.ExportHelper.vb" />
     <Compile Include="Glyphs\UnicodeGlyph.vb" />

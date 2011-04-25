@@ -42,7 +42,7 @@
         ' Append the newly created char to the textedit
         Dim X As New UnicodeGlyph(InputChar)
         TextEdit.AddChild(X)
-        This.AddChild(TextEdit)
+        This.Selection.ReplaceContents(TextEdit)
 
         ' Change the selection to the TextEdit
         ' TODO: Determine if it wouldn't be better to put the selection in RLE instead

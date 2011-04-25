@@ -51,7 +51,7 @@
 
     Public Overrides Function ProcessChar_FromRight_Internal(ByVal InputChar As Integer) As Boolean
 
-        If IsAccepted(InputChar) Then
+        If IsAccepted(InputChar) AndAlso This.Children.CanAdd Then
 
             This.Selection.DeleteContents()
 

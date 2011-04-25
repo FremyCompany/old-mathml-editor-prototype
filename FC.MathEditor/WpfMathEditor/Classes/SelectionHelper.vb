@@ -1,10 +1,12 @@
 ﻿Partial Public Class SelectionHelper
     Implements IEnumerable(Of MathElement)
 
-    Private This As MathDocument
+    Protected This As MathDocument
+    Private WithEvents CA_SEL, CA_START, CA_END As MathElement
+
     Public Sub New(ByVal This As MathDocument)
         Me.This = This
-        SetSelection(This, Nothing, Nothing)
+        SetSelection(This, This.LastChild, Nothing)
     End Sub
 
     Private IsSelectionChanging As Boolean
@@ -43,41 +45,51 @@
     Private Sub SetSelection(ByVal StartPoint As Selection, ByVal EndPoint As Selection)
 
         ' Compute _Selection
-        Dim CA = StartPoint.SelectionStart.GetCommonAncestrorWith(EndPoint.SelectionEnd)
         Dim SS = StartPoint.SelectionStart
-        Dim SE = StartPoint.SelectionEnd
+        Dim SE = EndPoint.SelectionEnd
 
-        While SS.Parent IsNot CA
-            SS = SS.Parent
-        End While
+        ' Collapse selection points
+        StartPoint = New Selection(StartPoint.CommonAncestror, SS, StartPoint.CommonAncestror.Children.After(SS))
+        EndPoint = New Selection(EndPoint.CommonAncestror, EndPoint.CommonAncestror.Children.After(SE), SE)
 
-        While SE.Parent IsNot SE
-            SE = SE.Parent
-        End While
+        Dim CA = If(SS, SE)
+        If StartPoint.CommonAncestror Is EndPoint.CommonAncestror Then
+            CA = StartPoint.CommonAncestror
+        Else
+            CA = StartPoint.CommonAncestror.GetCommonAncestrorWith(EndPoint.CommonAncestror)
 
-        ' Insert StartPoint and EndPoint if needed
-        Dim Dir = SelectionDirection.LTR
+            While SS.Parent IsNot CA
+                SS = SS.Parent
+            End While
 
-        If SE.IsBefore(SS) Then
+            While SE.Parent IsNot SE
+                SE = SE.Parent
+            End While
+
+        End If
+
+        ' Invert StartPoint and EndPoint if needed
+        Dim Dir As SelectionDirection = SelectionDirection.LTR
+        If (SE IsNot Nothing) AndAlso (SS IsNot Nothing) AndAlso (SE Is SS OrElse SE.IsBefore(SS)) Then
             Dir = SelectionDirection.RTL
-            Dim Temp = StartPoint
-            StartPoint = EndPoint
-            EndPoint = Temp
+            Dim ST = SE.PreviousSibling
+            SE = SS.NextSibling : SS = ST
         End If
 
         ' Set the selection
         SetSelection_Internal(New Selection(CA, SS, SE), StartPoint, EndPoint)
+        _Dir = Dir
 
     End Sub
 
-    Public Sub SetSelection(ByVal Point As Selection, Optional ByVal PointToChange As SelectionPointType = SelectionPointType.Selection)
+    Public Sub SetSelection(ByVal NewPoint As Selection, Optional ByVal PointToChange As SelectionPointType = SelectionPointType.Selection)
         Select Case PointToChange
             Case SelectionPointType.Selection
-                SetSelection(Point.CommonAncestror, Point.SelectionStart, Point.SelectionEnd)
+                SetSelection(NewPoint.CommonAncestror, NewPoint.SelectionStart, NewPoint.SelectionEnd)
             Case SelectionPointType.StartPoint
-                SetSelection(Point, EndPoint)
+                SetSelection(NewPoint, EndPoint)
             Case SelectionPointType.EndPoint
-                SetSelection(StartPoint, Point)
+                SetSelection(StartPoint, NewPoint)
             Case Else
                 Throw New ArgumentException("Unknown value for the selection point type", "PointToChange")
         End Select
@@ -97,20 +109,39 @@
     End Function
 
     Public Sub SetSelection(ByVal CommonAncestror As MathElement, ByVal SelectionStart As MathElement, ByVal SelectionEnd As MathElement)
+
         ' Check if the selection is valid
         If (
-            (CommonAncestror.ParentDocument Is This) _
+            (CommonAncestror IsNot Nothing) _
+            AndAlso (CommonAncestror.ParentDocument Is This) _
             AndAlso (SelectionStart Is Nothing OrElse SelectionStart.Parent Is CommonAncestror) _
             AndAlso (SelectionEnd Is Nothing OrElse SelectionEnd.Parent Is CommonAncestror)
         ) Then
 
+            ' Invert StartPoint and EndPoint if needed
+            Dim SS = SelectionStart, SE = SelectionEnd, CA = CommonAncestror
+            If (SS Is Nothing) OrElse (SE IsNot Nothing AndAlso (SE Is SS OrElse SE.IsBefore(SS))) Then
+                _Dir = SelectionDirection.RTL
+                Dim ST = If(SE Is Nothing, Nothing, SE.PreviousSibling)
+                SE = SS : SS = SE
+            Else
+                _Dir = SelectionDirection.LTR
+            End If
+
+            ' Perform the selection change
             SetSelection_Internal(
-                New Selection(CommonAncestror, SelectionStart, SelectionEnd),
-                New Selection(CommonAncestror, SelectionStart, CommonAncestror.Children.After(SelectionStart)),
-                New Selection(CommonAncestror, CommonAncestror.Children.Before(SelectionEnd), SelectionEnd)
+                New Selection(CA, SS, SE),
+                New Selection(CA, SS, CA.Children.After(SS)),
+                New Selection(CA, CA.Children.Before(SE), SE)
             )
 
+        Else
+
+            ' Notify of an error
+            Throw New ArgumentException("Selection was invalid.")
+
         End If
+
     End Sub
 
     Private Sub SetSelection_Internal(ByVal Selection As Selection, ByVal StartPoint As Selection, ByVal EndPoint As Selection)
@@ -122,11 +153,13 @@
             Selection.SelectionStart = Temp
             _Dir = SelectionDirection.RTL
         Else
+            ' TODO: Some SetSelection perfor the _Dir modification themselves...
             _Dir = SelectionDirection.LTR
         End If
 
         ' Raise the BeforeSelectionChanged event
         If Not IsSelectionChanging Then
+            ' TODO: What about IsSelectionChanging and SelectionChanged ????
             RaiseEvent BeforeSelectionChanged(Me, EventArgs.Empty)
         End If
 
@@ -134,6 +167,10 @@
         _Selection = Selection
         _StartPoint = StartPoint
         _EndPoint = EndPoint
+
+        CA_START = StartPoint.CommonAncestror
+        CA_END = EndPoint.CommonAncestror
+        CA_SEL = Selection.CommonAncestror
 
     End Sub
 
@@ -214,4 +251,54 @@
     Private Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
         Return GetEnumerator()
     End Function
+
+    Private Sub CA_END_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_END.ChildAdded
+        If EndPoint.SelectionEnd Is Nothing Then
+            SetSelection(New Selection(CA_END, CA_END.LastChild, Nothing), PointToChange:=SelectionPointType.EndPoint)
+        Else
+            SetSelection(New Selection(CA_END, CA_END.Children.Before(_EndPoint.SelectionEnd), _EndPoint.SelectionEnd), PointToChange:=SelectionPointType.EndPoint)
+        End If
+    End Sub
+
+    Private Sub CA_END_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_END.ChildRemoved
+
+        '
+        ' Verify that the newly removed child don't make the Selection EndPoint invalid!
+        '
+        If (_EndPoint.SelectionEnd Is Nothing) OrElse (CA_END.Children.Contains(_EndPoint.SelectionEnd)) Then
+            SetSelection(New Selection(CA_END, CA_END.Children.Before(_EndPoint.SelectionEnd), _EndPoint.SelectionEnd), PointToChange:=SelectionPointType.EndPoint)
+        Else
+            If (_EndPoint.SelectionStart Is Nothing) OrElse (CA_END.Children.Contains(_EndPoint.SelectionStart)) Then
+                SetSelection(New Selection(CA_END, _EndPoint.SelectionStart, CA_END.Children.After(_EndPoint.SelectionStart)), PointToChange:=SelectionPointType.EndPoint)
+            Else
+                SetSelection(New Selection(CA_END, CA_END.LastChild, Nothing), PointToChange:=SelectionPointType.EndPoint)
+            End If
+        End If
+
+    End Sub
+
+    Private Sub CA_START_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_START.ChildAdded
+        If StartPoint.SelectionStart Is Nothing Then
+            SetSelection(New Selection(CA_START, Nothing, CA_START.FirstChild), PointToChange:=SelectionPointType.StartPoint)
+        Else
+            SetSelection(New Selection(CA_START, _StartPoint.SelectionStart, CA_START.Children.After(_StartPoint.SelectionStart)), PointToChange:=SelectionPointType.StartPoint)
+        End If
+    End Sub
+
+    Private Sub CA_START_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_START.ChildRemoved
+
+        '
+        ' Verify that the newly removed child don't make the Selection StartPoint invalid!
+        '
+        If (_StartPoint.SelectionStart Is Nothing) OrElse (CA_START.Children.Contains(_StartPoint.SelectionStart)) Then
+            SetSelection(New Selection(CA_START, _StartPoint.SelectionStart, CA_START.Children.After(_StartPoint.SelectionStart)), PointToChange:=SelectionPointType.StartPoint)
+        Else
+            If (_StartPoint.SelectionEnd Is Nothing) OrElse (CA_END.Children.Contains(_StartPoint.SelectionEnd)) Then
+                SetSelection(New Selection(CA_START, CA_START.Children.Before(_StartPoint.SelectionEnd), _StartPoint.SelectionEnd), PointToChange:=SelectionPointType.StartPoint)
+            Else
+                SetSelection(New Selection(CA_END, CA_END.LastChild, Nothing), PointToChange:=SelectionPointType.StartPoint)
+            End If
+        End If
+
+    End Sub
 End Class

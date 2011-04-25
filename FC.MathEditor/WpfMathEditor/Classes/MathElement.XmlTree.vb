@@ -306,7 +306,14 @@ Partial Public MustInherit Class MathElement
         If _Parent IsNot Nothing Then Parent.RaiseChanged()
     End Sub
 
-    ' TODO: RemovedFromParent
+    ' TODO: Reviewing completely the event usage (drawing a schema)
+
+    Public Event SubTreeModified As EventHandler(Of TreeEventArgs)
+    Public Sub RaiseSubTreeModified(ByVal e As TreeEventArgs)
+        RaiseEvent SubTreeModified(Me, e)
+        RaiseEvent Changed(Me, EventArgs.Empty)
+    End Sub
+
     Public Event AttachedToParent As EventHandler
     Public Sub RaiseAttachedToParent()
         RaiseEvent AttachedToParent(Me, EventArgs.Empty)
@@ -333,28 +340,45 @@ Partial Public MustInherit Class MathElement
     End Sub
 
     Public Event ChildAdded As EventHandler(Of TreeEventArgs)
-    Public Sub RaiseChildAdded(ByVal Child As MathElement)
-        RaiseEvent ChildAdded(Me, New TreeEventArgs(Child))
+    Public Sub RaiseChildAdded(ByVal ChildElement As MathElement, ByVal ChildIndex As Integer)
+        Dim e = New TreeEventArgs(ChildElement, Me, ChildIndex, TreeEventArgs.TreeAction.Added)
+        RaiseEvent ChildAdded(Me, e)
+        RaiseEvent SubTreeModified(Me, e)
     End Sub
 
     Public Event ChildRemoved As EventHandler(Of TreeEventArgs)
-    Public Sub RaiseChildRemoved(ByVal Child As MathElement)
-        RaiseEvent ChildRemoved(Me, New TreeEventArgs(Child))
+    Public Sub RaiseChildRemoved(ByVal ChildElement As MathElement, ByVal ChildIndex As Integer)
+        Dim e = New TreeEventArgs(ChildElement, Me, ChildIndex, TreeEventArgs.TreeAction.Removed)
+        RaiseEvent ChildRemoved(Me, e)
+        RaiseEvent SubTreeModified(Me, e)
     End Sub
 
     Public Class TreeEventArgs : Inherits EventArgs
-        Public Property Argument As MathElement
-        Public Sub New(ByVal Argument As MathElement)
-            Me.Argument = Argument
+
+        Public Property ParentElement As MathElement
+        Public Property ChildElement As MathElement
+        Public Property ChildIndex As Integer
+        Public Property Action As TreeAction
+
+        Public Enum TreeAction
+            Added = +1 : Removed = -1 : Modified = 0
+        End Enum
+
+        Public Sub New(ByVal ChildElement As MathElement, ByVal ParentElement As MathElement, ByVal ChildIndex As Integer, ByVal Action As TreeAction)
+            Me.ChildElement = ChildElement
+            Me.ParentElement = ParentElement
+            Me.ChildIndex = ChildIndex
+            Me.Action = Action
         End Sub
+
     End Class
 
     Private Sub MathElement_ChildAdded(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.ChildAdded
-        e.Argument.RaiseAddedToParent()
+        e.ChildElement.RaiseAddedToParent()
     End Sub
 
     Private Sub MathElement_ChildRemoved(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.ChildRemoved
-        e.Argument.RaiseRemovedFromParent()
+        e.ChildElement.RaiseRemovedFromParent()
     End Sub
 
     Private Sub MathElement_DetachedFromDocument(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.DetachedFromDocument
@@ -367,5 +391,9 @@ Partial Public MustInherit Class MathElement
         For Each Child In Children
             Child.RaiseDetachedFromDocument()
         Next
+    End Sub
+
+    Private Sub MathElement_SubTreeModified(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.SubTreeModified
+        Me.Parent.RaiseSubTreeModified(e)
     End Sub
 End Class
