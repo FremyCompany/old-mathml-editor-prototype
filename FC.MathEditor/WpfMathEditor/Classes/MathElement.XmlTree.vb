@@ -400,6 +400,6 @@ Partial Public MustInherit Class MathElement
     End Sub
 
     Private Sub MathElement_SubTreeModified(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.SubTreeModified
-        Me.ParentElement.RaiseSubTreeModified(e)
+        If Me.ParentElement IsNot Nothing Then Me.ParentElement.RaiseSubTreeModified(e)
     End Sub
 End Class

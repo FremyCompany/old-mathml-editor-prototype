@@ -68,7 +68,7 @@
         Private Document As MathDocument
         Private WithEvents _Host As MathElement
         Private WithEvents _Parent As SelectionPoint
-        Private Valid As Boolean
+        Private Valid As Boolean = True
 
         Private Property Index As Integer
             Get
@@ -111,7 +111,7 @@
         ''' <summary>
         ''' Gets the last element of the selection host that's before this point (or Nothing if there's no).
         ''' </summary>
-        Public ReadOnly Property Start() As MathElement
+        Public ReadOnly Property PreviousSibling() As MathElement
             Get
                 If ChildIndex = 0 Then Return Nothing
                 Return ParentElement.Children.ElementAt(ChildIndex - 1)
@@ -121,7 +121,7 @@
         ''' <summary>
         ''' Gets the first element of the selection host that's after this point (or Nothing if there's no).
         ''' </summary>
-        Public ReadOnly Property [End]() As MathElement
+        Public ReadOnly Property NextSibling() As MathElement
             Get
                 Return ParentElement.Children.ElementAt(ChildIndex)
             End Get

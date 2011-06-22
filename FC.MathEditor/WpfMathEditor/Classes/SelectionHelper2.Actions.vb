@@ -48,8 +48,7 @@
     ''' Moves the selection to the next available parent location
     ''' </summary>
     ''' <param name="MovedPoint">The point to move</param>
-    ''' <remarks>See MoveRight for a better result</remarks>
-    Public Sub MoveNext(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveAfterParent(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         Dim P = GetSelection(MovedPoint)
         Dim E = P.ParentElement
@@ -86,8 +85,7 @@
     ''' Moves the selection to the next available parent location (backward)
     ''' </summary>
     ''' <param name="MovedPoint">The point to move</param>
-    ''' <remarks>See MoveLeft for a better result</remarks>
-    Public Sub MovePrevious(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveBeforeParent(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         Dim P = GetSelection(MovedPoint)
         Dim E = P.ParentElement
@@ -128,7 +126,7 @@
         Dim Sel = GetSelection(MovedPoint)
 
         If Sel.IsAtOrigin Then
-            MovePrevious(MovedPoint)
+            MoveBeforeParent(MovedPoint)
         Else
             SetSelection(Sel.Increment(-1), MovedPoint)
         End If
@@ -144,7 +142,7 @@
         Dim Sel = GetSelection(MovedPoint)
 
         If Sel.IsAtEnd Then
-            MoveNext(MovedPoint)
+            MoveAfterParent(MovedPoint)
         Else
             SetSelection(Sel.Increment(1), MovedPoint)
         End If
@@ -193,6 +191,37 @@
             MovedPoint
         )
 
+    End Sub
+
+    Private Function GetSelectedElements() As IEnumerable(Of MathElement)
+        If IsEmpty Then Return New MathElement() {}
+        Return New SiblingEnumeratorGenerator(ApparentSSP, ApparentSEP)
+    End Function
+
+    Private Function CloneSelectedElements() As IEnumerable(Of MathElement)
+        Return GetSelectedElements().Select(Function(el) el.Clone())
+    End Function
+
+    Public Sub DeleteContents()
+        For Each el In GetSelectedElements().ToArray()
+            ParentElement.RemoveChild(el)
+        Next
+    End Sub
+
+    Public Sub ReplaceContents(ByVal NewChilds As IEnumerable(Of MathElement))
+        Dim EndPoint = ApparentSEP.NextSibling
+        Me.DeleteContents()
+        For Each el In NewChilds
+            ParentElement.Children.InsertBefore(el, EndPoint)
+        Next
+        SetSelection(ApparentSEP, ApparentSEP)
+    End Sub
+
+    Public Sub ReplaceContents(ByVal NewChild As MathElement)
+        Dim EndPoint = ApparentSEP.NextSibling
+        Me.DeleteContents()
+        ParentElement.Children.InsertBefore(NewChild, EndPoint)
+        SetSelection(ApparentSEP, ApparentSEP)
     End Sub
 
 End Class

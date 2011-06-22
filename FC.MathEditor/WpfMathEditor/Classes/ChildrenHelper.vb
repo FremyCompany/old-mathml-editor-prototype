@@ -450,7 +450,12 @@
 
         InsertBefore(Wrapper, InitialChild)
 
-        Dim Children = New SiblingEnumerator(InitialChild, FinalChild)
+        Dim ICI = If(InitialChild Is Nothing, 0, InitialChild.ChildIndex)
+        Dim FCI = If(FinalChild Is Nothing, Me.Count, FinalChild.ChildIndex)
+        Dim Children = New SiblingEnumerator(New SelectionHelper.SelectionPoint(This, ICI), New SelectionHelper.SelectionPoint(This, FCI))
+
+
+        ' TODO: Write test on this matter. SiblingEnumerator implementation changed
         Dim CurrentChild As MathElement
         While Children.MoveNext()
             CurrentChild = Children.Current
@@ -480,7 +485,7 @@
     ''' Gets the enumerator.
     ''' </summary>
     Public Overridable Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement) Implements System.Collections.Generic.IEnumerable(Of MathElement).GetEnumerator
-        Return New SiblingEnumerator(Me.First)
+        Return New SiblingEnumerator(This, True)
     End Function
 
     Private Function GetUntypedEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator

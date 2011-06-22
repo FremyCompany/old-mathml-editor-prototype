@@ -1,8 +1,32 @@
-﻿Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
+﻿Public Class SiblingEnumeratorGenerator : Implements IEnumerable(Of MathElement)
 
-    'Public Sub New(ByVal ParentElement As MathElement)
+    Private StartPoint, EndPoint As SelectionHelper.SelectionPoint
 
-    'End Sub
+    Public Sub New(ByVal ParentToWalk As MathElement)
+        StartPoint = New SelectionHelper.SelectionPoint(ParentToWalk, 0)
+        EndPoint = StartPoint.GetEnd()
+    End Sub
+
+    Public Sub New(ByVal StartPoint As SelectionHelper.SelectionPoint, ByVal EndPoint As SelectionHelper.SelectionPoint)
+        Me.StartPoint = StartPoint
+        Me.EndPoint = EndPoint
+    End Sub
+
+    Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement) Implements System.Collections.Generic.IEnumerable(Of MathElement).GetEnumerator
+        Return New SiblingEnumerator(StartPoint, EndPoint)
+    End Function
+
+    Private Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+        Return GetEnumerator()
+    End Function
+
+End Class
+
+Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
+
+    Public Sub New(ByVal ParentElement As MathElement, ByVal BoolToDelete As Boolean)
+
+    End Sub
 
     Public Sub New(ByVal StartPoint As SelectionHelper.SelectionPoint)
         Me.StartPoint = StartPoint : CurrentPoint = StartPoint : EndPoint = StartPoint.GetEnd()
@@ -13,8 +37,15 @@
     ''' </summary>
     ''' <param name="StartPoint">Point de départ de l'énumération</param>
     ''' <param name="EndPoint">Point d'arrivée de l'énumération</param>
-    Public Sub New(ByVal StartPoint As SelectionHelper.SelectionPoint, EndPoint As SelectionHelper.SelectionPoint)
+    Public Sub New(ByVal StartPoint As SelectionHelper.SelectionPoint, ByVal EndPoint As SelectionHelper.SelectionPoint)
+
+        ' Vérifie la cohérence des données
+        If EndPoint Is Nothing Then EndPoint = StartPoint.GetEnd()
+        If StartPoint.ParentElement IsNot EndPoint.ParentElement Then Throw New ArgumentException("Un énumérateur d'enfant ne peut avoir son début et sa fin dans des éléments différents.")
+
+        ' Ecrit les données en mémoire
         Me.StartPoint = StartPoint : Me.CurrentPoint = StartPoint : Me.EndPoint = EndPoint
+
     End Sub
 
     Private StartPoint As SelectionHelper.SelectionPoint
@@ -27,7 +58,7 @@
     Public ReadOnly Property Current As MathElement Implements System.Collections.Generic.IEnumerator(Of MathElement).Current
         Get
             AssertNotDisposed()
-            Return CurrentPoint.Start
+            Return CurrentPoint.PreviousSibling
         End Get
     End Property
 
@@ -37,12 +68,17 @@
         End Get
     End Property
 
+    ''' <summary>
+    ''' Augmente la position du pointeur de un élément
+    ''' </summary>
+    ''' <returns>True si l'incrément a pu être effectué, False sinon</returns>
+    ''' <remarks>Cette fonction peut retourner une InvalidOperationException si son pointeur courrant est devenu invalide</remarks>
     Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
         AssertNotDisposed()
 
         If CurrentPoint.IsValid Then
             ' Passe au point suivant, si on peut (<max) et si il existe (!at end)
-            If CurrentPoint.ChildIndex - EndPoint.ChildIndex OrElse CurrentPoint.IsAtEnd Then
+            If CurrentPoint.ChildIndex >= EndPoint.ChildIndex OrElse CurrentPoint.IsAtEnd Then
                 Return False
             Else
                 CurrentPoint = CurrentPoint.Increment(1)
@@ -54,6 +90,9 @@
         End If
     End Function
 
+    ''' <summary>
+    ''' Retourne le pointeur courrant à son état initial
+    ''' </summary>
     Public Sub Reset() Implements System.Collections.IEnumerator.Reset
         AssertNotDisposed()
         CurrentPoint = StartPoint

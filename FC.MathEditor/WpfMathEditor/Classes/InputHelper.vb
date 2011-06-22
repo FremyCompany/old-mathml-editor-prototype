@@ -21,7 +21,7 @@
 
     Public ReadOnly Property CurrentInput As InputHelper
         Get
-            Return This.Selection.CommonAncestror.Input
+            Return This.Selection.ParentElement.Input
         End Get
     End Property
 
@@ -43,7 +43,7 @@
     Public Sub ProcessChar(ByVal InputChar As Integer)
 
         ' Can't process char if not currently selected
-        If This.Selection.CommonAncestror IsNot This Then
+        If This.Selection.ParentElement IsNot This Then
             Throw New InvalidOperationException("Sending text input can be done only to the element who host the selection. Modify your code to change the selection before sending any input.")
         End If
 
@@ -64,13 +64,13 @@
         This.Selection.DeleteContents()
 
         ' Handle chars by right, by left, or by this input helper
-        If This.Selection.SelectionStart IsNot Nothing AndAlso This.Selection.SelectionStart.Input.ProcessChar_FromRight(InputChar) Then Exit Sub
-        If This.Selection.SelectionEnd IsNot Nothing AndAlso This.Selection.SelectionEnd.Input.ProcessChar_FromLeft(InputChar) Then Exit Sub
+        If This.Selection.PreviousSibling IsNot Nothing AndAlso This.Selection.PreviousSibling.Input.ProcessChar_FromRight(InputChar) Then Exit Sub
+        If This.Selection.NextSibling IsNot Nothing AndAlso This.Selection.NextSibling.Input.ProcessChar_FromLeft(InputChar) Then Exit Sub
         If ProcessChar_Internal(InputChar) Then Exit Sub
 
         ' When a char wasn't handled neither by right, by left or by current element:
-        If This.Selection.SelectionEnd Is Nothing Then
-            This.Selection.MoveNext() : This.Selection.CommonAncestror.Input.ProcessChar(InputChar)
+        If This.Selection.NextSibling Is Nothing Then
+            This.Selection.MoveAfterParent() : This.Selection.ParentElement.Input.ProcessChar(InputChar)
         End If
 
     End Sub
@@ -88,7 +88,7 @@
         If This.Selection.IsEmpty Then
 
             ' If the selection is emtpy, try to give the priority to the left element
-            Dim RightElement = This.Selection.SelectionEnd
+            Dim RightElement = This.Selection.NextSibling
             If RightElement.Input.ProcessDelete_FromLeft() Then
                 Exit Sub
             End If
@@ -107,9 +107,9 @@
         End If
 
         ' If this element didn't respond to the keypress, we may forward the event to another one
-        If This.Selection.SelectionEnd Is Nothing Then
-            This.Selection.MoveNext()
-            This.Selection.CommonAncestror.Input.ProcessDelete()
+        If This.Selection.NextSibling Is Nothing Then
+            This.Selection.MoveAfterParent()
+            This.Selection.ParentElement.Input.ProcessDelete()
             Exit Sub
         End If
 
@@ -120,7 +120,7 @@
         If This.Selection.IsEmpty Then
 
             ' If the selection is emtpy, try to give the priority to the left element
-            Dim LeftElement = This.Selection.SelectionStart
+            Dim LeftElement = This.Selection.PreviousSibling
             If (LeftElement IsNot Nothing) AndAlso (LeftElement.Input.ProcessBackSpace_FromRight()) Then
                 Exit Sub
             End If
@@ -139,9 +139,9 @@
         End If
 
         ' If this element didn't respond to the keypress, we may forward the event to another one
-        If This.Selection.SelectionStart Is Nothing Then
-            This.Selection.MovePrevious()
-            This.Selection.CommonAncestror.Input.ProcessBackSpace()
+        If This.Selection.PreviousSibling Is Nothing Then
+            This.Selection.MoveBeforeParent()
+            This.Selection.ParentElement.Input.ProcessBackSpace()
             Exit Sub
         End If
 
@@ -248,12 +248,14 @@
 
     Public Overridable Function ProcessDelete_Internal() As Boolean
 
+        ' Retreive the first element before the selection
+        Dim ElementToDelete = This.Selection.NextSibling
+
         ' In case there's no element to delete, forward the call
-        If This.Selection.SelectionStart Is Nothing Then Return False
+        If ElementToDelete Is Nothing Then Return False
 
         ' If there's one element to delete, delete it
-        This.Selection.MoveLeft(SelectionHelper.SelectionPointType.StartPoint)
-        This.Selection.DeleteContents()
+        ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
 
         ' Inform that the delete key was handled
         Return True
@@ -262,12 +264,14 @@
 
     Public Overridable Function ProcessBackSpace_Internal() As Boolean
 
+        ' Retreive the first element before the selection
+        Dim ElementToDelete = This.Selection.PreviousSibling
+
         ' In case there's no element to delete, forward the call
-        If This.Selection.SelectionEnd Is Nothing Then Return False
+        If ElementToDelete Is Nothing Then Return False
 
         ' If there's one element to delete, delete it
-        This.Selection.MoveRight(SelectionHelper.SelectionPointType.EndPoint)
-        This.Selection.DeleteContents()
+        ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
 
         ' Inform that the delete key was handled
         Return True

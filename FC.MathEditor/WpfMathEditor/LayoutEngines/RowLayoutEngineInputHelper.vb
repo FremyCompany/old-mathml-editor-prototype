@@ -8,18 +8,6 @@
         Return False
     End Function
 
-    Public Overrides Function ProcessBackSpace_Internal() As Boolean
-
-        ' In case there's no element to delete, forward the call
-        If This.Selection.SelectionStart Is Nothing Then Return False
-
-        ' If there's one element to delete, delete it
-        This.Selection.MoveLeft(SelectionHelper.SelectionPointType.StartPoint)
-        This.Selection.DeleteContents()
-        Return True
-
-    End Function
-
     Public Overrides Function ProcessChar_Internal(ByVal InputChar As Integer) As Boolean
 
         ' [[Assumption]] When we reach this function, the adjacent textedits refused the char.
@@ -32,7 +20,7 @@
         ( _
             (Char.IsDigit(Char.ConvertFromUtf32(InputChar))) OrElse
             (InputChar = ".") OrElse
-            ((InputChar = "-" OrElse InputChar = "+") AndAlso TryCast(This.Selection.SelectionStart, OperatorTextEdit) IsNot Nothing) _
+            ((InputChar = "-" OrElse InputChar = "+") AndAlso TryCast(This.Selection.PreviousSibling, OperatorTextEdit) IsNot Nothing) _
         ) Then
             TextEdit = New NumberTextEdit()
         Else

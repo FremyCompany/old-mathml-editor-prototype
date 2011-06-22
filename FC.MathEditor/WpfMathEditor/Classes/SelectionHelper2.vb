@@ -30,6 +30,20 @@
     ''' </summary>
     Public Event Changed As EventHandler
 
+    ''' <summary>
+    ''' Called when the selection end point is invalidated
+    ''' </summary>
+    Private Sub SEP_Invalidated(ByVal sender As Object, ByVal e As System.EventArgs) Handles SEP.Invalidated
+        SetSelection(SEP.FirstValidParent, SelectionPointType.EndPoint)
+    End Sub
+
+    ''' <summary>
+    ''' Called when the selection start point is invalidated
+    ''' </summary>
+    Private Sub SSP_Invalidated(ByVal sender As Object, ByVal e As System.EventArgs) Handles SSP.Invalidated
+        SetSelection(SSP.FirstValidParent, SelectionPointType.StartPoint)
+    End Sub
+
     '++
     '++ Private fields
     '++
@@ -58,18 +72,18 @@
     Private ReadOnly Property SS As MathElement
         Get
             If Direction = SelectionDirection.LTR Then
-                Return ApparentSSP.Start
+                Return ApparentSSP.PreviousSibling
             Else
-                Return ApparentSEP.Start
+                Return ApparentSEP.PreviousSibling
             End If
         End Get
     End Property
     Private ReadOnly Property SE As MathElement
         Get
             If Direction = SelectionDirection.LTR Then
-                Return ApparentSEP.End
+                Return ApparentSEP.NextSibling
             Else
-                Return ApparentSSP.End
+                Return ApparentSSP.NextSibling
             End If
         End Get
     End Property
@@ -77,7 +91,7 @@
     ''' <summary>
     ''' Gets the last host' child that's before the selection (or Nothing)
     ''' </summary>
-    Public ReadOnly Property LogicalStart() As MathElement
+    Public ReadOnly Property PreviousSibling() As MathElement
         Get
             Return SS
         End Get
@@ -86,7 +100,7 @@
     ''' <summary>
     ''' Gets the first host' child that's after the selection (or Nothing)
     ''' </summary>
-    Public ReadOnly Property LogicalEnd() As MathElement
+    Public ReadOnly Property NextSibling() As MathElement
         Get
             Return SE
         End Get
@@ -119,15 +133,18 @@
     End Property
 
     ''' <summary>
-    ''' Returns the selection start point (or Nothing)
+    ''' Returns the selection start point
     ''' </summary>
-    Public ReadOnly Property SelectionStart() As SelectionPoint
+    Public ReadOnly Property StartPoint() As SelectionPoint
         Get
             Return ApparentSSP
         End Get
     End Property
 
-    Public ReadOnly Property SelectionEnd() As SelectionPoint
+    ''' <summary>
+    ''' Returns the selection end point
+    ''' </summary>
+    Public ReadOnly Property EndPoint() As SelectionPoint
         Get
             Return ApparentSEP
         End Get
@@ -236,4 +253,5 @@
     Private Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
         Return GetEnumerator()
     End Function
+
 End Class

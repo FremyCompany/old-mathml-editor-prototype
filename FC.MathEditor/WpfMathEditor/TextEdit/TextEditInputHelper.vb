@@ -18,8 +18,8 @@
             Dim NewElement = New UnicodeGlyph(InputChar)
 
             Console.WriteLine("TODO: TextEdit.ProcessChar_Internal")
-            This.Selection.CommonAncestror.Children.InsertAfter(NewElement, This.Selection.SelectionStart)
-            This.Selection.SetSelection(This, NewElement, This.Selection.SelectionEnd)
+            This.Selection.ParentElement.Children.InsertAfter(NewElement, This.Selection.PreviousSibling)
+            This.Selection.SetSelection(This, NewElement, This.Selection.NextSibling)
 
             Return True
 
