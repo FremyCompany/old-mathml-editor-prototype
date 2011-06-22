@@ -1,4 +1,4 @@
-﻿Partial Public Class SelectionHelper
+﻿Partial Public Class SelectionHelper0
     Implements IEnumerable(Of MathElement)
 
     Protected This As MathDocument
@@ -58,12 +58,12 @@
         Else
             CA = StartPoint.CommonAncestror.GetCommonAncestrorWith(EndPoint.CommonAncestror)
 
-            While SS.Parent IsNot CA
-                SS = SS.Parent
+            While SS.ParentElement IsNot CA
+                SS = SS.ParentElement
             End While
 
-            While SE.Parent IsNot SE
-                SE = SE.Parent
+            While SE.ParentElement IsNot SE
+                SE = SE.ParentElement
             End While
 
         End If
@@ -114,8 +114,8 @@
         If (
             (CommonAncestror IsNot Nothing) _
             AndAlso (CommonAncestror.ParentDocument Is This) _
-            AndAlso (SelectionStart Is Nothing OrElse SelectionStart.Parent Is CommonAncestror) _
-            AndAlso (SelectionEnd Is Nothing OrElse SelectionEnd.Parent Is CommonAncestror)
+            AndAlso (SelectionStart Is Nothing OrElse SelectionStart.ParentElement Is CommonAncestror) _
+            AndAlso (SelectionEnd Is Nothing OrElse SelectionEnd.ParentElement Is CommonAncestror)
         ) Then
 
             ' Invert StartPoint and EndPoint if needed

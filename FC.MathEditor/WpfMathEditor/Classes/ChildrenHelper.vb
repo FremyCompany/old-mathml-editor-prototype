@@ -18,7 +18,7 @@
     ''' </summary>
     ''' <param name="Element">The element to search for</param>
     Public Function Contains(ByVal Element As MathElement) As Boolean
-        Return (Element.Parent Is Me) AndAlso Contains_Internal(Element)
+        Return (Element.ParentElement Is Me) AndAlso Contains_Internal(Element)
     End Function
 
     ''' <summary>
@@ -62,7 +62,7 @@
     ''' <param name="OldChild">The old child.</param>
     Public Sub Remove(ByVal OldChild As MathElement)
 
-        If OldChild.Parent IsNot This Then _
+        If OldChild.ParentElement IsNot This Then _
             Throw New ArgumentException("OldChild was not a child of this element.")
 
         Try
@@ -275,7 +275,7 @@
     ''' </summary>
     ''' <param name="Element">The element to be added to the children list</param>
     Public Function CanContains(ByVal Element As MathElement) As Boolean
-        Return (Element IsNot Nothing) AndAlso (Element.Parent Is Nothing) AndAlso CanContains_Internal(Element)
+        Return (Element IsNot Nothing) AndAlso (Element.ParentElement Is Nothing) AndAlso CanContains_Internal(Element)
     End Function
 
     ''' <summary>
@@ -329,9 +329,9 @@
 
             ' Perform checks
             If OldChild Is NewChild Then Throw New ArgumentException("An element can be replaced by itself.")
-            If OldChild.Parent IsNot Me Then Throw New ArgumentException("The element to replace is not attached to this element.")
+            If OldChild.ParentElement IsNot Me Then Throw New ArgumentException("The element to replace is not attached to this element.")
 
-            If NewChild.Parent Is Me Then Remove(NewChild)
+            If NewChild.ParentElement Is Me Then Remove(NewChild)
 
             ' Launch user-defined code
             This.Attach(NewChild)
@@ -486,71 +486,5 @@
     Private Function GetUntypedEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
         Return GetEnumerator()
     End Function
-
-End Class
-
-Public Class SiblingEnumeratorGenerator : Implements IEnumerable(Of MathElement)
-
-    Private FirstEl, LastEl As MathElement
-    Public Sub New(ByVal FirstEl As MathElement)
-        Me.New(FirstEl, Nothing)
-    End Sub
-
-    Public Sub New(ByVal FirstEl As MathElement, ByVal LastEl As MathElement)
-        Me.FirstEl = FirstEl : Me.LastEl = LastEl
-    End Sub
-
-    Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement) Implements System.Collections.Generic.IEnumerable(Of MathElement).GetEnumerator
-        Return New SiblingEnumerator(FirstEl, LastEl)
-    End Function
-
-    Public Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
-        Return GetEnumerator()
-    End Function
-
-End Class
-
-Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
-
-    Private FirstEl As MathElement, NextEl As MathElement, CurrentEl As MathElement
-    Public Sub New(ByVal FirstEl As MathElement)
-        Me.FirstEl = FirstEl : Me.NextEl = FirstEl
-    End Sub
-
-    Private LastEl As MathElement
-    Public Sub New(ByVal FirstEl As MathElement, ByVal LastEl As MathElement)
-        Me.FirstEl = FirstEl : Me.NextEl = FirstEl : Me.LastEl = LastEl
-    End Sub
-
-    Public ReadOnly Property Current As MathElement Implements System.Collections.Generic.IEnumerator(Of MathElement).Current
-        Get
-            Return CurrentEl
-        End Get
-    End Property
-
-    Public ReadOnly Property CurrentUnTyped As Object Implements System.Collections.IEnumerator.Current
-        Get
-            Return CurrentEl
-        End Get
-    End Property
-
-    Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
-        If (NextEl Is Nothing) OrElse (LastEl IsNot Nothing AndAlso Current Is LastEl) Then
-            CurrentEl = Nothing
-            Return False
-        Else
-            CurrentEl = NextEl
-            NextEl = CurrentEl.NextSibling
-            Return True
-        End If
-    End Function
-
-    Public Sub Reset() Implements System.Collections.IEnumerator.Reset
-        NextEl = FirstEl : CurrentEl = Nothing
-    End Sub
-
-    Public Sub Dispose() Implements IDisposable.Dispose
-        FirstEl = Nothing : NextEl = Nothing : CurrentEl = Nothing
-    End Sub
 
 End Class

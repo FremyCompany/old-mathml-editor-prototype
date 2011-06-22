@@ -1,224 +1,239 @@
-﻿Partial Public Class SelectionHelper2
+﻿Partial Public Class SelectionHelper
+    Implements IEnumerable(Of MathElement)
 
-    Private WithEvents SH As MathElement
-    Private SSI, SEI As Integer
+    '++
+    '++ Constructor
+    '++
+
+    Public Sub New(ByVal Document As MathDocument)
+
+        This = Document
+
+        SSP = New SelectionPoint(Document, Document.Children.Count)
+        SEP = New SelectionPoint(Document, Document.Children.Count)
+        ApparentSSP = New SelectionPoint(Document, Document.Children.Count)
+        ApparentSEP = New SelectionPoint(Document, Document.Children.Count)
+
+    End Sub
+
+    '++
+    '++ Events
+    '++
+
+    ''' <summary>
+    ''' Event risen when any of the selection point is being modified
+    ''' </summary>
+    Public Event Changing As EventHandler(Of SelectionChangedEventArgs)
+
+    ''' <summary>
+    ''' Event risen when any of the selection point is modified
+    ''' </summary>
+    Public Event Changed As EventHandler
+
+    '++
+    '++ Private fields
+    '++
+
+    Private This As MathDocument
+
+    Private WithEvents SSP As SelectionPoint
+    Private WithEvents SEP As SelectionPoint
+
+    Private WithEvents ApparentSSP As SelectionPoint
+    Private WithEvents ApparentSEP As SelectionPoint
+
+    ''' <summary>
+    ''' Return LTR if the selection points are in the logical order, RTL otherly.
+    ''' </summary>
+    Public ReadOnly Property Direction As SelectionDirection
+        Get
+            If ApparentSEP.ChildIndex < ApparentSSP.ChildIndex Then
+                Return SelectionDirection.RTL
+            Else
+                Return SelectionDirection.LTR
+            End If
+        End Get
+    End Property
 
     Private ReadOnly Property SS As MathElement
         Get
-            Return SH.Children.ElementAt(SSI)
+            If Direction = SelectionDirection.LTR Then
+                Return ApparentSSP.Start
+            Else
+                Return ApparentSEP.Start
+            End If
         End Get
     End Property
-
     Private ReadOnly Property SE As MathElement
         Get
-            Return SH.Children.ElementAt(SEI)
+            If Direction = SelectionDirection.LTR Then
+                Return ApparentSEP.End
+            Else
+                Return ApparentSSP.End
+            End If
         End Get
     End Property
 
-    Public ReadOnly Property [Start]() As MathElement
+    ''' <summary>
+    ''' Gets the last host' child that's before the selection (or Nothing)
+    ''' </summary>
+    Public ReadOnly Property LogicalStart() As MathElement
         Get
             Return SS
         End Get
     End Property
 
-    Public ReadOnly Property [End]() As MathElement
+    ''' <summary>
+    ''' Gets the first host' child that's after the selection (or Nothing)
+    ''' </summary>
+    Public ReadOnly Property LogicalEnd() As MathElement
         Get
             Return SE
         End Get
     End Property
 
-    Public ReadOnly Property [Host] As MathElement
+    ''' <summary>
+    ''' Returns the first selection point, in the logical order
+    ''' </summary>
+    Public ReadOnly Property LogicalSelectionStart() As SelectionPoint
         Get
-            Return SH
+            If Direction = SelectionDirection.LTR Then
+                Return ApparentSSP
+            Else
+                Return ApparentSEP
+            End If
         End Get
     End Property
 
-    Public Class SelectionPoint
-
-        Public Sub New(ByVal SelectionHost As MathElement, ByVal ChildIndex As Integer)
-
-            ' A selection host can't be null, and the index should be valid
-            If SelectionHost Is Nothing Then Throw New ArgumentNullException("SelectionHost", "A selection host can't be null")
-            If ChildIndex < 0 Then Throw New ArgumentException("ChildIndex can't be negative. It should be a positive number between 0 and SelectionHost.Children.Count.")
-            If ChildIndex > SelectionHost.Children.Count Then Throw New ArgumentException("ChildIndex can't be superior to the number of children. It should be a positive number between 0 and SelectionHost.Children.Count.")
-
-            ' An element should have a parent document in order to be a valid SelectionHost target
-            Document = SelectionHost.ParentDocument
-            If Document Is Nothing Then Throw New ArgumentException("An element should have a parent document in order to be a valid SelectionHost target")
-
-            ' Fields initialization
-            Me.Host = SelectionHost : Me.Index = ChildIndex
-
-            ' Parent initialization
-            If SelectionHost.Parent IsNot Nothing Then
-                Parent = New SelectionPoint(SelectionHost.Parent, SelectionHost.Parent.Children.IndexOf(SelectionHost))
+    ''' <summary>
+    ''' Returns the last selection point, in the logical order
+    ''' </summary>
+    Public ReadOnly Property LogicalSelectionEnd() As SelectionPoint
+        Get
+            If Direction = SelectionDirection.LTR Then
+                Return ApparentSEP
+            Else
+                Return ApparentSSP
             End If
+        End Get
+    End Property
 
-        End Sub
+    ''' <summary>
+    ''' Returns the selection start point (or Nothing)
+    ''' </summary>
+    Public ReadOnly Property SelectionStart() As SelectionPoint
+        Get
+            Return ApparentSSP
+        End Get
+    End Property
 
-        '++
-        '++ Events
-        '++
+    Public ReadOnly Property SelectionEnd() As SelectionPoint
+        Get
+            Return ApparentSEP
+        End Get
+    End Property
 
-        Public Event ParentChanged As EventHandler(Of ChangeEventArgs)
-        Public Event Changed As EventHandler(Of ChangeEventArgs)
+    ''' <summary>
+    ''' Returns the element in which the selection occurs
+    ''' </summary>
+    Public ReadOnly Property ParentElement As MathElement
+        Get
+            Return ApparentSSP.ParentElement
+        End Get
+    End Property
 
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Class ChangeEventArgs : Inherits EventArgs
+    ''' <summary>
+    ''' Returns the document in which the selection occurs
+    ''' </summary>
+    Public ReadOnly Property ParentDocument As MathDocument
+        Get
+            Return This
+        End Get
+    End Property
 
-            Public Property MovedPoint As SelectionPoint
-            Public Property OldIndex As Integer
-            Public Property NewIndex As Integer
+    Private Sub SetSelection(ByVal StartPoint As SelectionPoint, ByVal EndPoint As SelectionPoint)
 
-            Public Sub New(ByVal MovedPoint As SelectionPoint, ByVal OldIndex As Integer, ByVal NewIndex As Integer)
-                Me.MovedPoint = MovedPoint : Me.OldIndex = OldIndex : Me.NewIndex = NewIndex
-            End Sub
+        ' Find the apparent selection for the specified points
+        Dim R = StartPoint.GetApparentSelection(EndPoint)
 
-        End Class
+        ' Save the previous state
+        Dim E As New SelectionChangedEventArgs(Me.SSP, Me.SEP, StartPoint, EndPoint)
 
-        '++
-        '++ Properties
-        '++
+        ' Raise the Chaning event
+        RaiseEvent Changing(Me, E)
 
-        Private _Index As Integer = 0
-        Private Document As MathDocument
-        Private WithEvents Host As MathElement
-        Private WithEvents Parent As SelectionPoint
-        Private Valid As Boolean
+        ' Perform the changes
+        SSP = StartPoint
+        SEP = EndPoint
+        ApparentSSP = R.Item1
+        ApparentSEP = R.Item2
 
-        Private Property Index As Integer
-            Get
-                Return _Index
-            End Get
-            Set(ByVal value As Integer)
+        ' Raise the Changed event
+        RaiseEvent Changed(Me, E)
 
-                If Index <> value Then
+    End Sub
 
-                    Dim e = New SelectionPoint.ChangeEventArgs(Me, Index, value) : _Index = value
-                    RaiseEvent Changed(Me, e)
+    Public Sub SetSelection(ByVal NewPoint As SelectionPoint, Optional ByVal PointToChange As SelectionPointType = SelectionPointType.Selection)
+        Select Case PointToChange
+            Case SelectionPointType.Selection
+                SetSelection(NewPoint, NewPoint)
+            Case SelectionPointType.StartPoint
+                SetSelection(NewPoint, SEP)
+            Case SelectionPointType.EndPoint
+                SetSelection(SSP, NewPoint)
+            Case Else
+                Throw New ArgumentException("Unknown value for the selection point type", "PointToChange")
+        End Select
+    End Sub
 
-                End If
-            End Set
-        End Property
+    Public Function GetSelection(ByVal PointToRetreive As SelectionPointType) As SelectionPoint
+        Select Case PointToRetreive
+            Case SelectionPointType.Selection
+                ' TODO: Check if it's not better to throw an exception here
+                Return ApparentSEP
+            Case SelectionPointType.StartPoint
+                Return SSP
+            Case SelectionPointType.EndPoint
+                Return SEP
+            Case Else
+                Throw New ArgumentException("Unknown value for the selection point type", "PointToRetreive")
+        End Select
+    End Function
 
-        ''' <summary>
-        ''' Gets the index of the child.
-        ''' </summary>
-        ''' <value>
-        ''' The index of the child.
-        ''' </value>
-        Public ReadOnly Property ChildIndex As Integer
-            Get
-                If IsValid Then Return Index
-                Throw New InvalidOperationException("This selection point has been invalidated.")
-            End Get
-        End Property
+    Public Sub SetSelection(ByVal CommonAncestror As MathElement, ByVal SelectionStart As MathElement, ByVal SelectionEnd As MathElement)
 
-        ''' <summary>
-        ''' Gets the selection host.
-        ''' </summary>
-        Public ReadOnly Property SelectionHost As MathElement
-            Get
-                If IsValid Then Return Host
-                Throw New InvalidOperationException("This selection point has been invalidated.")
-            End Get
-        End Property
+        ' Check if the selection is valid
+        If (
+            (CommonAncestror IsNot Nothing) _
+            AndAlso (CommonAncestror.ParentDocument Is This) _
+            AndAlso (SelectionStart Is Nothing OrElse SelectionStart.ParentElement Is CommonAncestror) _
+            AndAlso (SelectionEnd Is Nothing OrElse SelectionEnd.ParentElement Is CommonAncestror)
+        ) Then
 
-        ''' <summary>
-        ''' Gets the last element of the selection host that's before this point (or Nothing if there's no).
-        ''' </summary>
-        Public ReadOnly Property SelectionStart() As MathElement
-            Get
-                Return Host.Children.ElementAt(ChildIndex - 1)
-            End Get
-        End Property
+            ' Set the selection
+            SetSelection(
+                New SelectionPoint(CommonAncestror, If(SelectionStart Is Nothing, 0, SelectionStart.ChildIndex + 1)),
+                New SelectionPoint(CommonAncestror, If(SelectionEnd Is Nothing, CommonAncestror.Children.Count, SelectionEnd.ChildIndex))
+            )
 
-        ''' <summary>
-        ''' Gets the first element of the selection host that's after this point (or Nothing if there's no).
-        ''' </summary>
-        Public ReadOnly Property SelectionEnd() As MathElement
-            Get
-                Return Host.Children.ElementAt(ChildIndex)
-            End Get
-        End Property
+        Else
 
-        ''' <summary>
-        ''' Gets the parent document.
-        ''' </summary>
-        Public ReadOnly Property ParentDocument As MathDocument
-            Get
-                Return Document
-            End Get
-        End Property
+            ' Notify of an error
+            Throw New ArgumentException("Selection was invalid.")
 
-        ''' <summary>
-        ''' Gets the parent selection point.
-        ''' </summary>
-        Public ReadOnly Property ParentSelectionPoint As SelectionPoint
-            Get
-                Return Parent
-            End Get
-        End Property
+        End If
 
-        ''' <summary>
-        ''' Gets the first valid parent.
-        ''' </summary>
-        Public ReadOnly Property FirstValidParent() As SelectionPoint
-            Get
+    End Sub
 
-                ' Seek valid point
-                FirstValidParent = Me
-                While Not FirstValidParent.IsValid : FirstValidParent = FirstValidParent.ParentSelectionPoint : End While
+    '++
+    '++ Enumerator
+    '++
 
-                ' Return result
-                Return FirstValidParent
+    Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement) Implements System.Collections.Generic.IEnumerable(Of MathElement).GetEnumerator
+        Return New SiblingEnumerator(ApparentSSP, ApparentSEP)
+    End Function
 
-            End Get
-        End Property
-
-        ''' <summary>
-        ''' Gets a value indicating whether this instance is valid.
-        ''' </summary>
-        ''' <value>
-        '''   <c>true</c> if this instance is valid; otherwise, <c>false</c>.
-        ''' </value>
-        Public ReadOnly Property IsValid As Boolean
-            Get
-                Return Valid
-            End Get
-        End Property
-
-        '++
-        '++ Detect changes
-        '++
-
-        Private Sub Host_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles Host.ChildAdded
-            If e.ChildIndex <= Me.ChildIndex Then
-                Me.Index += 1
-            End If
-        End Sub
-
-        Private Sub Host_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles Host.ChildRemoved
-            If e.ChildIndex <= Me.ChildIndex Then
-                Me.Index -= 1
-            End If
-        End Sub
-
-        Private Sub Host_DetachedFromDocument(ByVal sender As Object, ByVal e As System.EventArgs) Handles Host.DetachedFromDocument
-            Valid = False
-        End Sub
-
-        '++
-        '++ Propatage changes
-        '++
-
-        Private Sub Parent_Changed(ByVal sender As Object, ByVal e As ChangeEventArgs) Handles Parent.Changed, Parent.ParentChanged
-            RaiseEvent ParentChanged(Me, e)
-        End Sub
-
-    End Class
-
+    Private Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+        Return GetEnumerator()
+    End Function
 End Class

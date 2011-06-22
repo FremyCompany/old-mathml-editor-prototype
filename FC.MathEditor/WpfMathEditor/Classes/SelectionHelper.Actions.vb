@@ -1,4 +1,4 @@
-﻿Partial Public Class SelectionHelper
+﻿Partial Public Class SelectionHelper0
 
     Public Enum SelectionPointType
         StartPoint
@@ -34,7 +34,7 @@
     Public Sub MoveNext(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
         Dim Sel As Selection = GetSelection(MovedPoint)
         Dim E = Sel.CommonAncestror.ParentLayoutEngineChild
-        Sel.CommonAncestror = E.Parent
+        Sel.CommonAncestror = E.ParentElement
         Sel.SelectionStart = E
         Sel.SelectionEnd = E.NextSibling
         SetSelection(Sel, MovedPoint)
@@ -43,7 +43,7 @@
     Public Sub MovePrevious(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
         Dim Sel As Selection = GetSelection(MovedPoint)
         Dim E = Sel.CommonAncestror.ParentLayoutEngineChild
-        Sel.CommonAncestror = E.Parent
+        Sel.CommonAncestror = E.ParentElement
         Sel.SelectionStart = E.PreviousSibling
         Sel.SelectionEnd = E
         SetSelection(Sel, MovedPoint)
@@ -57,7 +57,7 @@
         If E Is Nothing Then
             MovePrevious(MovedPoint)
         Else
-            Sel.CommonAncestror = E.Parent
+            Sel.CommonAncestror = E.ParentElement
             Sel.SelectionStart = E.PreviousSibling
             Sel.SelectionEnd = E
             SetSelection(Sel, MovedPoint)
@@ -73,7 +73,7 @@
         If E Is Nothing Then
             MoveNext(MovedPoint)
         Else
-            Sel.CommonAncestror = E.Parent
+            Sel.CommonAncestror = E.ParentElement
             Sel.SelectionStart = E
             Sel.SelectionEnd = E.NextSibling
             SetSelection(Sel, MovedPoint)

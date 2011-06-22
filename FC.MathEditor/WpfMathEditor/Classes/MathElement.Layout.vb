@@ -52,10 +52,10 @@
     Public Property FontFamily As FontFamily
         Get
             If _FontFamily Is Nothing Then
-                If Parent Is Nothing Then
+                If ParentElement Is Nothing Then
                     Return DefaultFontFamily
                 Else
-                    _FontFamily = Parent.FontFamily
+                    _FontFamily = ParentElement.FontFamily
                     Return _FontFamily
                 End If
             Else
@@ -82,10 +82,10 @@
     Public Property FontStretch As FontStretch?
         Get
             If _FontStretch Is Nothing Then
-                If Parent Is Nothing Then
+                If ParentElement Is Nothing Then
                     Return DefaultFontStretch
                 Else
-                    _FontStretch = Parent.FontStretch
+                    _FontStretch = ParentElement.FontStretch
                     Return _FontStretch
                 End If
             Else
@@ -112,10 +112,10 @@
     Public Property FontStyle As FontStyle?
         Get
             If _FontStyle Is Nothing Then
-                If Parent Is Nothing Then
+                If ParentElement Is Nothing Then
                     Return DefaultFontStyle
                 Else
-                    _FontStyle = Parent.FontStyle
+                    _FontStyle = ParentElement.FontStyle
                     Return _FontStyle
                 End If
             Else
@@ -142,10 +142,10 @@
     Public Property FontWeight As FontWeight?
         Get
             If _FontWeight Is Nothing Then
-                If Parent Is Nothing Then
+                If ParentElement Is Nothing Then
                     Return DefaultFontWeight
                 Else
-                    _FontWeight = Parent.FontWeight
+                    _FontWeight = ParentElement.FontWeight
                     Return _FontWeight
                 End If
             Else
@@ -173,10 +173,10 @@
     Public Property Foreground As Color?
         Get
             If _Foreground Is Nothing Then
-                If Parent Is Nothing Then
+                If ParentElement Is Nothing Then
                     Return SystemColors.WindowTextColor
                 Else
-                    _Foreground = Parent.Foreground
+                    _Foreground = ParentElement.Foreground
                     Return _Foreground
                 End If
             Else
@@ -203,10 +203,10 @@
     Public Property FontSize As Double?
         Get
             If _FontSize Is Nothing Then
-                If Parent Is Nothing Then
+                If ParentElement Is Nothing Then
                     Return 20
                 Else
-                    _FontSize = Parent.FontSize
+                    _FontSize = ParentElement.FontSize
                     Return _FontSize
                 End If
             Else
@@ -233,10 +233,10 @@
     Public Property Background As Color?
         Get
             If _Background Is Nothing Then
-                If Parent Is Nothing Then
+                If ParentElement Is Nothing Then
                     Return Colors.Transparent
                 Else
-                    _Background = Parent.Background
+                    _Background = ParentElement.Background
                     Return _Background
                 End If
             Else

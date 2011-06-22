@@ -207,8 +207,8 @@
         End If
 
         ' The parent may want to pre-process, too
-        If This.Parent IsNot Nothing Then
-            This.Parent.Input.PreProcessChar(InputChar)
+        If This.ParentElement IsNot Nothing Then
+            This.ParentElement.Input.PreProcessChar(InputChar)
         End If
 
         ' No pre-process
@@ -218,7 +218,7 @@
 
     Public Overridable Function ProcessWaitChar(ByVal InputChar As Integer) As Boolean
         ' Default wait char processing : eat, and walk to next child
-        WaitChar = Nothing : This.Selection.SetSelection(This.Parent, This, This.NextSibling)
+        WaitChar = Nothing : This.Selection.SetSelection(This.ParentElement, This, This.NextSibling)
         Return True
     End Function
 
@@ -328,10 +328,10 @@
     Public Property WritingMode As InputWritingMode
         Get
             If WM = 0 Then
-                If This.Parent Is Nothing Then
+                If This.ParentElement Is Nothing Then
                     Return InputWritingMode.Linear
                 Else
-                    Return This.Parent.Input.WritingMode
+                    Return This.ParentElement.Input.WritingMode
                 End If
             Else
                 Return WM

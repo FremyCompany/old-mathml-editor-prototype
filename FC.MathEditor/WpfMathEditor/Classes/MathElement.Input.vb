@@ -38,19 +38,27 @@
     End Property
 
     Public Overridable Function GetNextInputElement(ByVal CurrentElement As MathElement) As MathElement
-        If CurrentElement Is Nothing Then Return Children.First
-        Return Children.After(CurrentElement)
+        If Me.Children.IsFormatter Then
+            If CurrentElement Is Nothing Then Return Children.First
+            Return Children.After(CurrentElement)
+        Else
+            Return Nothing
+        End If
     End Function
 
     Public Overridable Function GetPreviousInputElement(ByVal CurrentElement As MathElement) As MathElement
-        If CurrentElement Is Nothing Then Return Children.Last
-        Return Children.Before(CurrentElement)
+        If Me.Children.IsFormatter Then
+            If CurrentElement Is Nothing Then Return Children.Last
+            Return Children.Before(CurrentElement)
+        Else
+            Return Nothing
+        End If
     End Function
 
     Public ReadOnly Property ParentLayoutEngine As MathElement
         Get
-            Dim P As MathElement = Parent
-            If Parent Is Nothing Then
+            Dim P As MathElement = ParentElement
+            If ParentElement Is Nothing Then
                 Throw New InvalidOperationException("Unable to retreive a ParentLayoutEngine from an unparented element.")
             End If
 
@@ -58,7 +66,7 @@
                 If P.Children.IsLayoutEngine Then
                     Return P
                 Else
-                    P = P.Parent
+                    P = P.ParentElement
                 End If
             End While
 
@@ -69,15 +77,15 @@
     Public ReadOnly Property ParentLayoutEngineChild As MathElement
         Get
             Dim P As MathElement = Me
-            If Parent Is Nothing Then
+            If ParentElement Is Nothing Then
                 Throw New InvalidOperationException("Unable to retreive a ParentLayoutEngine from an unparented element.")
             End If
 
             While P IsNot Nothing
-                If P.Parent.Children.IsLayoutEngine Then
+                If P.ParentElement.Children.IsLayoutEngine Then
                     Return P
                 Else
-                    P = P.Parent
+                    P = P.ParentElement
                 End If
             End While
 

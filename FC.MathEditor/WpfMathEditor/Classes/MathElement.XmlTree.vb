@@ -13,7 +13,7 @@ Partial Public MustInherit Class MathElement
     ''' <summary>
     ''' Returns the element which attached this element.
     ''' </summary>
-    Public ReadOnly Property Parent As MathElement
+    Public ReadOnly Property ParentElement As MathElement
         Get
             Return _Parent
         End Get
@@ -34,7 +34,7 @@ Partial Public MustInherit Class MathElement
     ''' <param name="Child"></param>
     ''' <remarks></remarks>
     Public Sub Detach(ByVal Child As MathElement)
-        If Child.Parent Is Me Then Child.ResetParent() _
+        If Child.ParentElement Is Me Then Child.ResetParent() _
             Else Throw New ArgumentException("Child must be a child of this element.")
     End Sub
 
@@ -93,7 +93,7 @@ Partial Public MustInherit Class MathElement
     ''' </summary>
     Private Sub ResetParent()
 
-        If Parent.Children.Contains(Me) Then
+        If ParentElement.Children.Contains(Me) Then
 
             Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
 
@@ -118,7 +118,7 @@ Partial Public MustInherit Class MathElement
         Get
             If _ParentDocument IsNot Nothing Then Return _ParentDocument
             If _Parent Is Nothing Then Return Me
-            Return Parent.Root
+            Return ParentElement.Root
         End Get
     End Property
 
@@ -132,8 +132,8 @@ Partial Public MustInherit Class MathElement
 
             ' Cache the parent document, if not already done
             If _ParentDocument Is Nothing Then
-                If Parent IsNot Nothing Then
-                    _ParentDocument = Parent.ParentDocument
+                If ParentElement IsNot Nothing Then
+                    _ParentDocument = ParentElement.ParentDocument
                 ElseIf TryCast(Me, MathDocument) IsNot Nothing Then
                     _ParentDocument = DirectCast(Me, MathDocument)
                 End If
@@ -142,6 +142,12 @@ Partial Public MustInherit Class MathElement
             ' Return the cached parent document
             Return _ParentDocument
 
+        End Get
+    End Property
+
+    Public ReadOnly Property ChildIndex As Integer
+        Get
+            Return ParentElement.Children.IndexOf(Me)
         End Get
     End Property
 
@@ -162,11 +168,11 @@ Partial Public MustInherit Class MathElement
     Public Function IsBefore(ByVal Elm As MathElement) As Boolean
 
         If Elm Is Nothing Then Return True
-        If Elm.Parent IsNot Parent Then Return False
+        If Elm.ParentElement IsNot ParentElement Then Return False
 
         Do 'PreviousSiblig
             If (Elm Is Me) Then Return True
-            Elm = Parent.Children.Before(Elm)
+            Elm = ParentElement.Children.Before(Elm)
         Loop While (Elm IsNot Nothing)
 
         Return False
@@ -230,8 +236,8 @@ Partial Public MustInherit Class MathElement
     Public ReadOnly Property TreeDepht As Integer
         Get
             TreeDepht = 0 : Dim P As MathElement = Me
-            While P.Parent IsNot Nothing
-                TreeDepht += 1 : P = P.Parent
+            While P.ParentElement IsNot Nothing
+                TreeDepht += 1 : P = P.ParentElement
             End While
             Return TreeDepht
         End Get
@@ -246,16 +252,16 @@ Partial Public MustInherit Class MathElement
         Dim Delta As Integer = el2.TreeDepht - el1.TreeDepht
         If Delta > 0 Then
             For x = 1 To Delta
-                el2 = el2.Parent
+                el2 = el2.ParentElement
             Next
         ElseIf Delta < 0 Then
             For x = 1 To -Delta
-                el1 = el1.Parent
+                el1 = el1.ParentElement
             Next
         End If
 
         While el2 IsNot el1
-            el1 = el1.Parent : el2 = el2.Parent
+            el1 = el1.ParentElement : el2 = el2.ParentElement
         End While
 
         Return el1
@@ -303,7 +309,7 @@ Partial Public MustInherit Class MathElement
 #If DEBUG Then
         LastChangeTimestamp = Date.Now
 #End If
-        If _Parent IsNot Nothing Then Parent.RaiseChanged()
+        If _Parent IsNot Nothing Then ParentElement.RaiseChanged()
     End Sub
 
     ' TODO: Reviewing completely the event usage (drawing a schema)
@@ -394,6 +400,6 @@ Partial Public MustInherit Class MathElement
     End Sub
 
     Private Sub MathElement_SubTreeModified(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.SubTreeModified
-        Me.Parent.RaiseSubTreeModified(e)
+        Me.ParentElement.RaiseSubTreeModified(e)
     End Sub
 End Class

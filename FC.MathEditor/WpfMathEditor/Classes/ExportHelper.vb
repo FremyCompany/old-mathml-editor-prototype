@@ -185,10 +185,10 @@
     Private _LocationInParent As Rect
     Public ReadOnly Property LocationInParent As Rect
         Get
-            If This.Parent Is Nothing Then
+            If This.ParentElement Is Nothing Then
                 Return SizeRect
             Else
-                This.Parent.Export.PerformLayout()
+                This.ParentElement.Export.PerformLayout()
                 Return _LocationInParent
             End If
         End Get
@@ -200,11 +200,11 @@
 
     Public ReadOnly Property LocationInRoot As Rect
         Get
-            If This.Parent Is Nothing Then Return LocationInParent
+            If This.ParentElement Is Nothing Then Return LocationInParent
 
             This.Root.Export.PerformLayout()
             Dim L = LocationInParent
-            Return FitRect(LocationInParent, This.Parent.Export.SizeRect, This.Parent.Export.LocationInRoot)
+            Return FitRect(LocationInParent, This.ParentElement.Export.SizeRect, This.ParentElement.Export.LocationInRoot)
 
         End Get
     End Property
