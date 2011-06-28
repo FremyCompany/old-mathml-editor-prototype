@@ -23,7 +23,7 @@ Partial Public MustInherit Class MathElement
     ''' Changes the Parent of NewChild to this element
     ''' </summary>
     ''' <param name="NewChild">The element to attach to this element</param>
-    Public Sub Attach(ByVal NewChild As MathElement)
+    Public Sub Attach(NewChild As MathElement)
         If NewChild Is Nothing Then Throw New ArgumentNullException("NewChild", "The Attach method can't be used with a null argument.")
         NewChild.SetParent(Me)
     End Sub
@@ -33,7 +33,7 @@ Partial Public MustInherit Class MathElement
     ''' </summary>
     ''' <param name="Child"></param>
     ''' <remarks></remarks>
-    Public Sub Detach(ByVal Child As MathElement)
+    Public Sub Detach(Child As MathElement)
         If Child.ParentElement Is Me Then Child.ResetParent() _
             Else Throw New ArgumentException("Child must be a child of this element.")
     End Sub
@@ -44,7 +44,7 @@ Partial Public MustInherit Class MathElement
     ''' <param name="value">The new value for the Parent property</param>
     ''' <exception cref="InvalidOperationException">This functions throws an InvalidOperationException when this element already have a parent.</exception>
     ''' <exception cref="ArgumentException">This functions throws an ArgumentException when this element can't have 'value' as parent.</exception>
-    Private Sub SetParent(ByVal value As MathElement)
+    Private Sub SetParent(value As MathElement)
         If _Parent IsNot Nothing Then
 
             If value Is _Parent Then
@@ -165,7 +165,7 @@ Partial Public MustInherit Class MathElement
         End Get
     End Property
 
-    Public Function IsBefore(ByVal Elm As MathElement) As Boolean
+    Public Function IsBefore(Elm As MathElement) As Boolean
 
         If Elm Is Nothing Then Return True
         If Elm.ParentElement IsNot ParentElement Then Return False
@@ -178,7 +178,7 @@ Partial Public MustInherit Class MathElement
         Return False
     End Function
 
-    Public Function IsAfter(ByVal Elm As MathElement) As Boolean
+    Public Function IsAfter(Elm As MathElement) As Boolean
 
         If Elm Is Nothing Then Return True
         Return Elm.IsBefore(Me)
@@ -209,15 +209,15 @@ Partial Public MustInherit Class MathElement
         End Get
     End Property
 
-    Public Sub AddChild(ByVal NewChild As MathElement)
+    Public Sub AddChild(NewChild As MathElement)
         Children.Add(NewChild)
     End Sub
 
-    Public Sub RemoveChild(ByVal OldChild As MathElement)
+    Public Sub RemoveChild(OldChild As MathElement)
         Children.Remove(OldChild)
     End Sub
 
-    Public Sub ReplaceChild(ByVal OldChild As MathElement, ByVal NewChild As MathElement)
+    Public Sub ReplaceChild(OldChild As MathElement, NewChild As MathElement)
         Children.Replace(OldChild, NewChild)
     End Sub
 
@@ -243,11 +243,11 @@ Partial Public MustInherit Class MathElement
         End Get
     End Property
 
-    Public Function GetCommonAncestrorWith(ByVal el1 As MathElement) As MathElement
+    Public Function GetCommonAncestrorWith(el1 As MathElement) As MathElement
         Return GetCommonAncestrorBetween(el1, Me)
     End Function
 
-    Public Shared Function GetCommonAncestrorBetween(ByVal el1 As MathElement, ByVal el2 As MathElement) As MathElement
+    Public Shared Function GetCommonAncestrorBetween(el1 As MathElement, el2 As MathElement) As MathElement
 
         Dim Delta As Integer = el2.TreeDepht - el1.TreeDepht
         If Delta > 0 Then
@@ -305,7 +305,7 @@ Partial Public MustInherit Class MathElement
     Public LastChangeTimestamp As Date
 #End If
 
-    Private Sub MathElement_Changed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Changed
+    Private Sub MathElement_Changed(sender As Object, e As System.EventArgs) Handles Me.Changed
 #If DEBUG Then
         LastChangeTimestamp = Date.Now
 #End If
@@ -315,7 +315,7 @@ Partial Public MustInherit Class MathElement
     ' TODO: Reviewing completely the event usage (drawing a schema)
 
     Public Event SubTreeModified As EventHandler(Of TreeEventArgs)
-    Public Sub RaiseSubTreeModified(ByVal e As TreeEventArgs)
+    Public Sub RaiseSubTreeModified(e As TreeEventArgs)
         RaiseEvent SubTreeModified(Me, e)
         RaiseEvent Changed(Me, EventArgs.Empty)
     End Sub
@@ -346,14 +346,14 @@ Partial Public MustInherit Class MathElement
     End Sub
 
     Public Event ChildAdded As EventHandler(Of TreeEventArgs)
-    Public Sub RaiseChildAdded(ByVal ChildElement As MathElement, ByVal ChildIndex As Integer)
+    Public Sub RaiseChildAdded(ChildElement As MathElement, ChildIndex As Integer)
         Dim e = New TreeEventArgs(ChildElement, Me, ChildIndex, TreeEventArgs.TreeAction.Added)
         RaiseEvent ChildAdded(Me, e)
         RaiseEvent SubTreeModified(Me, e)
     End Sub
 
     Public Event ChildRemoved As EventHandler(Of TreeEventArgs)
-    Public Sub RaiseChildRemoved(ByVal ChildElement As MathElement, ByVal ChildIndex As Integer)
+    Public Sub RaiseChildRemoved(ChildElement As MathElement, ChildIndex As Integer)
         Dim e = New TreeEventArgs(ChildElement, Me, ChildIndex, TreeEventArgs.TreeAction.Removed)
         RaiseEvent ChildRemoved(Me, e)
         RaiseEvent SubTreeModified(Me, e)
@@ -370,7 +370,7 @@ Partial Public MustInherit Class MathElement
             Added = +1 : Removed = -1 : Modified = 0
         End Enum
 
-        Public Sub New(ByVal ChildElement As MathElement, ByVal ParentElement As MathElement, ByVal ChildIndex As Integer, ByVal Action As TreeAction)
+        Public Sub New(ChildElement As MathElement, ParentElement As MathElement, ChildIndex As Integer, Action As TreeAction)
             Me.ChildElement = ChildElement
             Me.ParentElement = ParentElement
             Me.ChildIndex = ChildIndex
@@ -379,27 +379,27 @@ Partial Public MustInherit Class MathElement
 
     End Class
 
-    Private Sub MathElement_ChildAdded(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.ChildAdded
+    Private Sub MathElement_ChildAdded(sender As Object, e As TreeEventArgs) Handles Me.ChildAdded
         e.ChildElement.RaiseAddedToParent()
     End Sub
 
-    Private Sub MathElement_ChildRemoved(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.ChildRemoved
+    Private Sub MathElement_ChildRemoved(sender As Object, e As TreeEventArgs) Handles Me.ChildRemoved
         e.ChildElement.RaiseRemovedFromParent()
     End Sub
 
-    Private Sub MathElement_DetachedFromDocument(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.DetachedFromDocument
+    Private Sub MathElement_DetachedFromDocument(sender As Object, e As System.EventArgs) Handles Me.DetachedFromDocument
         _ParentDocument = Nothing
         _Selection = Nothing
     End Sub
 
-    Private Sub MathElement_DetachedFromParent(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.DetachedFromParent
+    Private Sub MathElement_DetachedFromParent(sender As Object, e As System.EventArgs) Handles Me.DetachedFromParent
         RaiseDetachedFromDocument()
         For Each Child In Children
             Child.RaiseDetachedFromDocument()
         Next
     End Sub
 
-    Private Sub MathElement_SubTreeModified(ByVal sender As Object, ByVal e As TreeEventArgs) Handles Me.SubTreeModified
+    Private Sub MathElement_SubTreeModified(sender As Object, e As TreeEventArgs) Handles Me.SubTreeModified
         If Me.ParentElement IsNot Nothing Then Me.ParentElement.RaiseSubTreeModified(e)
     End Sub
 End Class

@@ -1,6 +1,6 @@
 ﻿Public Class GlyphDisplayer
 
-    Private Sub GlyphDisplayer_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
+    Private Sub GlyphDisplayer_Loaded(sender As Object, e As System.Windows.RoutedEventArgs) Handles Me.Loaded
 
         Dim TotalWidth As Double = 0
         Const fontSize = 14 + 2 / 3
@@ -59,7 +59,7 @@
 
         For i = 1 To 5
             Try
-            Dim Font = New Typeface(New FontFamily("Cambria Math"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, New FontFamily("Arial Unicode MS"))
+                Dim Font = New Typeface(New FontFamily("Cambria Math"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal, New FontFamily("Arial Unicode MS"))
                 Dim GlyphFont As GlyphTypeface = Nothing : Font.TryGetGlyphTypeface(GlyphFont)
                 Dim GlyphIndex = GlyphFont.CharacterToGlyphMap(AscW("."c))
                 Dim GlyphAvW = fontSize * GlyphFont.AdvanceWidths(GlyphIndex)

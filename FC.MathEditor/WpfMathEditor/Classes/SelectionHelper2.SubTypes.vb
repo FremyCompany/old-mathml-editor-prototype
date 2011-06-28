@@ -16,7 +16,7 @@
         '++ Constructors
         '++
 
-        Public Sub New(ByVal SelectionHost As MathElement, ByVal ChildIndex As Integer)
+        Public Sub New(SelectionHost As MathElement, ChildIndex As Integer)
 
             ' A selection host can't be null, and the index should be valid
             If SelectionHost Is Nothing Then Throw New ArgumentNullException("SelectionHost", "A selection host can't be null")
@@ -54,7 +54,7 @@
             Public Property OldIndex As Integer
             Public Property NewIndex As Integer
 
-            Public Sub New(ByVal MovedPoint As SelectionPoint, ByVal OldIndex As Integer, ByVal NewIndex As Integer)
+            Public Sub New(MovedPoint As SelectionPoint, OldIndex As Integer, NewIndex As Integer)
                 Me.MovedPoint = MovedPoint : Me.OldIndex = OldIndex : Me.NewIndex = NewIndex
             End Sub
 
@@ -74,7 +74,7 @@
             Get
                 Return __Index
             End Get
-            Set(ByVal value As Integer)
+            Set(value As Integer)
 
                 If Index <> value Then
 
@@ -123,6 +123,7 @@
         ''' </summary>
         Public ReadOnly Property NextSibling() As MathElement
             Get
+                If ChildIndex = ParentElement.Children.Count Then Return Nothing
                 Return ParentElement.Children.ElementAt(ChildIndex)
             End Get
         End Property
@@ -201,7 +202,7 @@
         ''' </summary>
         ''' <param name="StartPoint">The start point.</param>
         ''' <param name="EndPoint">The end point.</param>
-        Public Shared Function GetApparentSelection(ByVal StartPoint As SelectionPoint, ByVal EndPoint As SelectionPoint) As Tuple(Of SelectionPoint, SelectionPoint)
+        Public Shared Function GetApparentSelection(StartPoint As SelectionPoint, EndPoint As SelectionPoint) As Tuple(Of SelectionPoint, SelectionPoint)
             Return StartPoint.GetApparentSelection(EndPoint)
         End Function
 
@@ -209,7 +210,7 @@
         ''' Gets the apparent selection resulting from the specified start and end points.
         ''' </summary>
         ''' <param name="EndPoint">The end point. The start point is the object on which this function is called.</param>
-        Public Function GetApparentSelection(ByVal EndPoint As SelectionPoint) As Tuple(Of SelectionPoint, SelectionPoint)
+        Public Function GetApparentSelection(EndPoint As SelectionPoint) As Tuple(Of SelectionPoint, SelectionPoint)
 
             Dim StartPoint = Me
 
@@ -240,7 +241,7 @@
         ''' Returns a new selection point located in the same parent element, but with a different child index
         ''' </summary>
         ''' <param name="ChildIndexChange">The number to add to the current child index</param>
-        Public Function Increment(ByVal ChildIndexChange As Integer) As SelectionPoint
+        Public Function Increment(ChildIndexChange As Integer) As SelectionPoint
             Return New SelectionPoint(ParentElement, ChildIndex + ChildIndexChange)
         End Function
 
@@ -262,19 +263,19 @@
         '++ Detect changes
         '++
 
-        Private Sub Host_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles _Host.ChildAdded
+        Private Sub Host_ChildAdded(sender As Object, e As MathElement.TreeEventArgs) Handles _Host.ChildAdded
             If e.ChildIndex <= Me.ChildIndex Then
                 Me.Index += 1
             End If
         End Sub
 
-        Private Sub Host_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles _Host.ChildRemoved
+        Private Sub Host_ChildRemoved(sender As Object, e As MathElement.TreeEventArgs) Handles _Host.ChildRemoved
             If e.ChildIndex <= Me.ChildIndex Then
                 Me.Index -= 1
             End If
         End Sub
 
-        Private Sub Host_DetachedFromDocument(ByVal sender As Object, ByVal e As System.EventArgs) Handles _Host.DetachedFromDocument
+        Private Sub Host_DetachedFromDocument(sender As Object, e As System.EventArgs) Handles _Host.DetachedFromDocument
             Valid = False : RaiseEvent Invalidated(Me, EventArgs.Empty)
         End Sub
 
@@ -282,7 +283,7 @@
         '++ Propagate changes
         '++
 
-        Private Sub Parent_Changed(ByVal sender As Object, ByVal e As ChangeEventArgs) Handles _Parent.Changed, _Parent.ParentChanged
+        Private Sub Parent_Changed(sender As Object, e As ChangeEventArgs) Handles _Parent.Changed, _Parent.ParentChanged
             RaiseEvent ParentChanged(Me, e)
         End Sub
 
@@ -294,7 +295,7 @@
     Public Class SelectionChangedEventArgs : Inherits EventArgs
 
         Private OldStartPoint, OldEndPoint, NewStartPoint, NewEndPoint As SelectionPoint
-        Public Sub New(ByVal OldStartPoint As SelectionPoint, ByVal OldEndPoint As SelectionPoint, ByVal NewStartPoint As SelectionPoint, ByVal NewEndPoint As SelectionPoint)
+        Public Sub New(OldStartPoint As SelectionPoint, OldEndPoint As SelectionPoint, NewStartPoint As SelectionPoint, NewEndPoint As SelectionPoint)
             Me.NewStartPoint = NewStartPoint
             Me.NewEndPoint = NewEndPoint
             Me.OldStartPoint = OldStartPoint

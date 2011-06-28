@@ -1,6 +1,6 @@
 ﻿Public Class RowLayoutEngineInputHelper : Inherits InputHelper
 
-    Public Sub New(ByVal This As RowLayoutEngine)
+    Public Sub New(This As RowLayoutEngine)
         MyBase.New(This)
     End Sub
 
@@ -8,7 +8,7 @@
         Return False
     End Function
 
-    Public Overrides Function ProcessChar_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overrides Function ProcessChar_Internal(InputChar As Integer) As Boolean
 
         ' [[Assumption]] When we reach this function, the adjacent textedits refused the char.
         ' Create a new textedit to host the new char

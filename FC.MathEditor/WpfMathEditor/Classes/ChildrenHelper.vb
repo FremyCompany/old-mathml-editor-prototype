@@ -5,7 +5,7 @@
     ''' Returns the element for which the current children list is maintained.
     ''' </summary>
     Protected This As MathElement
-    Public Sub New(ByVal This As MathElement)
+    Public Sub New(This As MathElement)
         Me.This = This
     End Sub
 
@@ -17,7 +17,7 @@
     ''' Determines whether this children list contains the specified element.
     ''' </summary>
     ''' <param name="Element">The element to search for</param>
-    Public Function Contains(ByVal Element As MathElement) As Boolean
+    Public Function Contains(Element As MathElement) As Boolean
         Return (Element.ParentElement Is Me) AndAlso Contains_Internal(Element)
     End Function
 
@@ -25,19 +25,19 @@
     ''' Determines whether this children list contains the specified element.
     ''' </summary>
     ''' <param name="Element">The element to check for</param>
-    Protected MustOverride Function Contains_Internal(ByVal Element As MathElement) As Boolean
+    Protected MustOverride Function Contains_Internal(Element As MathElement) As Boolean
 
     ''' <summary>
     ''' Returns the index of the specified element in this children list, or -1 if it wasn't found.
     ''' </summary>
     ''' <param name="Element">The element to search for.</param><returns></returns>
-    Public MustOverride Function IndexOf(ByVal Element As MathElement) As Integer
+    Public MustOverride Function IndexOf(Element As MathElement) As Integer
 
     ''' <summary>
     ''' Adds the specified new child.
     ''' </summary>
     ''' <param name="NewChild">The new child.</param>
-    Public Sub Add(ByVal NewChild As MathElement)
+    Public Sub Add(NewChild As MathElement)
         Try
 
             This.StartBatchProcess()
@@ -60,7 +60,7 @@
     ''' Removes the specified old child.
     ''' </summary>
     ''' <param name="OldChild">The old child.</param>
-    Public Sub Remove(ByVal OldChild As MathElement)
+    Public Sub Remove(OldChild As MathElement)
 
         If OldChild.ParentElement IsNot This Then _
             Throw New ArgumentException("OldChild was not a child of this element.")
@@ -88,7 +88,7 @@
     ''' </summary>
     ''' <param name="NewChild">The new child.</param>
     ''' <param name="OldChild">The old child.</param>
-    Public Sub InsertAfter(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Public Sub InsertAfter(NewChild As MathElement, OldChild As MathElement)
         Try
 
             This.StartBatchProcess()
@@ -111,13 +111,13 @@
     ''' Adds NewChild to the internal representation of the children list.
     ''' </summary>
     ''' <param name="NewChild">The child to add</param>
-    Protected MustOverride Sub Add_Internal(ByVal NewChild As MathElement)
+    Protected MustOverride Sub Add_Internal(NewChild As MathElement)
 
     ''' <summary>
     ''' Removes a child from the internal representation of the children list
     ''' </summary>
     ''' <param name="OldChild">The child to remove</param>
-    Protected MustOverride Sub Remove_Internal(ByVal OldChild As MathElement)
+    Protected MustOverride Sub Remove_Internal(OldChild As MathElement)
 
     ''' <summary>
     ''' Inserts a child after another in the in the internal representation of the children list.
@@ -125,19 +125,19 @@
     ''' <param name="NewChild">The child to insert</param>
     ''' <param name="OldChild">The child after which to insert</param>
     ''' <remarks></remarks>
-    Protected MustOverride Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected MustOverride Sub InsertAfter_Internal(NewChild As MathElement, OldChild As MathElement)
 
     ''' <summary>
     ''' Returns the child located after the specified one in this children list
     ''' </summary>
     ''' <param name="OldChild">The old child.</param><returns></returns>
-    Public MustOverride Function After(ByVal OldChild As MathElement) As MathElement
+    Public MustOverride Function After(OldChild As MathElement) As MathElement
 
     ''' <summary>
     ''' Returns the child located before the specified one in this children list.
     ''' </summary>
     ''' <param name="OldChild">The old child.</param><returns></returns>
-    Public MustOverride Function Before(ByVal OldChild As MathElement) As MathElement
+    Public MustOverride Function Before(OldChild As MathElement) As MathElement
 
     ''' <summary>
     ''' Gets the first child of this list.
@@ -238,34 +238,6 @@
     ''' </remarks>
     Public MustOverride ReadOnly Property ElementType As MathElement.Type
 
-    ''' <summary>
-    ''' Returns True if this element is a Layout Engine (as many child as you want).
-    ''' </summary>
-    Public ReadOnly Property IsLayoutEngine As Boolean
-        Get
-            Return (ElementType And MathElement.Type.LayoutEngine) = MathElement.Type.LayoutEngine
-        End Get
-    End Property
-
-    ''' <summary>
-    ''' Returns True if this element is a Text Edit (can only contains UnicodeGlyph children).
-    ''' </summary>
-    Public ReadOnly Property IsTextEdit As Boolean
-        Get
-            Return ElementType = MathElement.Type.TextEdit
-        End Get
-    End Property
-
-    ''' <summary>
-    ''' Returns True if this element is a Formatter (can only contains a fixed number of children)
-    ''' </summary>
-    Public ReadOnly Property IsFormatter As Boolean
-        Get
-            Return ElementType = MathElement.Type.Formatter
-        End Get
-    End Property
-
-
     '++
     '++ Derived traps
     '++
@@ -274,7 +246,7 @@
     ''' Determines whether this instance can contains the specified element.
     ''' </summary>
     ''' <param name="Element">The element to be added to the children list</param>
-    Public Function CanContains(ByVal Element As MathElement) As Boolean
+    Public Function CanContains(Element As MathElement) As Boolean
         Return (Element IsNot Nothing) AndAlso (Element.ParentElement Is Nothing) AndAlso CanContains_Internal(Element)
     End Function
 
@@ -282,7 +254,7 @@
     ''' Returns True if the specified non-null element can be contained in the current children list.
     ''' </summary>
     ''' <param name="Element">The element to be checked</param>
-    Protected Overridable Function CanContains_Internal(ByVal Element As MathElement) As Boolean
+    Protected Overridable Function CanContains_Internal(Element As MathElement) As Boolean
         Return True
     End Function
 
@@ -291,7 +263,7 @@
     ''' </summary>
     ''' <param name="NewChild">The element to be inserted.</param>
     ''' <param name="OldChild">The element before which NewChild should be inserted.</param>
-    Public Sub InsertBefore(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Public Sub InsertBefore(NewChild As MathElement, OldChild As MathElement)
         Try
 
             This.StartBatchProcess()
@@ -313,7 +285,7 @@
     ''' </summary>
     ''' <param name="NewChild">The element to be inserted.</param>
     ''' <param name="OldChild">The element before which NewChild should be inserted.</param>
-    Protected Overridable Sub InsertBefore_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overridable Sub InsertBefore_Internal(NewChild As MathElement, OldChild As MathElement)
         InsertAfter_Internal(NewChild, Before(OldChild))
     End Sub
 
@@ -322,7 +294,7 @@
     ''' </summary>
     ''' <param name="OldChild">The element to be removed from the children list.</param>
     ''' <param name="NewChild">The element to be added to the children list.</param>
-    Public Sub Replace(ByVal OldChild As MathElement, ByVal NewChild As MathElement)
+    Public Sub Replace(OldChild As MathElement, NewChild As MathElement)
         Try
 
             This.StartBatchProcess()
@@ -352,7 +324,7 @@
     ''' </summary>
     ''' <param name="OldChild">The element to be removed from the children list.</param>
     ''' <param name="NewChild">The element to be added to the children list.</param>
-    Protected Overridable Sub Replace_Internal(ByVal OldChild As MathElement, ByVal NewChild As MathElement)
+    Protected Overridable Sub Replace_Internal(OldChild As MathElement, NewChild As MathElement)
         InsertAfter(NewChild, OldChild) : Remove(OldChild)
     End Sub
 
@@ -361,7 +333,7 @@
     ''' </summary>
     ''' <param name="FirstChild">The first child.</param>
     ''' <param name="SecondChild">The second child.</param>
-    Public Sub Swap(ByVal FirstChild As MathElement, ByVal SecondChild As MathElement)
+    Public Sub Swap(FirstChild As MathElement, SecondChild As MathElement)
         Try
 
             This.StartBatchProcess()
@@ -382,7 +354,7 @@
     ''' </summary>
     ''' <param name="FirstChild">The first child.</param>
     ''' <param name="SecondChild">The second child.</param>
-    Protected Overridable Sub Swap_Internal(ByVal FirstChild As MathElement, ByVal SecondChild As MathElement)
+    Protected Overridable Sub Swap_Internal(FirstChild As MathElement, SecondChild As MathElement)
         Remove(FirstChild) : InsertBefore(FirstChild, SecondChild)
     End Sub
 
@@ -392,7 +364,7 @@
     ''' </summary>
     ''' <param name="InitialChild">The child to wrap.</param>
     ''' <param name="Wrapper">The wrapper to use.</param>
-    Public Sub Wrap(ByVal InitialChild As MathElement, ByVal Wrapper As MathElement)
+    Public Sub Wrap(InitialChild As MathElement, Wrapper As MathElement)
         Try
 
             This.StartBatchProcess()
@@ -412,7 +384,7 @@
     ''' </summary>
     ''' <param name="InitialChild">The child to wrap.</param>
     ''' <param name="Wrapper">The wrapper to use.</param>
-    Protected Overridable Sub Wrap_Internal(ByVal InitialChild As MathElement, ByVal Wrapper As MathElement)
+    Protected Overridable Sub Wrap_Internal(InitialChild As MathElement, Wrapper As MathElement)
 
         InsertBefore(Wrapper, InitialChild)
         Remove(InitialChild)
@@ -426,7 +398,7 @@
     ''' <param name="InitialChild">The first child to wrap</param>
     ''' <param name="Wrapper">The wrapper to use.</param>
     ''' <param name="FinalChild">The last child to wrap. If this element is not found, all children after InitialChild will be wrapped.</param>
-    Public Sub Wrap(ByVal InitialChild As MathElement, ByVal Wrapper As MathElement, ByVal FinalChild As MathElement)
+    Public Sub Wrap(InitialChild As MathElement, Wrapper As MathElement, FinalChild As MathElement)
         Try
 
             This.StartBatchProcess()
@@ -446,7 +418,7 @@
     ''' <param name="InitialChild">The first child to wrap</param>
     ''' <param name="Wrapper">The wrapper to use.</param>
     ''' <param name="FinalChild">The last child to wrap. If this element is not found, all children after InitialChild will be wrapped.</param>
-    Protected Overridable Sub Wrap_Internal(ByVal InitialChild As MathElement, ByVal Wrapper As MathElement, ByVal FinalChild As MathElement)
+    Protected Overridable Sub Wrap_Internal(InitialChild As MathElement, Wrapper As MathElement, FinalChild As MathElement)
 
         InsertBefore(Wrapper, InitialChild)
 
@@ -469,7 +441,7 @@
     ''' Replaces a child element by all of its children in this children list.
     ''' </summary>
     ''' <param name="Wrapper">The element to replace.</param>
-    Public Overridable Sub Unwrap(ByVal Wrapper As MathElement)
+    Public Overridable Sub Unwrap(Wrapper As MathElement)
         Dim Children = Wrapper.Children.GetEnumerator()
         Dim LastChild = Wrapper, CurrentChild As MathElement
         While Children.MoveNext()

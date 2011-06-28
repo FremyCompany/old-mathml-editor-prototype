@@ -1,7 +1,7 @@
 ﻿Public MustInherit Class ExportHelper
 
     Protected WithEvents This As MathElement
-    Public Sub New(ByVal This As MathElement)
+    Public Sub New(This As MathElement)
         Me.This = This
     End Sub
 
@@ -30,11 +30,11 @@
         Return New DrawingImage(DV.Drawing)
     End Function
 
-    Public MustOverride Sub AppendKeyboardInput(ByVal SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendLaTeX(ByVal SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendMathML(ByVal SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendLaTeX(SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendMathML(SB As System.Text.StringBuilder)
 
-    Public MustOverride Sub Draw(ByVal DG As DrawingContext)
+    Public MustOverride Sub Draw(DG As DrawingContext)
 
     Private Property _IsLayoutToDate As Boolean
     Protected Overridable ReadOnly Property IsLayoutToDate As Boolean
@@ -126,7 +126,7 @@
         End Get
     End Property
 
-    Private Shared Function FitRect(ByVal ChildRect As Rect, ByVal InitalParentRect As Rect, ByVal FinalParentRect As Rect) As Rect
+    Private Shared Function FitRect(ChildRect As Rect, InitalParentRect As Rect, FinalParentRect As Rect) As Rect
         ChildRect.Offset(-CType(InitalParentRect.Location, Vector))
         ChildRect.Scale(FinalParentRect.Width / InitalParentRect.Width, FinalParentRect.Height / InitalParentRect.Height)
         ChildRect.Offset(FinalParentRect.Location)
@@ -150,7 +150,7 @@
         Get
             Return This.Font
         End Get
-        Set(ByVal value As Typeface)
+        Set(value As Typeface)
             This.Font = value
         End Set
     End Property
@@ -159,7 +159,7 @@
         Get
             Return This.FontSize
         End Get
-        Set(ByVal value As Double)
+        Set(value As Double)
             This.FontSize = value
         End Set
     End Property
@@ -168,7 +168,7 @@
         Get
             Return This.Foreground
         End Get
-        Set(ByVal value As Color)
+        Set(value As Color)
             This.Foreground = value
         End Set
     End Property
@@ -177,7 +177,7 @@
         Get
             Return This.Background
         End Get
-        Set(ByVal value As Color)
+        Set(value As Color)
             This.Background = value
         End Set
     End Property
@@ -194,7 +194,7 @@
         End Get
     End Property
 
-    Public Sub SetLocationInParent(ByVal value As Rect)
+    Public Sub SetLocationInParent(value As Rect)
         _LocationInParent = value
     End Sub
 
@@ -211,7 +211,7 @@
 
     Public MustOverride Sub GenerateLayout()
 
-    Private Sub This_Changed(ByVal sender As Object, ByVal e As System.EventArgs) Handles This.Changed
+    Private Sub This_Changed(sender As Object, e As System.EventArgs) Handles This.Changed
         _IsLayoutToDate = False
     End Sub
 End Class

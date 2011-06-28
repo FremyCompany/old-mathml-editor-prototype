@@ -43,7 +43,7 @@
             If _Font Is Nothing Then _Font = New Typeface(FontFamily, FontStyle, FontWeight, FontStretch)
             Return _Font
         End Get
-        Set(ByVal value As Typeface)
+        Set(value As Typeface)
             ' TODO: Implement font setting
         End Set
     End Property
@@ -62,12 +62,12 @@
                 Return _FontFamily
             End If
         End Get
-        Set(ByVal value As FontFamily)
+        Set(value As FontFamily)
             SetFontFamily(value, True)
         End Set
     End Property
 
-    Private Sub SetFontFamily(ByVal value As FontFamily, ByVal DefineProperty As Boolean)
+    Private Sub SetFontFamily(value As FontFamily, DefineProperty As Boolean)
         If (DefineProperty) OrElse (Not _IsFontFamilyDefined) Then
             _FontFamily = value
             _IsFontFamilyDefined = DefineProperty AndAlso (value IsNot Nothing)
@@ -92,12 +92,12 @@
                 Return _FontStretch
             End If
         End Get
-        Set(ByVal value As FontStretch?)
+        Set(value As FontStretch?)
             SetFontStretch(value, True)
         End Set
     End Property
 
-    Private Sub SetFontStretch(ByVal value As FontStretch?, ByVal DefineProperty As Boolean)
+    Private Sub SetFontStretch(value As FontStretch?, DefineProperty As Boolean)
         If (DefineProperty) OrElse (Not _IsFontStretchDefined) Then
             _FontStretch = value
             _IsFontStretchDefined = DefineProperty AndAlso (value IsNot Nothing)
@@ -122,12 +122,12 @@
                 Return _FontStyle
             End If
         End Get
-        Set(ByVal value As FontStyle?)
+        Set(value As FontStyle?)
             SetFontStyle(value, True)
         End Set
     End Property
 
-    Private Sub SetFontStyle(ByVal value As FontStyle?, ByVal DefineProperty As Boolean)
+    Private Sub SetFontStyle(value As FontStyle?, DefineProperty As Boolean)
         If (DefineProperty) OrElse (Not _IsFontStyleDefined) Then
             _FontStyle = value
             _IsFontStyleDefined = DefineProperty AndAlso (value IsNot Nothing)
@@ -152,12 +152,12 @@
                 Return _FontWeight
             End If
         End Get
-        Set(ByVal value As FontWeight?)
+        Set(value As FontWeight?)
             SetFontWeight(value, True)
         End Set
     End Property
 
-    Private Sub SetFontWeight(ByVal value As FontWeight?, ByVal DefineProperty As Boolean)
+    Private Sub SetFontWeight(value As FontWeight?, DefineProperty As Boolean)
         If (DefineProperty) OrElse (Not _IsFontWeightDefined) Then
             _FontWeight = value
             _IsFontWeightDefined = DefineProperty AndAlso (value IsNot Nothing)
@@ -183,12 +183,12 @@
                 Return _Foreground
             End If
         End Get
-        Set(ByVal value As Color?)
+        Set(value As Color?)
             SetForeground(value, True)
         End Set
     End Property
 
-    Private Sub SetForeground(ByVal value As Color?, ByVal DefineProperty As Boolean)
+    Private Sub SetForeground(value As Color?, DefineProperty As Boolean)
         If (DefineProperty) OrElse (Not _IsForegroundDefined) Then
             _Foreground = value
             _IsForegroundDefined = DefineProperty AndAlso (value IsNot Nothing)
@@ -213,12 +213,12 @@
                 Return _FontSize
             End If
         End Get
-        Set(ByVal value As Double?)
+        Set(value As Double?)
             SetFontSize(value, True)
         End Set
     End Property
 
-    Private Sub SetFontSize(ByVal value As Double?, ByVal DefineProperty As Boolean)
+    Private Sub SetFontSize(value As Double?, DefineProperty As Boolean)
         If (DefineProperty) OrElse (Not _IsFontSizeDefined) Then
             _FontSize = value
             _IsFontSizeDefined = DefineProperty AndAlso (value IsNot Nothing)
@@ -243,12 +243,12 @@
                 Return _Background
             End If
         End Get
-        Set(ByVal value As Color?)
+        Set(value As Color?)
             SetBackground(value, True)
         End Set
     End Property
 
-    Private Sub SetBackground(ByVal value As Color?, ByVal DefineProperty As Boolean)
+    Private Sub SetBackground(value As Color?, DefineProperty As Boolean)
         If (DefineProperty) OrElse (Not _IsBackgroundDefined) Then
             _Background = value
             _IsBackgroundDefined = DefineProperty AndAlso (value IsNot Nothing)

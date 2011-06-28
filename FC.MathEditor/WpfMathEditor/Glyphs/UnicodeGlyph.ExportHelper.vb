@@ -2,7 +2,7 @@
 
     Public Class UnicodeGlyphExportHelper : Inherits ExportHelper
 
-        Public Sub New(ByVal This As MathElement)
+        Public Sub New(This As MathElement)
             MyBase.New(This)
         End Sub
 
@@ -12,19 +12,19 @@
             End Get
         End Property
 
-        Public Overrides Sub AppendKeyboardInput(ByVal SB As System.Text.StringBuilder)
+        Public Overrides Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
             SB.Append(This.DisplayCharacter)
         End Sub
 
-        Public Overrides Sub AppendLaTeX(ByVal SB As System.Text.StringBuilder)
+        Public Overrides Sub AppendLaTeX(SB As System.Text.StringBuilder)
             ' TODO: AppendLaTeX for unicode chars
         End Sub
 
-        Public Overrides Sub AppendMathML(ByVal SB As System.Text.StringBuilder)
+        Public Overrides Sub AppendMathML(SB As System.Text.StringBuilder)
             ' TODO: AppendMathML for unicode chars
         End Sub
 
-        Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
+        Public Overrides Sub Draw(DG As System.Windows.Media.DrawingContext)
             ' IM is used to modify the drawing zone
             DG.PushTransform(New TranslateTransform(0 * IM.Left, IM.Top))
 

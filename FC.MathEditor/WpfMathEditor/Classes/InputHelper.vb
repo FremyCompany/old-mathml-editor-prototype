@@ -1,7 +1,7 @@
 ﻿Partial Public MustInherit Class InputHelper
 
     Protected WithEvents This As MathElement
-    Public Sub New(ByVal This As MathElement)
+    Public Sub New(This As MathElement)
         Me.This = This
     End Sub
 
@@ -25,7 +25,7 @@
         End Get
     End Property
 
-    Public Sub ProcessString(ByVal InputString As String)
+    Public Sub ProcessString(InputString As String)
         For X As Integer = 0 To InputString.Length - 1
             Dim InputChar = InputString(X)
             If AscW(InputChar) >= 899072 AndAlso AscW(InputChar) <= 901119 Then
@@ -40,7 +40,7 @@
     Shared StartBlockChars As String = "├([{"
     Shared EndBlockChars As String = "┤)]}"
 
-    Public Sub ProcessChar(ByVal InputChar As Integer)
+    Public Sub ProcessChar(InputChar As Integer)
 
         ' Can't process char if not currently selected
         If This.Selection.ParentElement IsNot This Then
@@ -75,11 +75,11 @@
 
     End Sub
 
-    Public Function ProcessChar_FromLeft(ByVal InputChar As Integer) As Boolean
+    Public Function ProcessChar_FromLeft(InputChar As Integer) As Boolean
         Return ProcessChar_FromLeft_Internal(InputChar)
     End Function
 
-    Public Function ProcessChar_FromRight(ByVal InputChar As Integer) As Boolean
+    Public Function ProcessChar_FromRight(InputChar As Integer) As Boolean
         Return ProcessChar_FromRight_Internal(InputChar)
     End Function
 
@@ -191,11 +191,11 @@
         Return ProcessFraction_FromRight_Internal()
     End Function
 
-    Public Function PreProcessChar(ByVal InputChar As Integer) As Boolean
+    Public Function PreProcessChar(InputChar As Integer) As Boolean
         Return PreProcessChar_Internal(InputChar)
     End Function
 
-    Public Overridable Function PreProcessChar_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overridable Function PreProcessChar_Internal(InputChar As Integer) As Boolean
 
         ' WaitChar (default pre-process)
         If IsWaitingForChar Then
@@ -216,33 +216,33 @@
 
     End Function
 
-    Public Overridable Function ProcessWaitChar(ByVal InputChar As Integer) As Boolean
+    Public Overridable Function ProcessWaitChar(InputChar As Integer) As Boolean
         ' Default wait char processing : eat, and walk to next child
         WaitChar = Nothing : This.Selection.SetSelection(This.ParentElement, This, This.NextSibling)
         Return True
     End Function
 
-    Public Function ProcessStartOfBlock(ByVal InputChar As Integer) As Boolean
+    Public Function ProcessStartOfBlock(InputChar As Integer) As Boolean
         Return ProcessStartOfBlock_Internal(InputChar)
     End Function
 
-    Public Overridable Function ProcessStartOfBlock_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overridable Function ProcessStartOfBlock_Internal(InputChar As Integer) As Boolean
         Return False
     End Function
 
-    Public Function ProcessEndOfBlock(ByVal InputChar As Integer) As Boolean
+    Public Function ProcessEndOfBlock(InputChar As Integer) As Boolean
         Return ProcessEndOfBlock_Internal(InputChar)
     End Function
 
-    Public Overridable Function ProcessEndOfBlock_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overridable Function ProcessEndOfBlock_Internal(InputChar As Integer) As Boolean
         Return False
     End Function
 
-    Public MustOverride Function ProcessChar_Internal(ByVal InputChar As Integer) As Boolean
-    Public Overridable Function ProcessChar_FromLeft_Internal(ByVal InputChar As Integer) As Boolean
+    Public MustOverride Function ProcessChar_Internal(InputChar As Integer) As Boolean
+    Public Overridable Function ProcessChar_FromLeft_Internal(InputChar As Integer) As Boolean
         Return False
     End Function
-    Public Overridable Function ProcessChar_FromRight_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overridable Function ProcessChar_FromRight_Internal(InputChar As Integer) As Boolean
         Return False
     End Function
 
@@ -341,7 +341,7 @@
                 Return WM
             End If
         End Get
-        Set(ByVal value As InputWritingMode)
+        Set(value As InputWritingMode)
             WM = value
         End Set
     End Property
@@ -353,7 +353,7 @@
         End Get
     End Property
 
-    Private Sub This_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles This.LostFocus
+    Private Sub This_LostFocus(sender As Object, e As System.EventArgs) Handles This.LostFocus
         ' Make sure the element input mode revert back to defaults
         WritingMode = InputWritingMode.Inherit
         WaitChar = Nothing

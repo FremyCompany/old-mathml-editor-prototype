@@ -1,6 +1,6 @@
 ﻿Public Class GlyphChildrenHelper : Inherits ChildrenHelper
 
-    Public Sub New(ByVal This As MathElement)
+    Public Sub New(This As MathElement)
         MyBase.New(This)
     End Sub
 
@@ -8,19 +8,19 @@
         Throw New NotSupportedException("This element don't accept children. Please refer to the CanHave property before calling the Children methods.")
     End Function
 
-    Protected Overrides Sub Add_Internal(ByVal NewChild As MathElement)
+    Protected Overrides Sub Add_Internal(NewChild As MathElement)
         InvalidCall()
     End Sub
 
-    Public Overrides Function After(ByVal OldChild As MathElement) As MathElement
+    Public Overrides Function After(OldChild As MathElement) As MathElement
         Return InvalidCall()
     End Function
 
-    Public Overrides Function Before(ByVal OldChild As MathElement) As MathElement
+    Public Overrides Function Before(OldChild As MathElement) As MathElement
         Return InvalidCall()
     End Function
 
-    Public Overrides Function IndexOf(ByVal Element As MathElement) As Integer
+    Public Overrides Function IndexOf(Element As MathElement) As Integer
         Return -1
     End Function
 
@@ -60,15 +60,15 @@
         End Get
     End Property
 
-    Protected Overrides Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overrides Sub InsertAfter_Internal(NewChild As MathElement, OldChild As MathElement)
         InvalidCall()
     End Sub
 
-    Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
+    Protected Overrides Sub Remove_Internal(OldChild As MathElement)
         InvalidCall()
     End Sub
 
-    Protected Overrides Function Contains_Internal(ByVal Element As MathElement) As Boolean
+    Protected Overrides Function Contains_Internal(Element As MathElement) As Boolean
         Return False
     End Function
 

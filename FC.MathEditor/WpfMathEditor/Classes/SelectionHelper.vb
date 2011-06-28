@@ -4,7 +4,7 @@
 '    Protected This As MathDocument
 '    Private WithEvents CA_SEL, CA_START, CA_END As MathElement
 
-'    Public Sub New(ByVal This As MathDocument)
+'    Public Sub New(This As MathDocument)
 '        Me.This = This
 '        SetSelection(This, This.LastChild, Nothing)
 '    End Sub
@@ -28,7 +28,7 @@
 '        Next
 '    End Sub
 
-'    Public Sub ReplaceContents(ByVal NewChilds As IEnumerable(Of MathElement))
+'    Public Sub ReplaceContents(NewChilds As IEnumerable(Of MathElement))
 '        Me.DeleteContents()
 '        For Each el In NewChilds
 '            CommonAncestror.Children.InsertBefore(el, SelectionEnd)
@@ -36,13 +36,13 @@
 '        SetSelection(CommonAncestror, CommonAncestror.Children.Before(SelectionEnd), SelectionEnd)
 '    End Sub
 
-'    Public Sub ReplaceContents(ByVal NewChild As MathElement)
+'    Public Sub ReplaceContents(NewChild As MathElement)
 '        Me.DeleteContents()
 '        CommonAncestror.Children.InsertBefore(NewChild, SelectionEnd)
 '        SetSelection(CommonAncestror, NewChild, SelectionEnd)
 '    End Sub
 
-'    Private Sub SetSelection(ByVal StartPoint As Selection, ByVal EndPoint As Selection)
+'    Private Sub SetSelection(StartPoint As Selection, EndPoint As Selection)
 
 '        ' Compute _Selection
 '        Dim SS = StartPoint.SelectionStart
@@ -82,7 +82,7 @@
 
 '    End Sub
 
-'    Public Sub SetSelection(ByVal NewPoint As Selection, Optional ByVal PointToChange As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub SetSelection(NewPoint As Selection, Optional PointToChange As SelectionPointType = SelectionPointType.Selection)
 '        Select Case PointToChange
 '            Case SelectionPointType.Selection
 '                SetSelection(NewPoint.CommonAncestror, NewPoint.SelectionStart, NewPoint.SelectionEnd)
@@ -95,7 +95,7 @@
 '        End Select
 '    End Sub
 
-'    Public Function GetSelection(ByVal PointToRetreive As SelectionPointType) As Selection
+'    Public Function GetSelection(PointToRetreive As SelectionPointType) As Selection
 '        Select Case PointToRetreive
 '            Case SelectionPointType.Selection
 '                Return _Selection
@@ -108,7 +108,7 @@
 '        End Select
 '    End Function
 
-'    Public Sub SetSelection(ByVal CommonAncestror As MathElement, ByVal SelectionStart As MathElement, ByVal SelectionEnd As MathElement)
+'    Public Sub SetSelection(CommonAncestror As MathElement, SelectionStart As MathElement, SelectionEnd As MathElement)
 
 '        ' Check if the selection is valid
 '        If (
@@ -144,7 +144,7 @@
 
 '    End Sub
 
-'    Private Sub SetSelection_Internal(ByVal Selection As Selection, ByVal StartPoint As Selection, ByVal EndPoint As Selection)
+'    Private Sub SetSelection_Internal(Selection As Selection, StartPoint As Selection, EndPoint As Selection)
 
 '        ' Verify the direction of the selection
 '        If Selection.SelectionEnd IsNot Nothing AndAlso Selection.SelectionEnd.IsBefore(SelectionStart) Then
@@ -229,7 +229,7 @@
 '        ''' <param name="CA">CA</param>
 '        ''' <param name="SS">SS</param>
 '        ''' <param name="SE">SE</param>
-'        Public Sub New(ByVal CA As MathElement, ByVal SS As MathElement, ByVal SE As MathElement)
+'        Public Sub New(CA As MathElement, SS As MathElement, SE As MathElement)
 '            CommonAncestror = CA : SelectionStart = SS : SelectionEnd = SE
 '        End Sub
 
@@ -252,7 +252,7 @@
 '        Return GetEnumerator()
 '    End Function
 
-'    Private Sub CA_END_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_END.ChildAdded
+'    Private Sub CA_END_ChildAdded(sender As Object, e As MathElement.TreeEventArgs) Handles CA_END.ChildAdded
 '        If EndPoint.SelectionEnd Is Nothing Then
 '            SetSelection(New Selection(CA_END, CA_END.LastChild, Nothing), PointToChange:=SelectionPointType.EndPoint)
 '        Else
@@ -260,7 +260,7 @@
 '        End If
 '    End Sub
 
-'    Private Sub CA_END_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_END.ChildRemoved
+'    Private Sub CA_END_ChildRemoved(sender As Object, e As MathElement.TreeEventArgs) Handles CA_END.ChildRemoved
 
 '        '
 '        ' Verify that the newly removed child don't make the Selection EndPoint invalid!
@@ -277,7 +277,7 @@
 
 '    End Sub
 
-'    Private Sub CA_START_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_START.ChildAdded
+'    Private Sub CA_START_ChildAdded(sender As Object, e As MathElement.TreeEventArgs) Handles CA_START.ChildAdded
 '        If StartPoint.SelectionStart Is Nothing Then
 '            SetSelection(New Selection(CA_START, Nothing, CA_START.FirstChild), PointToChange:=SelectionPointType.StartPoint)
 '        Else
@@ -285,7 +285,7 @@
 '        End If
 '    End Sub
 
-'    Private Sub CA_START_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles CA_START.ChildRemoved
+'    Private Sub CA_START_ChildRemoved(sender As Object, e As MathElement.TreeEventArgs) Handles CA_START.ChildRemoved
 
 '        '
 '        ' Verify that the newly removed child don't make the Selection StartPoint invalid!

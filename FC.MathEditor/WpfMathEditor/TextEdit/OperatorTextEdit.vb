@@ -4,7 +4,7 @@
         Me.FontStyle = DefaultFontStyle
     End Sub
 
-    Public Sub New(ByVal Children As IEnumerable(Of MathElement))
+    Public Sub New(Children As IEnumerable(Of MathElement))
         Call Me.New()
         For Each C In Children
             Me.Children.Add(C)
@@ -24,7 +24,7 @@
         End Get
     End Property
 
-    Public Overrides Function IsAccepted(ByVal C As Integer) As Boolean
+    Public Overrides Function IsAccepted(C As Integer) As Boolean
         '? Can this really be done? I mean, is it a good idea to disallow this here?
         Return Not (Children.HasAny OrElse Char.IsLetter(Char.ConvertFromUtf32(C)))
     End Function

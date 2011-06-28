@@ -6,7 +6,7 @@
             If Me.ParentDocument Is Nothing Then Return Nothing
             Return _Input
         End Get
-        Set(ByVal value As InputHelper)
+        Set(value As InputHelper)
             _Input = value
         End Set
     End Property
@@ -32,12 +32,12 @@
         Get
             Return _Export
         End Get
-        Set(ByVal value As ExportHelper)
+        Set(value As ExportHelper)
             _Export = value
         End Set
     End Property
 
-    Public Overridable Function GetNextInputElement(ByVal CurrentElement As MathElement) As MathElement
+    Public Overridable Function GetNextInputElement(CurrentElement As MathElement) As MathElement
         If Me.Children.IsFormatter Then
             If CurrentElement Is Nothing Then Return Children.First
             Return Children.After(CurrentElement)
@@ -46,7 +46,7 @@
         End If
     End Function
 
-    Public Overridable Function GetPreviousInputElement(ByVal CurrentElement As MathElement) As MathElement
+    Public Overridable Function GetPreviousInputElement(CurrentElement As MathElement) As MathElement
         If Me.Children.IsFormatter Then
             If CurrentElement Is Nothing Then Return Children.Last
             Return Children.Before(CurrentElement)

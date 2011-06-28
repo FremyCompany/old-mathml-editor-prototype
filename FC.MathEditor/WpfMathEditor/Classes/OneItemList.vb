@@ -2,7 +2,7 @@
 
     Private Content As T, Len As Integer
 
-    Public Sub Add(ByVal item As T) Implements System.Collections.Generic.ICollection(Of T).Add
+    Public Sub Add(item As T) Implements System.Collections.Generic.ICollection(Of T).Add
         If Len = 0 Then Content = item Else Throw New IndexOutOfRangeException()
     End Sub
 
@@ -10,11 +10,11 @@
         Content = Nothing : Len = 0
     End Sub
 
-    Public Function Contains(ByVal item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Contains
+    Public Function Contains(item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Contains
         Return Len = 1 AndAlso Object.Equals(item, Content)
     End Function
 
-    Public Sub CopyTo(ByVal array() As T, ByVal arrayIndex As Integer) Implements System.Collections.Generic.ICollection(Of T).CopyTo
+    Public Sub CopyTo(array() As T, arrayIndex As Integer) Implements System.Collections.Generic.ICollection(Of T).CopyTo
         If Len = 1 Then array(arrayIndex) = Content
     End Sub
 
@@ -30,7 +30,7 @@
         End Get
     End Property
 
-    Public Function Remove(ByVal item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Remove
+    Public Function Remove(item As T) As Boolean Implements System.Collections.Generic.ICollection(Of T).Remove
         If Object.Equals(item, Content) Then
             Content = Nothing : Len = 0
             Return True
@@ -43,26 +43,26 @@
         Return New OneItemListEnumerator(Me)
     End Function
 
-    Public Function IndexOf(ByVal item As T) As Integer Implements System.Collections.Generic.IList(Of T).IndexOf
+    Public Function IndexOf(item As T) As Integer Implements System.Collections.Generic.IList(Of T).IndexOf
         If Contains(item) Then Return 1
         Return -1
     End Function
 
-    Public Sub Insert(ByVal index As Integer, ByVal item As T) Implements System.Collections.Generic.IList(Of T).Insert
+    Public Sub Insert(index As Integer, item As T) Implements System.Collections.Generic.IList(Of T).Insert
         Throw New IndexOutOfRangeException()
     End Sub
 
-    Default Public Property Item(ByVal index As Integer) As T Implements System.Collections.Generic.IList(Of T).Item
+    Default Public Property Item(index As Integer) As T Implements System.Collections.Generic.IList(Of T).Item
         Get
             If index > 0 AndAlso index < Len Then Return Content
             Throw New IndexOutOfRangeException()
         End Get
-        Set(ByVal value As T)
+        Set(value As T)
             If index = 0 Then Content = value : Len = 1 Else Throw New IndexOutOfRangeException()
         End Set
     End Property
 
-    Public Sub RemoveAt(ByVal index As Integer) Implements System.Collections.Generic.IList(Of T).RemoveAt
+    Public Sub RemoveAt(index As Integer) Implements System.Collections.Generic.IList(Of T).RemoveAt
         If index = 0 Then Content = Nothing
     End Sub
 
@@ -75,7 +75,7 @@
 
         Private _oneItemList As OneItemList(Of T)
 
-        Sub New(ByVal oneItemList As OneItemList(Of T))
+        Sub New(oneItemList As OneItemList(Of T))
             _oneItemList = oneItemList
         End Sub
 

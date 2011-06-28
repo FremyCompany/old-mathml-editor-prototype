@@ -2,12 +2,12 @@
 
     Private StartPoint, EndPoint As SelectionHelper.SelectionPoint
 
-    Public Sub New(ByVal ParentToWalk As MathElement)
+    Public Sub New(ParentToWalk As MathElement)
         StartPoint = New SelectionHelper.SelectionPoint(ParentToWalk, 0)
         EndPoint = StartPoint.GetEnd()
     End Sub
 
-    Public Sub New(ByVal StartPoint As SelectionHelper.SelectionPoint, ByVal EndPoint As SelectionHelper.SelectionPoint)
+    Public Sub New(StartPoint As SelectionHelper.SelectionPoint, EndPoint As SelectionHelper.SelectionPoint)
         Me.StartPoint = StartPoint
         Me.EndPoint = EndPoint
     End Sub
@@ -24,11 +24,11 @@ End Class
 
 Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
 
-    Public Sub New(ByVal ParentElement As MathElement, ByVal BoolToDelete As Boolean)
+    Public Sub New(ParentElement As MathElement, BoolToDelete As Boolean)
 
     End Sub
 
-    Public Sub New(ByVal StartPoint As SelectionHelper.SelectionPoint)
+    Public Sub New(StartPoint As SelectionHelper.SelectionPoint)
         Me.StartPoint = StartPoint : CurrentPoint = StartPoint : EndPoint = StartPoint.GetEnd()
     End Sub
 
@@ -37,7 +37,7 @@ Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
     ''' </summary>
     ''' <param name="StartPoint">Point de départ de l'énumération</param>
     ''' <param name="EndPoint">Point d'arrivée de l'énumération</param>
-    Public Sub New(ByVal StartPoint As SelectionHelper.SelectionPoint, ByVal EndPoint As SelectionHelper.SelectionPoint)
+    Public Sub New(StartPoint As SelectionHelper.SelectionPoint, EndPoint As SelectionHelper.SelectionPoint)
 
         ' Vérifie la cohérence des données
         If EndPoint Is Nothing Then EndPoint = StartPoint.GetEnd()
@@ -113,11 +113,11 @@ End Class
 'Public Class SiblingEnumeratorGenerator : Implements IEnumerable(Of MathElement)
 
 '    Private FirstEl, LastEl As MathElement
-'    Public Sub New(ByVal FirstEl As MathElement)
+'    Public Sub New(FirstEl As MathElement)
 '        Me.New(FirstEl, Nothing)
 '    End Sub
 
-'    Public Sub New(ByVal FirstEl As MathElement, ByVal LastEl As MathElement)
+'    Public Sub New(FirstEl As MathElement, LastEl As MathElement)
 '        Me.FirstEl = FirstEl : Me.LastEl = LastEl
 '    End Sub
 
@@ -134,12 +134,12 @@ End Class
 'Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
 
 '    Private FirstEl As MathElement, NextEl As MathElement, CurrentEl As MathElement
-'    Public Sub New(ByVal FirstEl As MathElement)
+'    Public Sub New(FirstEl As MathElement)
 '        Me.FirstEl = FirstEl : Me.NextEl = FirstEl
 '    End Sub
 
 '    Private LastEl As MathElement
-'    Public Sub New(ByVal FirstEl As MathElement, ByVal LastEl As MathElement)
+'    Public Sub New(FirstEl As MathElement, LastEl As MathElement)
 '        Me.FirstEl = FirstEl : Me.NextEl = FirstEl : Me.LastEl = LastEl
 '    End Sub
 

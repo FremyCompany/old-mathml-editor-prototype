@@ -1,11 +1,11 @@
 ﻿Public Class TextEditInputHelper : Inherits InputHelper
 
     Private IsAccepted As Func(Of Integer, Boolean) = Function(C) DirectCast(This, TextEdit).IsAccepted(C)
-    Public Sub New(ByVal This As TextEdit, ByVal IsAccepted As Func(Of Integer, Boolean))
+    Public Sub New(This As TextEdit, IsAccepted As Func(Of Integer, Boolean))
         MyBase.New(This)
     End Sub
 
-    Public Overrides Function ProcessChar_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overrides Function ProcessChar_Internal(InputChar As Integer) As Boolean
         '
         ' TODO: TextEdit.ProcessChar_Internal
         '
@@ -30,7 +30,7 @@
         End If
     End Function
 
-    Public Overrides Function ProcessChar_FromLeft_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overrides Function ProcessChar_FromLeft_Internal(InputChar As Integer) As Boolean
 
         If IsAccepted(InputChar) AndAlso This.Children.CanAdd Then
 
@@ -49,7 +49,7 @@
 
     End Function
 
-    Public Overrides Function ProcessChar_FromRight_Internal(ByVal InputChar As Integer) As Boolean
+    Public Overrides Function ProcessChar_FromRight_Internal(InputChar As Integer) As Boolean
 
         If IsAccepted(InputChar) AndAlso This.Children.CanAdd Then
 

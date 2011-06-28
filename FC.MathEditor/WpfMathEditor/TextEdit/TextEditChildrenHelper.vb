@@ -14,7 +14,7 @@
     ''' Initializes a new instance of the <see cref="TextEditChildrenHelper" /> class.
     ''' </summary>
     ''' <param name="This">The base element</param>
-    Sub New(ByVal This As TextEdit)
+    Sub New(This As TextEdit)
         MyBase.New(This)
     End Sub
 
@@ -27,7 +27,7 @@
     ''' Get the indexes the of specified element
     ''' </summary>
     ''' <param name="Element">The element to search for</param><returns></returns>
-    Public Overrides Function IndexOf(ByVal Element As MathElement) As Integer
+    Public Overrides Function IndexOf(Element As MathElement) As Integer
         Return All.IndexOf(Element)
     End Function
 
@@ -35,7 +35,7 @@
     ''' Determines whether this children list contains the specified element.
     ''' </summary>
     ''' <param name="Element">The element to search for</param>
-    Protected Overrides Function Contains_Internal(ByVal Element As MathElement) As Boolean
+    Protected Overrides Function Contains_Internal(Element As MathElement) As Boolean
         Return All.Contains(Element)
     End Function
 
@@ -49,11 +49,11 @@
         End Get
     End Property
 
-    Protected Overrides Sub Add_Internal(ByVal NewChild As MathElement)
+    Protected Overrides Sub Add_Internal(NewChild As MathElement)
         All.Add(NewChild)
     End Sub
 
-    Public Overrides Function After(ByVal OldChild As MathElement) As MathElement
+    Public Overrides Function After(OldChild As MathElement) As MathElement
         If OldChild Is Nothing Then Return Last
         Dim X As Integer = All.IndexOf(OldChild)
         If X = -1 Then Throw New ArgumentException("OldChild was not a child of this element.", "OldChild")
@@ -61,7 +61,7 @@
         Return Nothing
     End Function
 
-    Public Overrides Function Before(ByVal OldChild As MathElement) As MathElement
+    Public Overrides Function Before(OldChild As MathElement) As MathElement
         If OldChild Is Nothing Then Return First
         Dim X As Integer = All.IndexOf(OldChild)
         If X = -1 Then Throw New ArgumentException("OldChild was not a child of this element.", "OldChild")
@@ -106,7 +106,7 @@
         End Get
     End Property
 
-    Protected Overrides Sub InsertAfter_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overrides Sub InsertAfter_Internal(NewChild As MathElement, OldChild As MathElement)
 
         If OldChild Is Nothing Then
             All.Insert(0, NewChild)
@@ -116,7 +116,7 @@
 
     End Sub
 
-    Protected Overrides Sub InsertBefore_Internal(ByVal NewChild As MathElement, ByVal OldChild As MathElement)
+    Protected Overrides Sub InsertBefore_Internal(NewChild As MathElement, OldChild As MathElement)
 
         If OldChild Is Nothing Then
             All.Add(NewChild)
@@ -126,17 +126,17 @@
 
     End Sub
 
-    Protected Overrides Sub Remove_Internal(ByVal OldChild As MathElement)
+    Protected Overrides Sub Remove_Internal(OldChild As MathElement)
         All.Remove(OldChild)
     End Sub
 
-    Protected Overrides Sub Replace_Internal(ByVal OldChild As MathElement, ByVal NewChild As MathElement)
+    Protected Overrides Sub Replace_Internal(OldChild As MathElement, NewChild As MathElement)
         This.Attach(NewChild)
         All(All.IndexOf(OldChild)) = NewChild
         This.Detach(OldChild)
     End Sub
 
-    Protected Overrides Sub Swap_Internal(ByVal FirstChild As MathElement, ByVal SecondChild As MathElement)
+    Protected Overrides Sub Swap_Internal(FirstChild As MathElement, SecondChild As MathElement)
 
         Dim FCI = All.IndexOf(FirstChild)
         Dim SCI = All.IndexOf(SecondChild)

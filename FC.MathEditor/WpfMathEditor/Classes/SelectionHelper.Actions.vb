@@ -31,7 +31,7 @@
 '        Throw New NotImplementedException()
 '    End Sub
 
-'    Public Sub MoveNext(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MoveNext(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 '        Dim Sel As Selection = GetSelection(MovedPoint)
 '        Dim E = Sel.CommonAncestror.ParentLayoutEngineChild
 '        Sel.CommonAncestror = E.ParentElement
@@ -40,7 +40,7 @@
 '        SetSelection(Sel, MovedPoint)
 '    End Sub
 
-'    Public Sub MovePrevious(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MovePrevious(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 '        Dim Sel As Selection = GetSelection(MovedPoint)
 '        Dim E = Sel.CommonAncestror.ParentLayoutEngineChild
 '        Sel.CommonAncestror = E.ParentElement
@@ -49,7 +49,7 @@
 '        SetSelection(Sel, MovedPoint)
 '    End Sub
 
-'    Public Sub MoveLeft(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MoveLeft(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
 '        Dim Sel As Selection = GetSelection(MovedPoint)
 '        Dim E = Sel.SelectionStart
@@ -65,7 +65,7 @@
 
 '    End Sub
 
-'    Public Sub MoveRight(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MoveRight(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
 '        Dim Sel As Selection = GetSelection(MovedPoint)
 '        Dim E = Sel.SelectionEnd
@@ -81,7 +81,7 @@
 
 '    End Sub
 
-'    Public Sub MoveStart(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MoveStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
 '        Dim Sel As Selection = GetSelection(MovedPoint)
 '        Sel.SelectionStart = Nothing
@@ -90,7 +90,7 @@
 
 '    End Sub
 
-'    Public Sub MoveEnd(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MoveEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
 '        Dim Sel As Selection = GetSelection(MovedPoint)
 '        Sel.SelectionEnd = Nothing
@@ -99,13 +99,13 @@
 
 '    End Sub
 
-'    Public Sub MoveDocumentStart(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MoveDocumentStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
 '        SetSelection(New Selection(CommonAncestror.Root, Nothing, CommonAncestror.Root.FirstChild), MovedPoint)
 
 '    End Sub
 
-'    Public Sub MoveDocumentEnd(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+'    Public Sub MoveDocumentEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
 '        SetSelection(New Selection(CommonAncestror.Root, CommonAncestror.Root.LastChild, Nothing), MovedPoint)
 

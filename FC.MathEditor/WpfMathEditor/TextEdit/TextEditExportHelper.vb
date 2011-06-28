@@ -6,7 +6,7 @@
         End Get
     End Property
 
-    Public Sub New(ByVal T As TextEdit)
+    Public Sub New(T As TextEdit)
         MyBase.New(T)
     End Sub
 

@@ -3,7 +3,7 @@
     Public Sub New()
     End Sub
 
-    Public Sub New(ByVal Children As IEnumerable(Of MathElement))
+    Public Sub New(Children As IEnumerable(Of MathElement))
         Me.New()
         For Each Child In Children
             Me.Children.Add(Child)

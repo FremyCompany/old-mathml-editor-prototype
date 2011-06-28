@@ -1,10 +1,10 @@
 ﻿Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
 
-    Public Sub New(ByVal This As MathElement)
+    Public Sub New(This As MathElement)
         MyBase.New(This)
     End Sub
 
-    Public Overrides Sub AppendKeyboardInput(ByVal SB As System.Text.StringBuilder)
+    Public Overrides Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
         SB.Append("(")
         For Each Child In This.Children
             Child.Export.AppendKeyboardInput(SB)
@@ -12,7 +12,7 @@
         SB.Append(")")
     End Sub
 
-    Public Overrides Sub AppendLaTeX(ByVal SB As System.Text.StringBuilder)
+    Public Overrides Sub AppendLaTeX(SB As System.Text.StringBuilder)
         SB.Append("{")
         For Each Child In This.Children
             Child.Export.AppendLaTeX(SB)
@@ -20,11 +20,11 @@
         SB.Append("}")
     End Sub
 
-    Public Overrides Sub AppendMathML(ByVal SB As System.Text.StringBuilder)
+    Public Overrides Sub AppendMathML(SB As System.Text.StringBuilder)
         ' TODO: Implement MathML for "mrow" elements
     End Sub
 
-    Public Overrides Sub Draw(ByVal DG As System.Windows.Media.DrawingContext)
+    Public Overrides Sub Draw(DG As System.Windows.Media.DrawingContext)
         ' TODO: Draw element list
         PerformLayout()
         For Each G In This.Children

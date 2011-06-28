@@ -11,7 +11,7 @@
     '    Get
     '        Return GetValue(TextProperty)
     '    End Get
-    '    Set(ByVal value As String)
+    '    Set(value As String)
     '        SetValue(TextProperty, value) : InvalidateVisual()
     '    End Set
     'End Property
@@ -21,7 +21,7 @@
     '    Get
     '        Return GetValue(FontProperty)
     '    End Get
-    '    Set(ByVal value As Typeface)
+    '    Set(value As Typeface)
     '        SetValue(FontProperty, value)
     '    End Set
     'End Property
@@ -29,14 +29,14 @@
     Dim F As New Typeface(New FontFamily("Candara"), FontStyles.Italic, FontWeights.Normal, FontStretches.Normal)
     Dim WithEvents X As New MathDocument()
 
-    Protected Overrides Sub OnRender(ByVal drawingContext As System.Windows.Media.DrawingContext)
+    Protected Overrides Sub OnRender(drawingContext As System.Windows.Media.DrawingContext)
         For Each El In X.Selection
             drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 0, 148, 255)), Nothing, El.Export.LocationInRoot)
         Next
         X.Export.Draw(drawingContext)
     End Sub
 
-    Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
+    Private Sub PersonnalTextBox_KeyDown(sender As Object, e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
         Select Case e.Key
             Case Key.Left
                 If Not (Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)) Then
@@ -51,13 +51,13 @@
         End Select
     End Sub
 
-    Private Sub PersonnalTextBox_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
+    Private Sub PersonnalTextBox_Loaded(sender As Object, e As System.Windows.RoutedEventArgs) Handles Me.Loaded
         Dim CHL = New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}
         X.AddChild(New IdentifierTextEdit(CHL))
         Me.InvalidateVisual()
     End Sub
 
-    Private Sub PersonnalTextBox_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseDown
+    Private Sub PersonnalTextBox_MouseDown(sender As Object, e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseDown
         Me.Focus() : Keyboard.Focus(Me)
     End Sub
 
@@ -117,7 +117,7 @@
     '    Get
     '        Return If(SS < Text.Length, SS, Text.Length)
     '    End Get
-    '    Set(ByVal value As UInteger)
+    '    Set(value As UInteger)
     '        SS = value
     '    End Set
     'End Property
@@ -127,20 +127,20 @@
     '    Get
     '        Return If(SE < Text.Length, If(SE > SelectionStart, SE, SelectionStart), SelectionStart)
     '    End Get
-    '    Set(ByVal value As UInteger)
+    '    Set(value As UInteger)
     '        SE = value
     '    End Set
     'End Property
 
-    'Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
+    'Private Sub PersonnalTextBox_KeyDown(sender As Object, e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
 
     'End Sub
 
-    'Private Sub PersonnalTextBox_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseDown
+    'Private Sub PersonnalTextBox_MouseDown(sender As Object, e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseDown
     '    Me.Focus()
     'End Sub
 
-    'Private Sub PersonnalTextBox_TextInput(ByVal sender As Object, ByVal e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput
+    'Private Sub PersonnalTextBox_TextInput(sender As Object, e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput
     '    If e.Text = vbBack Then
     '        If Me.Text.Length <> 0 Then
     '            Me.Text = Me.Text.Substring(0, Me.Text.Length - 1)
@@ -150,11 +150,11 @@
     '    End If
     'End Sub
 
-    Private Sub PersonnalTextBox_TextInput(ByVal sender As Object, ByVal e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput
+    Private Sub PersonnalTextBox_TextInput(sender As Object, e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput
         X.Input.ProcessString(e.Text)
     End Sub
 
-    Private Sub X_Changed(ByVal sender As Object, ByVal e As System.EventArgs) Handles X.Changed
+    Private Sub X_Changed(sender As Object, e As System.EventArgs) Handles X.Changed
         Me.InvalidateVisual()
     End Sub
 

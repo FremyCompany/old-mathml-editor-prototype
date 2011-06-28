@@ -5,7 +5,7 @@
     '++ Constructor
     '++
 
-    Public Sub New(ByVal Document As MathDocument)
+    Public Sub New(Document As MathDocument)
 
         This = Document
 
@@ -33,14 +33,14 @@
     ''' <summary>
     ''' Called when the selection end point is invalidated
     ''' </summary>
-    Private Sub SEP_Invalidated(ByVal sender As Object, ByVal e As System.EventArgs) Handles SEP.Invalidated
+    Private Sub SEP_Invalidated(sender As Object, e As System.EventArgs) Handles SEP.Invalidated
         SetSelection(SEP.FirstValidParent, SelectionPointType.EndPoint)
     End Sub
 
     ''' <summary>
     ''' Called when the selection start point is invalidated
     ''' </summary>
-    Private Sub SSP_Invalidated(ByVal sender As Object, ByVal e As System.EventArgs) Handles SSP.Invalidated
+    Private Sub SSP_Invalidated(sender As Object, e As System.EventArgs) Handles SSP.Invalidated
         SetSelection(SSP.FirstValidParent, SelectionPointType.StartPoint)
     End Sub
 
@@ -168,7 +168,7 @@
         End Get
     End Property
 
-    Private Sub SetSelection(ByVal StartPoint As SelectionPoint, ByVal EndPoint As SelectionPoint)
+    Private Sub SetSelection(StartPoint As SelectionPoint, EndPoint As SelectionPoint)
 
         ' Find the apparent selection for the specified points
         Dim R = StartPoint.GetApparentSelection(EndPoint)
@@ -190,7 +190,7 @@
 
     End Sub
 
-    Public Sub SetSelection(ByVal NewPoint As SelectionPoint, Optional ByVal PointToChange As SelectionPointType = SelectionPointType.Selection)
+    Public Sub SetSelection(NewPoint As SelectionPoint, Optional PointToChange As SelectionPointType = SelectionPointType.Selection)
         Select Case PointToChange
             Case SelectionPointType.Selection
                 SetSelection(NewPoint, NewPoint)
@@ -203,7 +203,7 @@
         End Select
     End Sub
 
-    Public Function GetSelection(ByVal PointToRetreive As SelectionPointType) As SelectionPoint
+    Public Function GetSelection(PointToRetreive As SelectionPointType) As SelectionPoint
         Select Case PointToRetreive
             Case SelectionPointType.Selection
                 ' TODO: Check if it's not better to throw an exception here
@@ -217,7 +217,7 @@
         End Select
     End Function
 
-    Public Sub SetSelection(ByVal CommonAncestror As MathElement, ByVal SelectionStart As MathElement, ByVal SelectionEnd As MathElement)
+    Public Sub SetSelection(CommonAncestror As MathElement, SelectionStart As MathElement, SelectionEnd As MathElement)
 
         ' Check if the selection is valid
         If (

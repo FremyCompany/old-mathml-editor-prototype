@@ -24,7 +24,7 @@
     ''' Sets the selection start point to the selection end point
     ''' </summary>
     ''' <param name="UseApparentSelection">True if you want to collapse the selection to its apparent end point, false if you want it to collapse to its true end point</param>
-    Public Sub CollapseToEnd(Optional ByVal UseApparentSelection As Boolean = True)
+    Public Sub CollapseToEnd(Optional UseApparentSelection As Boolean = True)
         If UseApparentSelection Then
             SetSelection(ApparentSEP, ApparentSEP)
         Else
@@ -36,7 +36,7 @@
     ''' Sets the selection end point to the selection start point
     ''' </summary>
     ''' <param name="UseApparentSelection">True if you want to collapse the selection to its apparent start point, false if you want it to collapse to its true start point</param>
-    Public Sub CollapseToStart(Optional ByVal UseApparentSelection As Boolean = True)
+    Public Sub CollapseToStart(Optional UseApparentSelection As Boolean = True)
         If UseApparentSelection Then
             SetSelection(ApparentSSP, ApparentSSP)
         Else
@@ -48,7 +48,7 @@
     ''' Moves the selection to the next available parent location
     ''' </summary>
     ''' <param name="MovedPoint">The point to move</param>
-    Public Sub MoveAfterParent(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveAfterParent(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         Dim P = GetSelection(MovedPoint)
         Dim E = P.ParentElement
@@ -85,7 +85,7 @@
     ''' Moves the selection to the next available parent location (backward)
     ''' </summary>
     ''' <param name="MovedPoint">The point to move</param>
-    Public Sub MoveBeforeParent(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveBeforeParent(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         Dim P = GetSelection(MovedPoint)
         Dim E = P.ParentElement
@@ -121,7 +121,7 @@
     ''' Moves the selection to the previous available insertion point (previous sibling or before current element in parent)
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveLeft(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveLeft(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         Dim Sel = GetSelection(MovedPoint)
 
@@ -137,7 +137,7 @@
     ''' Moves the selection to the next available insertion point (next sibling or after current element in parent)
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveRight(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveRight(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         Dim Sel = GetSelection(MovedPoint)
 
@@ -153,7 +153,7 @@
     ''' Moves the selection to the beginning of the current element
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveStart(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         SetSelection(
             GetSelection(MovedPoint).GetOrigin(),
@@ -166,7 +166,7 @@
     ''' Moves the selection to the end of the current element
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveEnd(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         SetSelection(
             GetSelection(MovedPoint).GetEnd(),
@@ -175,7 +175,7 @@
 
     End Sub
 
-    Public Sub MoveDocumentStart(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveDocumentStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         SetSelection(
             New SelectionPoint(This.ParentDocument, 0),
@@ -184,7 +184,7 @@
 
     End Sub
 
-    Public Sub MoveDocumentEnd(Optional ByVal MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Sub MoveDocumentEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
 
         SetSelection(
             New SelectionPoint(This.ParentDocument, This.ParentDocument.Children.Count),
@@ -208,7 +208,7 @@
         Next
     End Sub
 
-    Public Sub ReplaceContents(ByVal NewChilds As IEnumerable(Of MathElement))
+    Public Sub ReplaceContents(NewChilds As IEnumerable(Of MathElement))
         Dim EndPoint = ApparentSEP.NextSibling
         Me.DeleteContents()
         For Each el In NewChilds
@@ -217,7 +217,7 @@
         SetSelection(ApparentSEP, ApparentSEP)
     End Sub
 
-    Public Sub ReplaceContents(ByVal NewChild As MathElement)
+    Public Sub ReplaceContents(NewChild As MathElement)
         Dim EndPoint = ApparentSEP.NextSibling
         Me.DeleteContents()
         ParentElement.Children.InsertBefore(NewChild, EndPoint)

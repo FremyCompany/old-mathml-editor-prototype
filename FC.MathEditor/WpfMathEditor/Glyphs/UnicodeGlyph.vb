@@ -1,14 +1,14 @@
 ﻿Partial Public Class UnicodeGlyph : Inherits MathElement
 
-    Public Sub New(ByVal C As Integer)
+    Public Sub New(C As Integer)
         Me.New(C, Nothing, Nothing)
     End Sub
 
-    Public Sub New(ByVal C As Integer, ByVal F As Typeface)
+    Public Sub New(C As Integer, F As Typeface)
         Me.New(C, F, Nothing)
     End Sub
 
-    Public Sub New(ByVal C As Integer, ByVal F As Typeface, ByVal S As Double?)
+    Public Sub New(C As Integer, F As Typeface, S As Double?)
         ' Field initialization
         Me.C = C
 
