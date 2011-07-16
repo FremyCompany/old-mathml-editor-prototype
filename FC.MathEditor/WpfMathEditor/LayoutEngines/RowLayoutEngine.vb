@@ -10,11 +10,16 @@
         Next
     End Sub
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
         Dim Clone As New RowLayoutEngine()
-        For Each Child In Children
-            Clone.AddChild(Child.Clone())
-        Next : Return Clone
+
+        If CloneChildren Then
+            For Each Child In Children
+                Clone.AddChild(Child.Clone())
+            Next
+        End If
+
+        Return Clone
     End Function
 
     Protected Overrides Function GetInitialChildrenHelper() As ChildrenHelper

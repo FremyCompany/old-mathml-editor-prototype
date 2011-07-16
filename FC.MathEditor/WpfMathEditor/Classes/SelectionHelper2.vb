@@ -31,17 +31,10 @@
     Public Event Changed As EventHandler
 
     ''' <summary>
-    ''' Called when the selection end point is invalidated
+    ''' Called when the selection end or start point is being invalidated
     ''' </summary>
-    Private Sub SEP_Invalidated(sender As Object, e As System.EventArgs) Handles SEP.Invalidated
-        SetSelection(SEP.FirstValidParent, SelectionPointType.EndPoint)
-    End Sub
-
-    ''' <summary>
-    ''' Called when the selection start point is invalidated
-    ''' </summary>
-    Private Sub SSP_Invalidated(sender As Object, e As System.EventArgs) Handles SSP.Invalidated
-        SetSelection(SSP.FirstValidParent, SelectionPointType.StartPoint)
+    Private Sub SP_Invalidated(ByVal sender As Object, ByVal e As System.EventArgs) Handles SEP.Invalidated, SSP.Invalidated
+        SetSelection(SSP.FirstValidParent, SEP.FirstValidParent)
     End Sub
 
     '++

@@ -18,17 +18,12 @@
 
         Public Sub New(SelectionHost As MathElement, ChildIndex As Integer)
 
+            ' Fields initialization
+            Me._Host = SelectionHost : Me.Index = ChildIndex : Me.Document = SelectionHost.ParentDocument
+
             ' A selection host can't be null, and the index should be valid
             If SelectionHost Is Nothing Then Throw New ArgumentNullException("SelectionHost", "A selection host can't be null")
-            If ChildIndex < 0 Then Throw New ArgumentException("ChildIndex can't be negative. It should be a positive number between 0 and SelectionHost.Children.Count.")
-            If ChildIndex > SelectionHost.Children.Count Then Throw New ArgumentException("ChildIndex can't be superior to the number of children. It should be a positive number between 0 and SelectionHost.Children.Count.")
-
-            ' An element should have a parent document in order to be a valid SelectionHost target
-            Document = SelectionHost.ParentDocument
-            If Document Is Nothing Then Throw New ArgumentException("An element should have a parent document in order to be a valid SelectionHost target")
-
-            ' Fields initialization
-            Me._Host = SelectionHost : Me.Index = ChildIndex
+            ValidateIndex(ChildIndex)
 
             ' Parent initialization
             If SelectionHost.ParentElement IsNot Nothing Then
@@ -70,11 +65,16 @@
         Private WithEvents _Parent As SelectionPoint
         Private Valid As Boolean = True
 
+        Protected Sub ValidateIndex(ByVal ChildIndex As Integer)
+            If ChildIndex < 0 Then Throw New ArgumentException("ChildIndex can't be negative. It should be a positive number between 0 and SelectionHost.Children.Count.")
+            If ChildIndex > ParentElement.Children.Count Then Throw New ArgumentException("ChildIndex can't be superior to the number of children. It should be a positive number between 0 and SelectionHost.Children.Count.")
+        End Sub
+
         Private Property Index As Integer
             Get
                 Return __Index
             End Get
-            Set(value As Integer)
+            Set(ByVal value As Integer)
 
                 If Index <> value Then
 
@@ -133,7 +133,12 @@
         ''' </summary>
         Public ReadOnly Property ParentDocument As MathDocument
             Get
-                Return Document
+                If IsValid Then
+                    If Document Is Nothing Then Document = ParentElement.ParentDocument
+                    Return Document
+                Else
+                    Throw New InvalidOperationException("This selection point has been invalidated.")
+                End If
             End Get
         End Property
 
@@ -170,7 +175,7 @@
         ''' </value>
         Public ReadOnly Property IsValid As Boolean
             Get
-                Return Valid
+                Return (Valid) AndAlso (_Host.ParentDocument Is Document)
             End Get
         End Property
 
@@ -214,6 +219,12 @@
 
             Dim StartPoint = Me
 
+            ' In case we have a document mismatch, throw an exception
+            If StartPoint.ParentDocument IsNot EndPoint.ParentDocument Then
+                Throw New ArgumentException("EndPoint and StartPoint of a selection should be located in the same document.")
+                'Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, StartPoint)
+            End If
+
             ' Start be removing the depht difference between the two points
             Dim DephtDiff = StartPoint.ParentElement.TreeDepht - EndPoint.ParentElement.TreeDepht
             If DephtDiff > 0 Then
@@ -232,8 +243,13 @@
                 EndPoint = EndPoint.ParentSelectionPoint
             End While
 
-            ' Return the response
-            Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, EndPoint)
+            ' Reorganisate start and end in order to get a logical selection
+            ' Return the final result
+            If StartPoint.ChildIndex > EndPoint.ChildIndex Then
+                Return New Tuple(Of SelectionPoint, SelectionPoint)(EndPoint, StartPoint)
+            Else
+                Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, EndPoint)
+            End If
 
         End Function
 
@@ -263,14 +279,16 @@
         '++ Detect changes
         '++
 
-        Private Sub Host_ChildAdded(sender As Object, e As MathElement.TreeEventArgs) Handles _Host.ChildAdded
+        Private Sub Host_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles _Host.ChildAdded
+            ' NOTE : < is not possible because the insertion point should move after the inserted element in the input flow
             If e.ChildIndex <= Me.ChildIndex Then
                 Me.Index += 1
             End If
         End Sub
 
-        Private Sub Host_ChildRemoved(sender As Object, e As MathElement.TreeEventArgs) Handles _Host.ChildRemoved
-            If e.ChildIndex <= Me.ChildIndex Then
+        Private Sub Host_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles _Host.ChildRemoved
+            ' NOTE : <= is not possible because, when the selection content is deleted, end and start point should be egal
+            If e.ChildIndex < Me.ChildIndex Then
                 Me.Index -= 1
             End If
         End Sub

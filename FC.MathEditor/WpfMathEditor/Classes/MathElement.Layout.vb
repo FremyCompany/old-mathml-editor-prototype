@@ -6,6 +6,7 @@
     ' Palatino Linotype, 
     Public FM1 As New FontFamily("Candara")
     Public FM2 As New FontFamily("Cambria Math")
+    Public FM3 As New FontFamily("Cambria")
     Public Overridable ReadOnly Property DefaultFontFamily As FontFamily
         Get
             Return FM1
@@ -15,6 +16,12 @@
     Public Overridable ReadOnly Property DefaultMathFontFamily As FontFamily
         Get
             Return FM2
+        End Get
+    End Property
+
+    Public Overridable ReadOnly Property DefaultMathFontFamily2 As FontFamily
+        Get
+            Return FM3
         End Get
     End Property
 

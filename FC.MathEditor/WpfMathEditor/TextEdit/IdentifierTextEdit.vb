@@ -12,11 +12,16 @@
         Next
     End Sub
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
         Dim Clone As New IdentifierTextEdit()
-        For Each C In Children
-            Clone.Children.Add(C.Clone())
-        Next : Return Clone
+
+        If CloneChildren Then
+            For Each C In Children
+                Clone.Children.Add(C.Clone())
+            Next
+        End If
+
+        Return Clone
     End Function
 
     Public Overrides ReadOnly Property ElementName As String

@@ -12,24 +12,8 @@
 
         ' [[Assumption]] When we reach this function, the adjacent textedits refused the char.
         ' Create a new textedit to host the new char
-        Dim TextEdit As TextEdit
+        Dim TextEdit As TextEdit = FC.MathEditor.TextEdit.FromChar(InputChar)
 
-        If Char.IsLetter(Char.ConvertFromUtf32(InputChar)) Then
-            TextEdit = New IdentifierTextEdit()
-        ElseIf _
-        ( _
-            (Char.IsDigit(Char.ConvertFromUtf32(InputChar))) OrElse
-            (InputChar = ".") OrElse
-            ((InputChar = "-" OrElse InputChar = "+") AndAlso TryCast(This.Selection.PreviousSibling, OperatorTextEdit) IsNot Nothing) _
-        ) Then
-            TextEdit = New NumberTextEdit()
-        Else
-            TextEdit = New OperatorTextEdit()
-        End If
-
-        ' Append the newly created char to the textedit
-        Dim X As New UnicodeGlyph(InputChar)
-        TextEdit.AddChild(X)
         This.Selection.ReplaceContents(TextEdit)
 
         ' Change the selection to the TextEdit

@@ -4,12 +4,14 @@
         MyBase.New() : Sel = New SelectionHelper(Me)
     End Sub
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
         Dim X As New MathDocument()
 
-        For Each Child In Me.Children
-            X.AddChild(Child.Clone())
-        Next
+        If CloneChildren Then
+            For Each Child In Me.Children
+                X.AddChild(Child.Clone())
+            Next
+        End If
 
         Return X
     End Function

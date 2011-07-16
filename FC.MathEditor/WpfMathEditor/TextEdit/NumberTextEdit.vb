@@ -1,14 +1,22 @@
 ﻿Public Class NumberTextEdit : Inherits TextEdit
 
     Public Sub New()
+        ' TODO: This is not normal that setting a default font family for an element needs to be done instance per instance.
+        ' It works but it's cleary *not* optimized
+        Me.FontFamily = New FontFamily("Calibri")
         Me.Input = New TextEditInputHelper(Me, Function(C) C = Asc("+") OrElse C = Asc("-") OrElse C = Asc(".") OrElse Char.IsDigit(Char.ConvertFromUtf32(C)))
     End Sub
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
         Dim Clone As New OperatorTextEdit()
-        For Each C In Children
-            Clone.Children.Add(C.Clone())
-        Next : Return Clone
+
+        If CloneChildren Then
+            For Each C In Children
+                Clone.Children.Add(C.Clone())
+            Next
+        End If
+
+        Return Clone
     End Function
 
     Public Overrides ReadOnly Property ElementName As String

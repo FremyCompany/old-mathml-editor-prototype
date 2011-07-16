@@ -67,10 +67,8 @@
 
                 Case MathElement.Type.LayoutEngine
                     Dim Result = E.NextSibling
-                    If Result IsNot Nothing Then
-                        SetSelection(E.ParentElement, E, Result)
-                        Exit Sub
-                    End If
+                    SetSelection(E.ParentElement, E, Result)
+                    Exit Sub
 
             End Select
 
@@ -78,6 +76,10 @@
             E = E.ParentElement
 
         End While
+
+        ' TODO: Replace by a function that return False/True
+        ' Throw New InvalidOperationException("This operation failled.")
+
 
     End Sub
 
@@ -104,10 +106,8 @@
 
                 Case MathElement.Type.LayoutEngine
                     Dim Result = E.PreviousSibling
-                    If Result IsNot Nothing Then
-                        SetSelection(E.ParentElement, E, Result)
-                        Exit Sub
-                    End If
+                    SetSelection(E.ParentElement, Result, E)
+                    Exit Sub
 
             End Select
 
@@ -115,6 +115,9 @@
             E = E.ParentElement
 
         End While
+
+        'Throw New InvalidOperationException("This operation failled.")
+
     End Sub
 
     ''' <summary>

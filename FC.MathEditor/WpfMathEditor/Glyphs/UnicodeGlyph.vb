@@ -29,7 +29,7 @@
         End Get
     End Property
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
         Return New UnicodeGlyph(C)
     End Function
 

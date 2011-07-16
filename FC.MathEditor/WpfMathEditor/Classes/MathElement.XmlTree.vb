@@ -185,8 +185,8 @@ Partial Public MustInherit Class MathElement
 
     End Function
 
-    Public Function Clone() As MathElement
-        Clone = Me.Clone_Internal()
+    Public Function Clone(Optional CloneChildren As Boolean = True) As MathElement
+        Clone = Me.Clone_Internal(CloneChildren)
         If _IsFontStretchDefined Then Clone.FontStretch = Me.FontStretch
         If _IsFontWeightDefined Then Clone.FontWeight = Me.FontWeight
         If _IsFontStyleDefined Then Clone.FontStyle = Me.FontStyle
@@ -196,7 +196,7 @@ Partial Public MustInherit Class MathElement
         If _IsBackgroundDefined Then Clone.Background = Me.Background
         Return Clone
     End Function
-    Public MustOverride Function Clone_Internal() As MathElement
+    Public MustOverride Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
 
     '++
     '++ XML Children

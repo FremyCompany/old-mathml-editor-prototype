@@ -26,6 +26,10 @@ Public Class SiblingEnumerator : Implements IEnumerator(Of MathElement)
 
     Public Sub New(ParentElement As MathElement, BoolToDelete As Boolean)
 
+        Me.StartPoint = ParentElement.GetSelectionAtOrigin()
+        Me.CurrentPoint = StartPoint
+        Me.EndPoint = StartPoint.GetEnd()
+
     End Sub
 
     Public Sub New(StartPoint As SelectionHelper.SelectionPoint)

@@ -60,8 +60,20 @@
     Protected H As Double
     Protected BH As Double
 
+    ''' <summary>
+    ''' Inner margin: used to define the draw box from the black box (glyph run). This margin is not collapsible and is used internally.
+    ''' </summary>
     Protected IM As Thickness
+
+    ''' <summary>
+    ''' Outer margin: useed to define a margin outside the black box. This margin is collapsible.
+    ''' </summary>
     Protected OM As Thickness
+
+    ''' <summary>
+    ''' Selection margin: used to define a margin outside the black box that it's used to compute the element selectable area.
+    ''' </summary>
+    Protected SM As Thickness
 
     Public ReadOnly Property Width As Double
         Get
@@ -123,6 +135,13 @@
         Get
             PerformLayout()
             Return OM
+        End Get
+    End Property
+
+    Public ReadOnly Property SelectionMargin As Thickness
+        Get
+            PerformLayout()
+            Return SM
         End Get
     End Property
 
@@ -203,8 +222,31 @@
             If This.ParentElement Is Nothing Then Return LocationInParent
 
             This.Root.Export.PerformLayout()
-            Dim L = LocationInParent
             Return FitRect(LocationInParent, This.ParentElement.Export.SizeRect, This.ParentElement.Export.LocationInRoot)
+
+        End Get
+    End Property
+
+    Public ReadOnly Property SelectionRectInParent() As Rect
+        Get
+
+            If This.ParentElement Is Nothing Then
+                Return New Rect(SizeRect.X - SM.Left, SizeRect.Y - SM.Top, SizeRect.Width + SM.Right, SizeRect.Height + SM.Bottom)
+            Else
+                This.ParentElement.Export.PerformLayout()
+                Dim L = _LocationInParent : Dim Zw = _LocationInParent.Width / SizeRect.Width : Dim Zh = _LocationInParent.Height / SizeRect.Height
+                Return New Rect(L.X - SM.Left * Zw, L.Y - SM.Top * Zh, L.Width + (SM.Left + SM.Right) * Zw, L.Height + (SM.Top + SM.Bottom) * Zh)
+            End If
+
+        End Get
+    End Property
+
+    Public ReadOnly Property SelectionRectInRoot() As Rect
+        Get
+            If This.ParentElement Is Nothing Then Return SelectionRectInParent
+
+            This.Root.Export.PerformLayout()
+            Return FitRect(SelectionRectInParent, This.ParentElement.Export.SizeRect, This.ParentElement.Export.LocationInRoot)
 
         End Get
     End Property

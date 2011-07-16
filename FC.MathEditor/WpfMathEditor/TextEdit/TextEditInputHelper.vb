@@ -25,7 +25,27 @@
 
         Else
 
-            Return False
+            Dim FirstPart As TextEdit = This.Clone(False)
+            Dim SecondPart As TextEdit = This.Clone(False)
+
+            For Each child In This.Children
+                If child.ChildIndex < This.Selection.GetSelection(SelectionHelper.SelectionPointType.Selection).ChildIndex Then
+                    FirstPart.AddChild(child.Clone())
+                Else
+                    SecondPart.AddChild(child.Clone())
+                End If
+            Next
+
+            Dim TextEdit As TextEdit = TextEdit.FromChar(InputChar)
+
+            This.ParentElement.Children.InsertAfter(SecondPart, This)
+            This.ParentElement.Children.InsertAfter(TextEdit, This)
+            This.ParentElement.Children.InsertAfter(FirstPart, This)
+            This.RemoveFromParent()
+
+            TextEdit.Selection.SetSelection(TextEdit.ParentElement, TextEdit, SecondPart)
+
+            Return True
 
         End If
     End Function

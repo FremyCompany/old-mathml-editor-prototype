@@ -24,6 +24,18 @@
         End Get
     End Property
 
+    Public Function GetSelectionAtOrigin() As SelectionHelper.SelectionPoint
+        Return New SelectionHelper.SelectionPoint(Me, 0)
+    End Function
+
+    Public Function GetSelectionAtEnd() As SelectionHelper.SelectionPoint
+        Return New SelectionHelper.SelectionPoint(Me, Me.Children.Count)
+    End Function
+
+    Public Function GetSelectionAt(ByVal Index As Integer) As SelectionHelper.SelectionPoint
+        Return New SelectionHelper.SelectionPoint(Me, Index)
+    End Function
+
     Public Event GotFocus As EventHandler
     Public Event LostFocus As EventHandler
 
@@ -38,7 +50,7 @@
     End Property
 
     Public Overridable Function GetNextInputElement(CurrentElement As MathElement) As MathElement
-        If Me.Children.IsFormatter Then
+        If Me.IsFormatter Then
             If CurrentElement Is Nothing Then Return Children.First
             Return Children.After(CurrentElement)
         Else
@@ -47,7 +59,7 @@
     End Function
 
     Public Overridable Function GetPreviousInputElement(CurrentElement As MathElement) As MathElement
-        If Me.Children.IsFormatter Then
+        If Me.IsFormatter Then
             If CurrentElement Is Nothing Then Return Children.Last
             Return Children.Before(CurrentElement)
         Else
@@ -63,7 +75,7 @@
             End If
 
             While P IsNot Nothing
-                If P.Children.IsLayoutEngine Then
+                If P.IsLayoutEngine Then
                     Return P
                 Else
                     P = P.ParentElement
@@ -82,7 +94,7 @@
             End If
 
             While P IsNot Nothing
-                If P.ParentElement.Children.IsLayoutEngine Then
+                If P.ParentElement.IsLayoutEngine Then
                     Return P
                 Else
                     P = P.ParentElement
@@ -101,4 +113,9 @@
             Trace.TraceError("Bug!")
         End If
     End Sub
+
+    Public Sub RemoveFromParent()
+        ParentElement.RemoveChild(Me)
+    End Sub
+
 End Class
