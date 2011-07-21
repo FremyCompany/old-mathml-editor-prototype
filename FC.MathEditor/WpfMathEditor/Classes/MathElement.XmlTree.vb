@@ -54,6 +54,10 @@ Partial Public MustInherit Class MathElement
                 Trace.TraceWarning("Multiple refefinition of the Parent property of an element. Spaghetti code suspected.")
 #End If
 
+            ElseIf value Is Nothing Then
+
+                ResetParent()
+
             Else
 
                 ' REMOVE THE CURRENT PARENT, AND RETRY
@@ -93,7 +97,7 @@ Partial Public MustInherit Class MathElement
     ''' </summary>
     Private Sub ResetParent()
 
-        If ParentElement.Children.Contains(Me) Then
+        If ParentElement IsNot Nothing AndAlso ParentElement.Children.Contains(Me) Then
 
             Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
 
@@ -294,7 +298,7 @@ Partial Public MustInherit Class MathElement
     End Sub
 
     Public Sub StopBatchProcess()
-        ShouldRaiseChanged = 0
+        ShouldRaiseChanged -= 1
         If ChangePendings <> 0 Then
             ChangePendings = 0
             RaiseChanged()
@@ -337,26 +341,30 @@ Partial Public MustInherit Class MathElement
 
     Public Event DetachedFromParent As EventHandler
     Public Sub RaiseDetachedFromParent()
+        If Me.ChildIndex <> -1 Then Throw New InvalidOperationException()
+        If Me._Parent IsNot Nothing Then Me.ResetParent()
         RaiseEvent DetachedFromParent(Me, EventArgs.Empty)
     End Sub
 
     Public Event DetachedFromDocument As EventHandler
     Public Sub RaiseDetachedFromDocument()
+        ' TODO : Preform a check here before raising DetachedFromDocument
         RaiseEvent DetachedFromDocument(Me, EventArgs.Empty)
     End Sub
 
     Public Event ChildAdded As EventHandler(Of TreeEventArgs)
     Public Sub RaiseChildAdded(ChildElement As MathElement, ChildIndex As Integer)
         Dim e = New TreeEventArgs(ChildElement, Me, ChildIndex, TreeEventArgs.TreeAction.Added)
+        ' TODO : Add some "StartBatchProcess" here in the event handling
         RaiseEvent ChildAdded(Me, e)
-        RaiseEvent SubTreeModified(Me, e)
+        RaiseSubTreeModified(e) 'also raises the Changed event
     End Sub
 
     Public Event ChildRemoved As EventHandler(Of TreeEventArgs)
     Public Sub RaiseChildRemoved(ChildElement As MathElement, ChildIndex As Integer)
         Dim e = New TreeEventArgs(ChildElement, Me, ChildIndex, TreeEventArgs.TreeAction.Removed)
         RaiseEvent ChildRemoved(Me, e)
-        RaiseEvent SubTreeModified(Me, e)
+        RaiseSubTreeModified(e) 'also raises the Changed event
     End Sub
 
     Public Class TreeEventArgs : Inherits EventArgs
@@ -390,13 +398,14 @@ Partial Public MustInherit Class MathElement
     Private Sub MathElement_DetachedFromDocument(sender As Object, e As System.EventArgs) Handles Me.DetachedFromDocument
         _ParentDocument = Nothing
         _Selection = Nothing
-    End Sub
-
-    Private Sub MathElement_DetachedFromParent(sender As Object, e As System.EventArgs) Handles Me.DetachedFromParent
-        RaiseDetachedFromDocument()
         For Each Child In Children
             Child.RaiseDetachedFromDocument()
         Next
+    End Sub
+
+    Private Sub MathElement_DetachedFromParent(sender As Object, e As System.EventArgs) Handles Me.DetachedFromParent
+        SetParent(Nothing)
+        RaiseDetachedFromDocument()
     End Sub
 
     Private Sub MathElement_SubTreeModified(sender As Object, e As TreeEventArgs) Handles Me.SubTreeModified

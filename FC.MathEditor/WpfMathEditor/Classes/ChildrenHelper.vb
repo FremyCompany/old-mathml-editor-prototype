@@ -1,4 +1,4 @@
-﻿Public MustInherit Class ChildrenHelper
+﻿Public MustInherit Class OldChildrenHelper
     Implements IEnumerable(Of MathElement)
 
     ''' <summary>

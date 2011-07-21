@@ -69,7 +69,7 @@
         If ProcessChar_Internal(InputChar) Then Exit Sub
 
         ' When a char wasn't handled neither by right, by left or by current element:
-        If This.Selection.NextSibling Is Nothing Then
+        If This.Selection.NextSibling Is Nothing AndAlso This.ParentElement IsNot Nothing Then
             This.Selection.MoveAfterParent() : This.Selection.ParentElement.Input.ProcessChar(InputChar)
         ElseIf This.Selection.PreviousSibling Is Nothing Then
             This.Selection.MoveBeforeParent() : This.Selection.ParentElement.Input.ProcessChar(InputChar)
