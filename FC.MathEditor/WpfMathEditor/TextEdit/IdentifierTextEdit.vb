@@ -30,12 +30,17 @@
         End Get
     End Property
 
-    Public Overrides Function IsAccepted(C As Integer) As Boolean
-        Return Char.IsLetter(Char.ConvertFromUtf32(C)) OrElse C = Asc("_")
+    Public Overrides Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
+        Return Char.IsLetter(Char.ConvertFromUtf32(C)) OrElse (Not IsFirst AndAlso C = Asc("_"))
     End Function
 
-    Public Overrides Function CanHaveMultipleChild() As Boolean
-        Return True
-    End Function
+    ''' <summary>
+    ''' Gets a value indicating if an accepted char typed from left or right should be added to the textedit or if another one should be created instead.
+    ''' </summary>
+    Public Overrides ReadOnly Property EatInputByDefault As Boolean
+        Get
+            Return False
+        End Get
+    End Property
 
 End Class

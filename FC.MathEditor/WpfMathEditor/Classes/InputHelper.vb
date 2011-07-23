@@ -70,9 +70,9 @@
 
         ' When a char wasn't handled neither by right, by left or by current element:
         If This.Selection.NextSibling Is Nothing AndAlso This.ParentElement IsNot Nothing Then
-            This.Selection.MoveAfterParent() : This.Selection.ParentElement.Input.ProcessChar(InputChar)
+            If This.Selection.MoveAfterParent() Then This.Selection.ParentElement.Input.ProcessChar(InputChar)
         ElseIf This.Selection.PreviousSibling Is Nothing Then
-            This.Selection.MoveBeforeParent() : This.Selection.ParentElement.Input.ProcessChar(InputChar)
+            If This.Selection.MoveBeforeParent() Then This.Selection.ParentElement.Input.ProcessChar(InputChar)
         End If
 
     End Sub
@@ -85,13 +85,13 @@
         Return ProcessChar_FromRight_Internal(InputChar)
     End Function
 
-    Public Sub ProcessDelete()
+    Public Sub ProcessDelete(Ctrl As Boolean, Alt As Boolean, Shift As Boolean)
 
-        If This.Selection.IsEmpty Then
+        If This.Selection.IsCollapsed Then
 
             ' If the selection is emtpy, try to give the priority to the left element
             Dim RightElement = This.Selection.NextSibling
-            If RightElement.Input.ProcessDelete_FromLeft() Then
+            If RightElement.Input.ProcessDelete_FromLeft(Ctrl, Alt, Shift) Then
                 Exit Sub
             End If
 
@@ -104,26 +104,25 @@
         End If
 
         ' Perform the classical action for Delete for this element
-        If ProcessDelete_Internal() Then
+        If ProcessDelete_Internal(Ctrl, Alt, Shift) Then
             Exit Sub
         End If
 
         ' If this element didn't respond to the keypress, we may forward the event to another one
         If This.Selection.NextSibling Is Nothing Then
-            This.Selection.MoveAfterParent()
-            This.Selection.ParentElement.Input.ProcessDelete()
+            If This.Selection.MoveAfterParent() Then This.Selection.ParentElement.Input.ProcessDelete(Ctrl, Alt, Shift)
             Exit Sub
         End If
 
     End Sub
 
-    Public Sub ProcessBackSpace()
+    Public Sub ProcessBackSpace(Ctrl As Boolean, Alt As Boolean, Shift As Boolean)
 
-        If This.Selection.IsEmpty Then
+        If This.Selection.IsCollapsed Then
 
             ' If the selection is emtpy, try to give the priority to the left element
             Dim LeftElement = This.Selection.PreviousSibling
-            If (LeftElement IsNot Nothing) AndAlso (LeftElement.Input.ProcessBackSpace_FromRight()) Then
+            If (LeftElement IsNot Nothing) AndAlso (LeftElement.Input.ProcessBackSpace_FromRight(Ctrl, Alt, Shift)) Then
                 Exit Sub
             End If
 
@@ -136,49 +135,118 @@
         End If
 
         ' Perform the classical action for Backspace for this element
-        If ProcessBackSpace_Internal() Then
+        If ProcessBackSpace_Internal(Ctrl, Alt, Shift) Then
             Exit Sub
         End If
 
         ' If this element didn't respond to the keypress, we may forward the event to another one
-        If This.Selection.PreviousSibling Is Nothing Then
-            This.Selection.MoveBeforeParent()
-            This.Selection.ParentElement.Input.ProcessBackSpace()
+        If This.Selection.PreviousSibling Is Nothing AndAlso This.Selection.ParentElement.ParentElement IsNot Nothing Then
+            If This.Selection.MoveBeforeParent() Then This.Selection.ParentElement.Input.ProcessBackSpace(Ctrl, Alt, Shift)
             Exit Sub
         End If
 
     End Sub
 
-    Public Function ProcessDelete_FromLeft() As Boolean
-        Return ProcessDelete_FromLeft_Internal()
+    Public Function ProcessDelete_FromLeft(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        Return ProcessDelete_FromLeft_Internal(Ctrl, Alt, Shift)
     End Function
 
-    Public Function ProcessBackSpace_FromRight() As Boolean
-        Return ProcessBackSpace_FromRight_Internal()
+    Public Function ProcessBackSpace_FromRight(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        Return ProcessBackSpace_FromRight_Internal(Ctrl, Alt, Shift)
     End Function
 
-    Public Function ProcessLeftKey() As Boolean
-        Return ProcessLeftKey_Internal()
+    Public Function ProcessLeftKey(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+
+        Dim InitialEP = This.Selection.EndPoint
+
+        ' Before everything, we should try to collapse selection
+        If Not Shift AndAlso Not This.Selection.IsCollapsed Then
+            This.Selection.CollapseToStart() : Return True
+        End If
+
+        ' First, the right element has the possibility to react, under certain circumstances
+        If (Not Ctrl) AndAlso (This.Selection.IsCollapsed) AndAlso (This.Selection.PreviousSibling IsNot Nothing) Then
+            If This.Selection.PreviousSibling.Input.ProcessLeftKey_FromRight(Ctrl, Alt, Shift) Then
+                If Shift Then
+                    This.Selection.SetPoint(This.Selection.EndPoint, PointToChange:=SelectionHelper.SelectionPointType.EndPoint)
+                    If This.Selection.EndPoint = InitialEP Then
+                        If Not This.Selection.EndPoint.IsAtOrigin Then
+                            This.Selection.SetPoint(This.Selection.EndPoint.Increment(-1), SelectionHelper.SelectionPointType.EndPoint)
+                        End If
+                    End If
+                End If : Return True
+            End If
+        End If
+
+        ' Then, we fall back to the normal behavior
+        If ProcessLeftKey_Internal(Ctrl, Alt, Shift) Then
+            If Shift Then
+                This.Selection.SetPoint(This.Selection.EndPoint, PointToChange:=SelectionHelper.SelectionPointType.EndPoint)
+                If This.Selection.EndPoint = InitialEP Then
+                    If Not This.Selection.EndPoint.IsAtOrigin Then
+                        This.Selection.SetPoint(This.Selection.EndPoint.Increment(-1), SelectionHelper.SelectionPointType.EndPoint)
+                    End If
+                End If
+            End If : Return True
+        Else
+            Return False
+        End If
+
     End Function
 
-    Public Function ProcessRightKey() As Boolean
-        Return ProcessRightKey_Internal()
+    Public Function ProcessRightKey(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+
+        Dim InitialEP = This.Selection.EndPoint
+
+        ' Before everything, we should try to collapse selection
+        If Not Shift AndAlso Not This.Selection.IsCollapsed Then
+            This.Selection.CollapseToEnd() : Return True
+        End If
+
+        ' First, the right element has the possibility to react, under certain circumstances
+        If (Not Ctrl) AndAlso (This.Selection.IsCollapsed) AndAlso (This.Selection.NextSibling IsNot Nothing) Then
+            If This.Selection.NextSibling.Input.ProcessRightKey_FromLeft(Ctrl, Alt, Shift) Then
+                If Shift Then
+                    This.Selection.SetPoint(This.Selection.EndPoint, PointToChange:=SelectionHelper.SelectionPointType.EndPoint)
+                    If This.Selection.EndPoint = InitialEP Then
+                        If Not This.Selection.EndPoint.IsAtEnd Then
+                            This.Selection.SetPoint(This.Selection.EndPoint.Increment(1), SelectionHelper.SelectionPointType.EndPoint)
+                        End If
+                    End If
+                End If : Return True
+            End If
+        End If
+
+        ' Then, we fall back to the no
+        If ProcessRightKey_Internal(Ctrl, Alt, Shift) Then
+            If Shift Then
+                This.Selection.SetPoint(This.Selection.EndPoint, PointToChange:=SelectionHelper.SelectionPointType.EndPoint)
+                If This.Selection.EndPoint = InitialEP Then
+                    If Not This.Selection.EndPoint.IsAtEnd Then
+                        This.Selection.SetPoint(This.Selection.EndPoint.Increment(1), SelectionHelper.SelectionPointType.EndPoint)
+                    End If
+                End If
+            End If : Return True
+        Else
+            Return False
+        End If
+
     End Function
 
-    Public Function ProcessLeftKey_FormRight() As Boolean
-        Return ProcessLeftKey_FormRight()
+    Public Function ProcessLeftKey_FromRight(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        Return ProcessLeftKey_FromRight_Internal(Ctrl, Alt, Shift)
     End Function
 
-    Public Function ProcessRightKey_FromLeft() As Boolean
-        Return ProcessRightKey_FromLeft_Internal()
+    Public Function ProcessRightKey_FromLeft(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        Return ProcessRightKey_FromLeft_Internal(Ctrl, Alt, Shift)
     End Function
 
-    Public Function ProcessUpKey() As Boolean
-        Return ProcessUpKey_Internal()
+    Public Function ProcessUpKey(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        Return ProcessUpKey_Internal(Ctrl, Alt, Shift)
     End Function
 
-    Public Function ProcessDownKey() As Boolean
-        Return ProcessDownKey_Internal()
+    Public Function ProcessDownKey(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        Return ProcessDownKey_Internal(Ctrl, Alt, Shift)
     End Function
 
     Public Function ProcessHat_FromRight() As Boolean
@@ -193,7 +261,7 @@
         Return ProcessFraction_FromRight_Internal()
     End Function
 
-    Public Function PreProcessChar(InputChar As Integer) As Boolean
+    Public Function PreProcessChar(InputChar As Integer, Optional FromChild As Boolean = False) As Boolean
         Return PreProcessChar_Internal(InputChar)
     End Function
 
@@ -210,7 +278,9 @@
 
         ' The parent may want to pre-process, too
         If This.ParentElement IsNot Nothing Then
-            This.ParentElement.Input.PreProcessChar(InputChar)
+            If This.ParentElement.Input.PreProcessChar(InputChar, True) Then
+                Return True
+            End If
         End If
 
         ' No pre-process
@@ -220,7 +290,7 @@
 
     Public Overridable Function ProcessWaitChar(InputChar As Integer) As Boolean
         ' Default wait char processing : eat, and walk to next child
-        WaitChar = Nothing : This.Selection.SetSelection(This.ParentElement, This, This.NextSibling)
+        WaitChar = Nothing : This.Selection.SetPoint(This.ParentElement.GetSelectionAt(This.ChildIndex + 1))
         Return True
     End Function
 
@@ -248,7 +318,7 @@
         Return False
     End Function
 
-    Public Overridable Function ProcessDelete_Internal() As Boolean
+    Public Overridable Function ProcessDelete_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
 
         ' Retreive the first element before the selection
         Dim ElementToDelete = This.Selection.NextSibling
@@ -257,14 +327,16 @@
         If ElementToDelete Is Nothing Then Return False
 
         ' If there's one element to delete, delete it
-        ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
+        ProcessRightKey(Ctrl, Alt, True)
+        This.Selection.DeleteContents()
+        'x ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
 
         ' Inform that the delete key was handled
         Return True
 
     End Function
 
-    Public Overridable Function ProcessBackSpace_Internal() As Boolean
+    Public Overridable Function ProcessBackSpace_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
 
         ' Retreive the first element before the selection
         Dim ElementToDelete = This.Selection.PreviousSibling
@@ -273,43 +345,93 @@
         If ElementToDelete Is Nothing Then Return False
 
         ' If there's one element to delete, delete it
-        ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
+        ProcessLeftKey(Ctrl, Alt, True)
+        This.Selection.DeleteContents()
+        'x ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
 
         ' Inform that the delete key was handled
         Return True
 
     End Function
 
-    Public Overridable Function ProcessDelete_FromLeft_Internal() As Boolean
+    Public Overridable Function ProcessDelete_FromLeft_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
-    Public Overridable Function ProcessBackSpace_FromRight_Internal() As Boolean
+    Public Overridable Function ProcessBackSpace_FromRight_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
-    Public Overridable Function ProcessLeftKey_Internal() As Boolean
-        This.Selection.MoveLeft() : Return True
+    Public Overridable Function ProcessLeftKey_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+
+        If Shift Then
+            If Ctrl AndAlso Not This.Selection.EndPoint.IsAtOrigin Then
+                This.Selection.Increment(SelectionHelper.SelectionPointType.EndPoint, -1)
+            Else
+                ' If we are at the start of the textedit, 
+                ' we need to change the selection to outside the textedit before treating the key
+                If This.Selection.EndPoint.IsAtOrigin Then
+                    If This.Selection.MoveBeforeParent(SelectionHelper.SelectionPointType.EndPoint) Then
+                        This.ParentDocument.CurrentInput.ProcessLeftKey(Ctrl, Alt, Shift)
+                    End If
+                Else
+                    This.Selection.MoveLeft(SelectionHelper.SelectionPointType.EndPoint)
+                End If
+            End If
+        Else
+            If This.Selection.IsCollapsed Then
+                This.Selection.MoveLeft(SelectionHelper.SelectionPointType.Selection)
+            Else
+                This.Selection.CollapseToStart()
+            End If
+        End If
+
+        Return True
+
     End Function
 
-    Public Overridable Function ProcessRightKey_Internal() As Boolean
-        This.Selection.MoveRight() : Return True
+    Public Overridable Function ProcessRightKey_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+
+        If Shift Then
+            If Ctrl AndAlso Not This.Selection.EndPoint.IsAtEnd Then
+                This.Selection.Increment(SelectionHelper.SelectionPointType.EndPoint, 1)
+            Else
+                ' If we are at the end of the textedit, 
+                ' we need to change the selection to outside the textedit before treating the key
+                If This.Selection.EndPoint.IsAtEnd Then
+                    If This.Selection.MoveAfterParent(SelectionHelper.SelectionPointType.EndPoint) Then
+                        This.ParentDocument.CurrentInput.ProcessRightKey(Ctrl, Alt, Shift)
+                    End If
+                Else
+                    This.Selection.MoveRight(SelectionHelper.SelectionPointType.EndPoint)
+                End If
+            End If
+        Else
+            If This.Selection.IsCollapsed Then
+                This.Selection.MoveRight(SelectionHelper.SelectionPointType.Selection)
+            Else
+                This.Selection.CollapseToEnd()
+            End If
+        End If
+
+        Return True
+
     End Function
 
-    ' TODO: Check those functions (LeftKey, from right) are actually used
-    Public Overridable Function ProcessLeftKey_FromRight_Internal() As Boolean
+    ' TODO : Check those functions (LeftKey, from right) are actually used
+    Public Overridable Function ProcessLeftKey_FromRight_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
-    Public Overridable Function ProcessRightKey_FromLeft_Internal() As Boolean
+    Public Overridable Function ProcessRightKey_FromLeft_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
-    Public Overridable Function ProcessUpKey_Internal() As Boolean
+    Public Overridable Function ProcessUpKey_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
-    Public Overridable Function ProcessDownKey_Internal() As Boolean
+    Public Overridable Function ProcessDownKey_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 

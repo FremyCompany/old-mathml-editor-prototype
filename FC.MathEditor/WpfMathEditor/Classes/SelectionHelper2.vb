@@ -102,7 +102,7 @@
     ''' <summary>
     ''' Returns the first selection point, in the logical order
     ''' </summary>
-    Public ReadOnly Property LogicalSelectionStart() As SelectionPoint
+    Public ReadOnly Property LogicalStartPoint() As SelectionPoint
         Get
             If Direction = SelectionDirection.LTR Then
                 Return ApparentSSP
@@ -115,7 +115,7 @@
     ''' <summary>
     ''' Returns the last selection point, in the logical order
     ''' </summary>
-    Public ReadOnly Property LogicalSelectionEnd() As SelectionPoint
+    Public ReadOnly Property LogicalEndPoint() As SelectionPoint
         Get
             If Direction = SelectionDirection.LTR Then
                 Return ApparentSEP
@@ -161,7 +161,7 @@
         End Get
     End Property
 
-    Private Sub SetSelection(StartPoint As SelectionPoint, EndPoint As SelectionPoint)
+    Public Sub SetSelection(StartPoint As SelectionPoint, EndPoint As SelectionPoint)
 
         ' Find the apparent selection for the specified points
         Dim R = StartPoint.GetApparentSelection(EndPoint)
@@ -183,7 +183,7 @@
 
     End Sub
 
-    Public Sub SetSelection(NewPoint As SelectionPoint, Optional PointToChange As SelectionPointType = SelectionPointType.Selection)
+    Public Sub SetPoint(NewPoint As SelectionPoint, Optional PointToChange As SelectionPointType = SelectionPointType.Selection)
         Select Case PointToChange
             Case SelectionPointType.Selection
                 SetSelection(NewPoint, NewPoint)
@@ -196,7 +196,7 @@
         End Select
     End Sub
 
-    Public Function GetSelection(PointToRetreive As SelectionPointType) As SelectionPoint
+    Public Function GetPoint(PointToRetreive As SelectionPointType) As SelectionPoint
         Select Case PointToRetreive
             Case SelectionPointType.Selection
                 ' TODO: Check if it's not better to throw an exception here
@@ -210,7 +210,7 @@
         End Select
     End Function
 
-    Public Sub SetSelection(CommonAncestror As MathElement, SelectionStart As MathElement, SelectionEnd As MathElement)
+    Public Sub SetSelection2(CommonAncestror As MathElement, SelectionStart As MathElement, SelectionEnd As MathElement)
 
         ' Check if the selection is valid
         If (
@@ -240,7 +240,7 @@
     '++
 
     Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of MathElement) Implements System.Collections.Generic.IEnumerable(Of MathElement).GetEnumerator
-        Return New SiblingEnumerator(ApparentSSP, ApparentSEP)
+        Return New SiblingEnumerator(LogicalStartPoint, LogicalEndPoint)
     End Function
 
     Private Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator

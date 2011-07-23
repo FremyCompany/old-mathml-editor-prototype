@@ -4,7 +4,7 @@
         MyBase.New(This)
     End Sub
 
-    Public Overrides Function ProcessBackSpace_FromRight_Internal() As Boolean
+    Public Overrides Function ProcessBackSpace_FromRight_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
@@ -12,23 +12,23 @@
 
         ' [[Assumption]] When we reach this function, the adjacent textedits refused the char.
         ' Create a new textedit to host the new char
-        Dim TextEdit As TextEdit = FC.MathEditor.TextEdit.FromChar(InputChar)
+        Dim TextEdit As TextEdit = FC.MathEditor.TextEdit.FromChar(InputChar, This)
 
         This.Selection.ReplaceContents(TextEdit)
 
         ' Change the selection to the TextEdit
         ' TODO: Determine if it wouldn't be better to put the selection in RLE instead
-        This.Selection.SetSelection(TextEdit, TextEdit.LastChild, Nothing)
+        This.Selection.SetPoint(TextEdit.GetSelectionAtEnd())
 
         Return True
 
     End Function
 
-    Public Overrides Function ProcessDelete_FromLeft_Internal() As Boolean
+    Public Overrides Function ProcessDelete_FromLeft_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
-    Public Overrides Function ProcessDownKey_Internal() As Boolean
+    Public Overrides Function ProcessDownKey_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 
@@ -40,27 +40,27 @@
         Return False
     End Function
 
-    Public Overrides Function ProcessLeftKey_FromRight_Internal() As Boolean
-
+    Public Overrides Function ProcessLeftKey_FromRight_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        If Shift Then
+            This.Selection.SetPoint(This.GetSelectionAtOrigin(), SelectionHelper.SelectionPointType.EndPoint) : Return True
+        Else
+            This.Selection.SetPoint(This.GetSelectionAtOrigin()) : Return True
+        End If
     End Function
 
-    Public Overrides Function ProcessLeftKey_Internal() As Boolean
-
-    End Function
-
-    Public Overrides Function ProcessRightKey_FromLeft_Internal() As Boolean
-
-    End Function
-
-    Public Overrides Function ProcessRightKey_Internal() As Boolean
-
+    Public Overrides Function ProcessRightKey_FromLeft_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
+        If Shift Then
+            This.Selection.SetPoint(This.GetSelectionAtEnd(), SelectionHelper.SelectionPointType.EndPoint) : Return True
+        Else
+            This.Selection.SetPoint(This.GetSelectionAtEnd()) : Return True
+        End If
     End Function
 
     Public Overrides Function ProcessUnderscore_FromRight_Internal() As Boolean
         Return False
     End Function
 
-    Public Overrides Function ProcessUpKey_Internal() As Boolean
+    Public Overrides Function ProcessUpKey_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function
 

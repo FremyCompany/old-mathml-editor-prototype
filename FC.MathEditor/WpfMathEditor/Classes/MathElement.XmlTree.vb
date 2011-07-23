@@ -97,20 +97,22 @@ Partial Public MustInherit Class MathElement
     ''' </summary>
     Private Sub ResetParent()
 
-        If ParentElement IsNot Nothing AndAlso ParentElement.Children.Contains(Me) Then
+        If ParentElement IsNot Nothing Then
+            If ParentElement.Children.Contains(Me) Then
 
-            Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
+                Throw New InvalidOperationException("Reseting the Parent property wasn't posssible because the parent still claims it owns the current element.")
 
-        Else
+            Else
 
-            ' Perform some cleanup
-            _Parent = Nothing
-            _ParentDocument = Nothing
-            _Selection = Nothing
+                ' Perform some cleanup
+                _Parent = Nothing
+                _ParentDocument = Nothing
+                _Selection = Nothing
 
-            ' Raise the corresponding event
-            RaiseDetachedFromParent()
+                ' Raise the corresponding event
+                RaiseDetachedFromParent()
 
+            End If
         End If
 
     End Sub
@@ -341,7 +343,6 @@ Partial Public MustInherit Class MathElement
 
     Public Event DetachedFromParent As EventHandler
     Public Sub RaiseDetachedFromParent()
-        If Me.ChildIndex <> -1 Then Throw New InvalidOperationException()
         If Me._Parent IsNot Nothing Then Me.ResetParent()
         RaiseEvent DetachedFromParent(Me, EventArgs.Empty)
     End Sub
@@ -404,7 +405,6 @@ Partial Public MustInherit Class MathElement
     End Sub
 
     Private Sub MathElement_DetachedFromParent(sender As Object, e As System.EventArgs) Handles Me.DetachedFromParent
-        SetParent(Nothing)
         RaiseDetachedFromDocument()
     End Sub
 

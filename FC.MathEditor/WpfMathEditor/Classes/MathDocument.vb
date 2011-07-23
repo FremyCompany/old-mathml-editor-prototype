@@ -23,4 +23,11 @@
         End Get
     End Property
 
+    Public ReadOnly Property CurrentInput As InputHelper
+        Get
+            Return Input.CurrentInput
+        End Get
+    End Property
+
+
 End Class

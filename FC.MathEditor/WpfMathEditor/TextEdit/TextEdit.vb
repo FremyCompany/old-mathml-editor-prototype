@@ -2,7 +2,6 @@
 
     Public MustOverride ReadOnly Property ElementName As String
 
-    Public MustOverride Function CanHaveMultipleChild() As Boolean
     Protected Overrides Function GetInitialChildrenHelper() As ChildrenHelper
         Return New TextEditChildrenHelper(Me)
     End Function
@@ -11,12 +10,18 @@
         Return New TextEditExportHelper(Me)
     End Function
 
-    Public MustOverride Function IsAccepted(C As Integer) As Boolean
+    Public MustOverride Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
     Protected Overrides Function GetInitialInputHelper() As InputHelper
-        Return New TextEditInputHelper(Me, AddressOf IsAccepted)
+        Return New TextEditInputHelper(Me)
     End Function
 
-    Public Shared Function FromChar(ByVal InputChar As Integer, Optional ByVal This As MathElement = Nothing) As TextEdit
+    ''' <summary>
+    ''' Gets a value indicating if an accepted char typed from left or right should be added to the textedit or if another one should be created instead.
+    ''' </summary>
+    ''' <remarks>This property has no effect on content typed between glyphs already in the textedit</remarks>
+    Public MustOverride ReadOnly Property EatInputByDefault() As Boolean
+
+    Public Shared Function FromChar(InputChar As Integer, Optional This As MathElement = Nothing) As TextEdit
 
         Dim TextEdit As TextEdit
 
@@ -26,7 +31,6 @@
         ElseIf _
         ( _
             (Char.IsDigit(Char.ConvertFromUtf32(InputChar))) OrElse
-            (InputChar = Asc(".")) OrElse
             ((InputChar = Asc("-") OrElse InputChar = Asc("+")) AndAlso (This IsNot Nothing) AndAlso (This.Selection IsNot Nothing) AndAlso TryCast(This.Selection.PreviousSibling, OperatorTextEdit) IsNot Nothing) _
         ) Then
             TextEdit = New NumberTextEdit()

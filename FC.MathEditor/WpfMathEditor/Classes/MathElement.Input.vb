@@ -36,6 +36,14 @@
         Return New SelectionHelper.SelectionPoint(Me, Index)
     End Function
 
+    Public Function GetSelectionAfter() As SelectionHelper.SelectionPoint
+        Return New SelectionHelper.SelectionPoint(ParentElement, Me.ChildIndex + 1)
+    End Function
+
+    Public Function GetSelectionBefore() As SelectionHelper.SelectionPoint
+        Return New SelectionHelper.SelectionPoint(ParentElement, Me.ChildIndex)
+    End Function
+
     Public Event GotFocus As EventHandler
     Public Event LostFocus As EventHandler
 

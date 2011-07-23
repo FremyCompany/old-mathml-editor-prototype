@@ -6,69 +6,80 @@
         Me.Focus()
     End Sub
 
-    'Public Shared TextProperty = DependencyProperty.Register("Text", GetType(String), GetType(PersonnalTextBox))
-    'Public Property Text As String
-    '    Get
-    '        Return GetValue(TextProperty)
-    '    End Get
-    '    Set(value As String)
-    '        SetValue(TextProperty, value) : InvalidateVisual()
-    '    End Set
-    'End Property
-
-    'Public Shared FontProperty = DependencyProperty.Register("Font", GetType(Typeface), GetType(PersonnalTextBox))
-    'Public Property Font As Typeface
-    '    Get
-    '        Return GetValue(FontProperty)
-    '    End Get
-    '    Set(value As Typeface)
-    '        SetValue(FontProperty, value)
-    '    End Set
-    'End Property
-
     Dim F As New Typeface(New FontFamily("Candara"), FontStyles.Italic, FontWeights.Normal, FontStretches.Normal)
     Dim WithEvents X As New MathDocument()
 
     Protected Overrides Sub OnRender(drawingContext As System.Windows.Media.DrawingContext)
+        drawingContext.DrawRectangle(Brushes.White, Nothing, New Rect(RenderSize))
         For Each El In X.Selection
             drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 0, 148, 255)), Nothing, El.Export.SelectionRectInRoot)
         Next
+
+        If X.Selection.PreviousSibling IsNot Nothing Then
+            drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 255, 0, 0)), Nothing, X.Selection.PreviousSibling.Export.SelectionRectInRoot)
+        End If
+
+        If X.Selection.NextSibling IsNot Nothing Then
+            drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 0, 255, 0)), Nothing, X.Selection.NextSibling.Export.SelectionRectInRoot)
+        End If
+
         X.Export.Draw(drawingContext)
     End Sub
 
     Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
 
+        ' TODO : 123{del} don't work anymore!!!
+
         ' Handle the typed key, if it's a special key
         Select Case e.Key
             Case Key.Left
-                If Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift) Then
-                    X.Selection.MoveLeft(SelectionHelper.SelectionPointType.EndPoint)
-                Else
-                    If X.Selection.IsEmpty Then
-                        X.Selection.MoveLeft(SelectionHelper.SelectionPointType.Selection)
-                    Else
-                        X.Selection.CollapseToStart()
-                    End If
-                End If
+                X.CurrentInput.ProcessLeftKey(
+                    Keyboard.IsKeyDown(Key.LeftCtrl) OrElse Keyboard.IsKeyDown(Key.RightCtrl),
+                    Keyboard.IsKeyDown(Key.LeftAlt) OrElse Keyboard.IsKeyDown(Key.RightAlt),
+                    Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)
+                )
+                'If Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift) Then
+                '    X.Selection.MoveLeft(SelectionHelper.SelectionPointType.EndPoint)
+                'Else
+                '    If X.Selection.IsCollapsed Then
+                '        X.Selection.MoveLeft(SelectionHelper.SelectionPointType.Selection)
+                '    Else
+                '        X.Selection.CollapseToStart()
+                '    End If
+                'End If
             Case Key.Right
-                If Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift) Then
-                    X.Selection.MoveRight(SelectionHelper.SelectionPointType.EndPoint)
-                Else
-                    If X.Selection.IsEmpty Then
-                        X.Selection.MoveRight(SelectionHelper.SelectionPointType.Selection)
-                    Else
-                        X.Selection.CollapseToEnd()
-                    End If
-                End If
+                X.CurrentInput.ProcessRightKey(
+                    Keyboard.IsKeyDown(Key.LeftCtrl) OrElse Keyboard.IsKeyDown(Key.RightCtrl),
+                    Keyboard.IsKeyDown(Key.LeftAlt) OrElse Keyboard.IsKeyDown(Key.RightAlt),
+                    Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)
+                )
+                'If Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift) Then
+                '    X.Selection.MoveRight(SelectionHelper.SelectionPointType.EndPoint)
+                'Else
+                '    If X.Selection.IsCollapsed Then
+                '        X.Selection.MoveRight(SelectionHelper.SelectionPointType.Selection)
+                '    Else
+                '        X.Selection.CollapseToEnd()
+                '    End If
+                'End If
             Case Key.Delete
-                X.Input.ProcessDelete()
+                X.CurrentInput.ProcessDelete(
+                    Keyboard.IsKeyDown(Key.LeftCtrl) OrElse Keyboard.IsKeyDown(Key.RightCtrl),
+                    Keyboard.IsKeyDown(Key.LeftAlt) OrElse Keyboard.IsKeyDown(Key.RightAlt),
+                    Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)
+                )
             Case Key.Back
-                X.Input.ProcessBackSpace()
+                X.CurrentInput.ProcessBackSpace(
+                    Keyboard.IsKeyDown(Key.LeftCtrl) OrElse Keyboard.IsKeyDown(Key.RightCtrl),
+                    Keyboard.IsKeyDown(Key.LeftAlt) OrElse Keyboard.IsKeyDown(Key.RightAlt),
+                    Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)
+                )
             Case Else
                 Exit Sub
         End Select
 
-        ' By default, redraw the equation
+        ' By default, redraw the equation and handles the event
+        e.Handled = True
         Me.InvalidateVisual()
 
     End Sub
@@ -85,7 +96,7 @@
     End Sub
 
     Private Sub PersonnalTextBox_TextInput(sender As Object, e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput
-        X.Input.ProcessString(e.Text)
+        X.CurrentInput.ProcessString(e.Text)
     End Sub
 
     Private Sub X_Changed(sender As Object, e As System.EventArgs) Handles X.Changed

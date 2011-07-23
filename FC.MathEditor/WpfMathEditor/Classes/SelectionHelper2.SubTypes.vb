@@ -211,6 +211,17 @@
             Return StartPoint.GetApparentSelection(EndPoint)
         End Function
 
+        Private Shared Function GetParentPoint(ByRef Point As SelectionPoint, ByRef Advanced As Boolean) As SelectionPoint
+            If (TypeOf Point.ParentElement Is TextEdit AndAlso Point.IsAtEnd) Then
+                Point = Point.ParentSelectionPoint.Increment(1)
+                Advanced = False
+            Else
+                Point = Point.ParentSelectionPoint
+                Advanced = True
+            End If
+
+        End Function
+
         ''' <summary>
         ''' Gets the apparent selection resulting from the specified start and end points.
         ''' </summary>
@@ -218,6 +229,9 @@
         Public Function GetApparentSelection(EndPoint As SelectionPoint) As Tuple(Of SelectionPoint, SelectionPoint)
 
             Dim StartPoint = Me
+
+            Dim StartPointAdvanced As Boolean = False
+            Dim EndPointAdvanced As Boolean = False
 
             ' In case we have a document mismatch, throw an exception
             If StartPoint.ParentDocument IsNot EndPoint.ParentDocument Then
@@ -229,26 +243,33 @@
             Dim DephtDiff = StartPoint.ParentElement.TreeDepht - EndPoint.ParentElement.TreeDepht
             If DephtDiff > 0 Then
                 For X As Integer = 1 To DephtDiff
-                    StartPoint = StartPoint.ParentSelectionPoint
+                    GetParentPoint(StartPoint, StartPointAdvanced)
                 Next
             ElseIf DephtDiff < 0 Then
                 For X As Integer = 1 To -DephtDiff
-                    EndPoint = EndPoint.ParentSelectionPoint
+                    GetParentPoint(EndPoint, EndPointAdvanced)
                 Next
             End If
 
             ' Now, move to parent until the host are identical
             While StartPoint.ParentElement IsNot EndPoint.ParentElement
-                StartPoint = StartPoint.ParentSelectionPoint
-                EndPoint = EndPoint.ParentSelectionPoint
+                GetParentPoint(StartPoint, StartPointAdvanced)
+                GetParentPoint(EndPoint, EndPointAdvanced)
             End While
 
-            ' Reorganisate start and end in order to get a logical selection
             ' Return the final result
-            If StartPoint.ChildIndex > EndPoint.ChildIndex Then
-                Return New Tuple(Of SelectionPoint, SelectionPoint)(EndPoint, StartPoint)
+            If StartPoint.ChildIndex < EndPoint.ChildIndex Then
+                If EndPointAdvanced Then
+                    Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, EndPoint.Increment(1))
+                Else
+                    Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, EndPoint)
+                End If
             Else
-                Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, EndPoint)
+                If StartPointAdvanced Then
+                    Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint.Increment(1), EndPoint)
+                Else
+                    Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, EndPoint)
+                End If
             End If
 
         End Function
@@ -305,6 +326,70 @@
             RaiseEvent ParentChanged(Me, e)
         End Sub
 
+        '++
+        '++ Operators
+        '++
+
+        Public Shared Operator =(A As SelectionPoint, B As SelectionPoint) As Boolean
+            Return (A.ParentElement Is B.ParentElement) AndAlso (A.ChildIndex = B.ChildIndex)
+        End Operator
+
+        Public Shared Operator <>(A As SelectionPoint, B As SelectionPoint) As Boolean
+            Return Not A = B
+        End Operator
+
+        Public Shared Operator <(StartPoint As SelectionPoint, EndPoint As SelectionPoint) As Boolean
+
+            ' In case we have a document mismatch, throw an exception
+            If StartPoint.ParentDocument IsNot EndPoint.ParentDocument Then
+                Throw New ArgumentException("EndPoint and StartPoint of a selection should be located in the same document.")
+                'Return New Tuple(Of SelectionPoint, SelectionPoint)(StartPoint, StartPoint)
+            End If
+
+            ' Start be removing the depht difference between the two points
+            Dim DephtDiff = StartPoint.ParentElement.TreeDepht - EndPoint.ParentElement.TreeDepht
+            If DephtDiff > 0 Then
+                For X As Integer = 1 To DephtDiff
+                    StartPoint = StartPoint.ParentSelectionPoint
+                Next
+            ElseIf DephtDiff < 0 Then
+                For X As Integer = 1 To -DephtDiff
+                    EndPoint = EndPoint.ParentSelectionPoint
+                Next
+            End If
+
+            ' Now, move to parent until the host are identical
+            While StartPoint.ParentElement IsNot EndPoint.ParentElement
+                StartPoint = StartPoint.ParentSelectionPoint
+                EndPoint = EndPoint.ParentSelectionPoint
+            End While
+
+            ' TODO : Check if it's a good idea to do this
+            ' TODO : We can't compare which was the first of the two here
+            ' Reorganisate start and end in order to get a logical selection
+            ' Return the final result
+            If StartPoint.ChildIndex > EndPoint.ChildIndex Then
+                Return False
+            Else
+                Return False
+            End If
+        End Operator
+
+        Public Shared Operator >(A As SelectionPoint, B As SelectionPoint) As Boolean
+            If A = B Then Return False
+            Return Not (A < B)
+        End Operator
+
+        Public Shared Operator <=(A As SelectionPoint, B As SelectionPoint) As Boolean
+            If A = B Then Return True
+            Return A < B
+        End Operator
+
+        Public Shared Operator >=(A As SelectionPoint, B As SelectionPoint) As Boolean
+            If A = B Then Return True
+            Return A > B
+        End Operator
+
     End Class
 
     ''' <summary>
@@ -321,6 +406,5 @@
         End Sub
 
     End Class
-
 
 End Class

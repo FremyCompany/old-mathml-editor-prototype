@@ -29,13 +29,14 @@
         End Get
     End Property
 
-    Public Overrides Function IsAccepted(C As Integer) As Boolean
-        '? Can this really be done? I mean, is it a good idea to disallow this here?
-        Return Not (Children.HasAny OrElse Char.IsLetter(Char.ConvertFromUtf32(C)))
+    Public Overrides Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
+        Return IsFirst
     End Function
 
-    Public Overrides Function CanHaveMultipleChild() As Boolean
-        Return False
-    End Function
+    Public Overrides ReadOnly Property EatInputByDefault As Boolean
+        Get
+            Return False
+        End Get
+    End Property
 
 End Class

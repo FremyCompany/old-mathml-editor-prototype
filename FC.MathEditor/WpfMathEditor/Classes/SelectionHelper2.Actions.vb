@@ -6,7 +6,7 @@
         Selection
     End Enum
 
-    Public ReadOnly Property IsEmpty As Boolean
+    Public ReadOnly Property IsCollapsed As Boolean
         Get
             Return Me.ApparentSEP.ChildIndex = Me.ApparentSSP.ChildIndex
         End Get
@@ -26,7 +26,7 @@
     ''' <param name="UseApparentSelection">True if you want to collapse the selection to its apparent end point, false if you want it to collapse to its true end point</param>
     Public Sub CollapseToEnd(Optional UseApparentSelection As Boolean = True)
         If UseApparentSelection Then
-            SetSelection(ApparentSEP, ApparentSEP)
+            SetSelection(LogicalEndPoint, LogicalEndPoint)
         Else
             SetSelection(SEP, SEP)
         End If
@@ -38,7 +38,7 @@
     ''' <param name="UseApparentSelection">True if you want to collapse the selection to its apparent start point, false if you want it to collapse to its true start point</param>
     Public Sub CollapseToStart(Optional UseApparentSelection As Boolean = True)
         If UseApparentSelection Then
-            SetSelection(ApparentSSP, ApparentSSP)
+            SetSelection(LogicalStartPoint, LogicalStartPoint)
         Else
             SetSelection(SSP, SSP)
         End If
@@ -48,9 +48,9 @@
     ''' Moves the selection to the next available parent location
     ''' </summary>
     ''' <param name="MovedPoint">The point to move</param>
-    Public Sub MoveAfterParent(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Function MoveAfterParent(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
 
-        Dim P = GetSelection(MovedPoint)
+        Dim P = GetPoint(MovedPoint)
         Dim E = P.ParentElement
 
         While E.ParentElement IsNot Nothing
@@ -61,14 +61,13 @@
                 Case MathElement.Type.Formatter
                     Dim Result = E.ParentElement.GetNextInputElement(E)
                     If Result IsNot Nothing Then
-                        SetSelection(Result, Nothing, Result.FirstChild)
-                        Exit Sub
+                        SetPoint(Result.GetSelectionAtOrigin(), MovedPoint)
+                        Return True
                     End If
 
                 Case MathElement.Type.LayoutEngine
-                    Dim Result = E.NextSibling
-                    SetSelection(E.ParentElement, E, Result)
-                    Exit Sub
+                    SetPoint(E.ParentElement.GetSelectionAt(E.ChildIndex + 1), MovedPoint)
+                    Return True
 
             End Select
 
@@ -77,19 +76,17 @@
 
         End While
 
-        ' TODO: Replace by a function that return False/True
-        ' Throw New InvalidOperationException("This operation failled.")
+        Return False
 
-
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Moves the selection to the next available parent location (backward)
     ''' </summary>
     ''' <param name="MovedPoint">The point to move</param>
-    Public Sub MoveBeforeParent(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Function MoveBeforeParent(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
 
-        Dim P = GetSelection(MovedPoint)
+        Dim P = GetPoint(MovedPoint)
         Dim E = P.ParentElement
 
         While E.ParentElement IsNot Nothing
@@ -100,14 +97,13 @@
                 Case MathElement.Type.Formatter
                     Dim Result = E.ParentElement.GetPreviousInputElement(E)
                     If Result IsNot Nothing Then
-                        SetSelection(Result, Result.LastChild, Nothing)
-                        Exit Sub
+                        SetPoint(Result.GetSelectionAtEnd(), MovedPoint)
+                        Return True
                     End If
 
                 Case MathElement.Type.LayoutEngine
-                    Dim Result = E.PreviousSibling
-                    SetSelection(E.ParentElement, Result, E)
-                    Exit Sub
+                    SetPoint(E.ParentElement.GetSelectionAt(E.ChildIndex), MovedPoint)
+                    Return True
 
             End Select
 
@@ -116,89 +112,145 @@
 
         End While
 
-        'Throw New InvalidOperationException("This operation failled.")
+        Return False
 
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Moves the selection to the previous available insertion point (previous sibling or before current element in parent)
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveLeft(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Function MoveLeft(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
 
-        Dim Sel = GetSelection(MovedPoint)
+        Dim Sel = GetPoint(MovedPoint)
 
         If Sel.IsAtOrigin Then
-            MoveBeforeParent(MovedPoint)
+
+            Return MoveBeforeParent(MovedPoint)
+
         Else
-            SetSelection(Sel.Increment(-1), MovedPoint)
+
+            SetPoint(Sel.Increment(-1), MovedPoint)
+            Return True
+
         End If
 
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Moves the selection to the next available insertion point (next sibling or after current element in parent)
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveRight(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Function MoveRight(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
 
-        Dim Sel = GetSelection(MovedPoint)
+        Dim Sel = GetPoint(MovedPoint)
 
         If Sel.IsAtEnd Then
-            MoveAfterParent(MovedPoint)
+
+            Return MoveAfterParent(MovedPoint)
+
         Else
-            SetSelection(Sel.Increment(1), MovedPoint)
+
+            SetPoint(Sel.Increment(1), MovedPoint)
+            Return True
+
         End If
 
-    End Sub
+    End Function
 
     ''' <summary>
     ''' Moves the selection to the beginning of the current element
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Function MoveStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
 
-        SetSelection(
-            GetSelection(MovedPoint).GetOrigin(),
-            MovedPoint
-        )
+        Dim Sel = GetPoint(MovedPoint)
+        If Sel.IsAtOrigin Then
 
-    End Sub
+            ' No change needed
+            Return False
+
+        Else
+
+            ' Modify the selection
+            SetPoint(Sel.GetOrigin(), MovedPoint)
+            Return True
+
+        End If
+
+
+    End Function
 
     ''' <summary>
     ''' Moves the selection to the end of the current element
     ''' </summary>
     ''' <param name="MovedPoint">The selection point to move</param>
-    Public Sub MoveEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    Public Function MoveEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
 
-        SetSelection(
-            GetSelection(MovedPoint).GetEnd(),
-            MovedPoint
-        )
+        Dim Sel = GetPoint(MovedPoint)
+        If Sel.IsAtEnd Then
 
-    End Sub
+            ' No change needed
+            Return False
 
-    Public Sub MoveDocumentStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+        Else
 
-        SetSelection(
-            New SelectionPoint(This.ParentDocument, 0),
-            MovedPoint
-        )
+            ' Modify the selection
+            SetPoint(Sel.GetEnd(), MovedPoint)
+            Return True
 
-    End Sub
+        End If
 
-    Public Sub MoveDocumentEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection)
+    End Function
 
-        SetSelection(
-            New SelectionPoint(This.ParentDocument, This.ParentDocument.Children.Count),
-            MovedPoint
-        )
+    Public Function MoveDocumentStart(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
 
-    End Sub
+        Dim DocumentStart = New SelectionPoint(This.ParentDocument, 0)
+        If GetPoint(MovedPoint) = DocumentStart Then
+
+            ' No change needed
+            Return False
+
+        Else
+
+            ' Modify the selection
+            SetPoint(DocumentStart, MovedPoint)
+            Return True
+
+        End If
+
+    End Function
+
+    Public Function MoveDocumentEnd(Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
+
+        Dim DocumentEnd = New SelectionPoint(This.ParentDocument, This.ParentDocument.Children.Count)
+        If GetPoint(MovedPoint) = DocumentEnd Then
+
+            ' No change needed
+            Return False
+
+        Else
+
+            ' Modify the selection
+            SetPoint(DocumentEnd, MovedPoint)
+            Return True
+
+        End If
+
+    End Function
+
+    ''' <summary>
+    ''' Increments the specified point's child index of a certain amount. May throw an ArgumentException if Amount is invalid.
+    ''' </summary>
+    ''' <param name="Amount">The amount to add to the current child index</param>
+    ''' <param name="MovedPoint">The point to move</param>
+    Public Function Increment(Amount As Integer, Optional MovedPoint As SelectionPointType = SelectionPointType.Selection) As Boolean
+        SetPoint(GetPoint(MovedPoint).Increment(Amount), MovedPoint) : Return True
+    End Function
 
     Private Function GetSelectedElements() As IEnumerable(Of MathElement)
-        If IsEmpty Then Return New MathElement() {}
-        Return New SiblingEnumeratorGenerator(ApparentSSP, ApparentSEP)
+        If IsCollapsed Then Return New MathElement() {}
+        Return New SiblingEnumeratorGenerator(LogicalStartPoint, LogicalEndPoint)
     End Function
 
     Private Function CloneSelectedElements() As IEnumerable(Of MathElement)

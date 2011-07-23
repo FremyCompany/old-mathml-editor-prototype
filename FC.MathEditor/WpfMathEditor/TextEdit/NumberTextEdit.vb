@@ -4,7 +4,7 @@
         ' TODO: This is not normal that setting a default font family for an element needs to be done instance per instance.
         ' It works but it's cleary *not* optimized
         Me.FontFamily = New FontFamily("Calibri")
-        Me.Input = New TextEditInputHelper(Me, Function(C) C = Asc("+") OrElse C = Asc("-") OrElse C = Asc(".") OrElse Char.IsDigit(Char.ConvertFromUtf32(C)))
+        Me.Input = New TextEditInputHelper(Me)
     End Sub
 
     Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
@@ -26,11 +26,14 @@
         End Get
     End Property
 
-    Public Overrides Function CanHaveMultipleChild() As Boolean
-        Return True
+    Public Overrides Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
+        Return Char.IsDigit(Char.ConvertFromUtf32(C)) OrElse (IsFirst AndAlso (C = Asc("-"c) OrElse C = Asc("+"c))) OrElse (Not IsFirst AndAlso (C = Asc("."c) OrElse C = Asc("e"c) OrElse C = Asc("E"c)))
     End Function
 
-    Public Overrides Function IsAccepted(C As Integer) As Boolean
-        Return Char.IsDigit(Char.ConvertFromUtf32(C)) OrElse C = Asc("."c) OrElse C = Asc("-"c) OrElse C = Asc("+"c)
-    End Function
+    Public Overrides ReadOnly Property EatInputByDefault As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
 End Class
