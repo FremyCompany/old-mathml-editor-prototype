@@ -103,7 +103,6 @@
       <DependentUpon>Application.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\ChildrenHelper.vb" />
     <Compile Include="Classes\ChildrenHelper2.vb" />
     <Compile Include="Classes\EmptyInputHelper.vb" />
     <Compile Include="Classes\ExportHelper.vb" />
@@ -111,12 +110,9 @@
     <Compile Include="Classes\MathDocument.vb" />
     <Compile Include="Classes\MathElement.Input.vb" />
     <Compile Include="Classes\MathElement.Layout.vb" />
-    <Compile Include="Classes\OneItemList.vb" />
     <Compile Include="Classes\MathElement.XmlTree.vb" />
     <Compile Include="Classes\MathElement.Type.vb" />
     <Compile Include="Classes\QualityControl.vb" />
-    <Compile Include="Classes\SelectionHelper.Actions.vb" />
-    <Compile Include="Classes\SelectionHelper.vb" />
     <Compile Include="Classes\SelectionHelper2.Actions.vb" />
     <Compile Include="Classes\SelectionHelper2.SubTypes.vb" />
     <Compile Include="Classes\SelectionHelper2.vb" />
@@ -125,10 +121,13 @@
     <Compile Include="Glyphs\UnicodeGlyph.ExportHelper.vb" />
     <Compile Include="Glyphs\UnicodeGlyph.vb" />
     <Compile Include="Glyphs\UnicodeGlyphInputHelper.vb" />
+    <None Include="LayoutEngines\Fenced\FencedLayoutEngineExportHelper.vb" />
+    <None Include="LayoutEngines\Fenced\FencedLayoutEngineInputHelper.vb" />
+    <None Include="LayoutEngines\Fenced\FencedLayoutEngine.vb" />
     <Compile Include="LayoutEngines\LayoutEngineChildrenHelper.vb" />
-    <Compile Include="LayoutEngines\RowLayoutEngine.vb" />
-    <Compile Include="LayoutEngines\RowLayoutEngineExportHelper.vb" />
-    <Compile Include="LayoutEngines\RowLayoutEngineInputHelper.vb" />
+    <Compile Include="LayoutEngines\Row\RowLayoutEngine.vb" />
+    <Compile Include="LayoutEngines\Row\RowLayoutEngineExportHelper.vb" />
+    <Compile Include="LayoutEngines\Row\RowLayoutEngineInputHelper.vb" />
     <Compile Include="TextEdit\IdentifierTextEdit.vb" />
     <Compile Include="TextEdit\NumberTextEdit.vb" />
     <Compile Include="TextEdit\OperatorTextEdit.vb" />
@@ -215,6 +214,10 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Formatters\" />
+    <Folder Include="Parsers\Elements\" />
+    <Folder Include="Parsers\Properties\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

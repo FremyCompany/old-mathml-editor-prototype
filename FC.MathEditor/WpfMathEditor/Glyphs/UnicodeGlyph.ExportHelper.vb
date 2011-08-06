@@ -24,17 +24,12 @@
             ' TODO: AppendMathML for unicode chars
         End Sub
 
-        Public Overrides Sub Draw(DG As System.Windows.Media.DrawingContext)
-            ' IM is used to modify the drawing zone
-            DG.PushTransform(New TranslateTransform(0 * IM.Left, IM.Top))
+        Protected Overrides Sub Draw_Internal(DG As System.Windows.Media.DrawingContext)
 
-            ' OLD CODE WHICH IS NOT WORKING PROPERLY BUT HAS MORE BEAUTIFUL OUTPUT
-            'Dim FT = New FormattedText(This.C.ToString(), Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, This.Font, This.FontSize, Brushes.Black)
-            'DG.PushTransform(New TranslateTransform(0, H - BH - FT.Baseline))
-            'DG.DrawText(FT, New Point(0, This.FontSize * GlyphFont.Baseline - FT.Baseline))
-
-            DG.DrawGlyphRun(Brushes.Black, GlyphRun)
+            DG.PushTransform(New ScaleTransform(1, 2))
+            DG.DrawGlyphRun(New SolidColorBrush(Foreground), GlyphRun)
             DG.Pop()
+
         End Sub
 
         Private GlyphFont As GlyphTypeface
@@ -52,15 +47,19 @@
 
             Dim S = FontSize
 
-            ' Find the first (fallback, if needed) typeface that contains a valid glyph for the current char
+            ' Find the first typeface (fallback, if needed) that contains a valid glyph for the current char
             Font.TryGetGlyphTypeface(GlyphFont)
             If Not GlyphFont.CharacterToGlyphMap.ContainsKey(This.C) Then
                 Call New Typeface(This.DefaultMathFontFamily, This.FontStyle, This.FontWeight, This.FontStretch).TryGetGlyphTypeface(GlyphFont)
                 If Not GlyphFont.CharacterToGlyphMap.ContainsKey(This.C) Then
                     Call New Typeface(This.DefaultMathFontFamily2, This.FontStyle, This.FontWeight, This.FontStretch).TryGetGlyphTypeface(GlyphFont)
                     If Not GlyphFont.CharacterToGlyphMap.ContainsKey(This.C) Then
-                        Font.TryGetGlyphTypeface(GlyphFont)
-                        GlyphIndex = 0 : GoTo SkipGlyphIndexMapping
+                        ' The last font we use is Arial. This font is known for implementing many MS glyphs
+                        Call New Typeface(New FontFamily("Arial"), This.FontStyle, This.FontWeight, This.FontStretch).TryGetGlyphTypeface(GlyphFont)
+                        If Not GlyphFont.CharacterToGlyphMap.ContainsKey(This.C) Then
+                            Font.TryGetGlyphTypeface(GlyphFont)
+                            GlyphIndex = 0 : GoTo SkipGlyphIndexMapping
+                        End If
                     End If
                 End If
             End If
@@ -98,10 +97,27 @@ SkipGlyphIndexMapping:
             IM = New Thickness(GlyphMargin.Left, 0, GlyphMargin.Right, 0)
             OM = New Thickness(0)
 
-            ' TODO : Corriger bug avec l, y et f qui débordent vers le haut (ou le bas)
             SM = New Thickness(0, GlyphFont.Baseline * This.FontSize - GlyphHeight + BH, 0, (Font.FontFamily.LineSpacing - GlyphFont.Baseline) * This.FontSize - BH)
 
 
+        End Sub
+
+        Protected Overrides Function GetMinABH() As Double
+            Return Me.AboveBaseLineHeight
+        End Function
+
+        Protected Overrides Function GetMinBBH() As Double
+            Return Me.BelowBaseLineHeight
+        End Function
+
+        Private AvailABH, AvailBBH As Double
+        Public Overrides Sub PrepareLayout(AvailABH As Double, AvailBBH As Double)
+            If (Me.AvailABH <> AvailABH) OrElse (Me.AvailBBH <> AvailBBH) Then
+                Me.AvailABH = AvailABH : Me.AvailBBH = AvailBBH
+                If (This.ParentElement Is Nothing) OrElse This.ParentElement.Export.IsFence Then
+
+                End If
+            End If
         End Sub
 
     End Class

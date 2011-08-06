@@ -211,16 +211,31 @@
             Return StartPoint.GetApparentSelection(EndPoint)
         End Function
 
-        Private Shared Function GetParentPoint(ByRef Point As SelectionPoint, ByRef Advanced As Boolean) As SelectionPoint
-            If (TypeOf Point.ParentElement Is TextEdit AndAlso Point.IsAtEnd) Then
-                Point = Point.ParentSelectionPoint.Increment(1)
-                Advanced = False
+        Private Shared Sub GetParentPoint(ByRef Point As SelectionPoint, ByRef Advanced As Boolean)
+
+            If (TypeOf Point.ParentElement Is TextEdit) Then
+
+                ' TextEdit's have special rules
+                If Point.IsAtEnd Then
+                    Point = Point.ParentSelectionPoint.Increment(1)
+                    Advanced = False
+                ElseIf Point.IsAtOrigin Then
+                    Point = Point.ParentSelectionPoint
+                    Advanced = False
+                Else
+                    Point = Point.ParentSelectionPoint
+                    Advanced = True
+                End If
+
             Else
+
+                ' Others are just advanced to parent
                 Point = Point.ParentSelectionPoint
                 Advanced = True
+
             End If
 
-        End Function
+        End Sub
 
         ''' <summary>
         ''' Gets the apparent selection resulting from the specified start and end points.
@@ -364,9 +379,6 @@
                 EndPoint = EndPoint.ParentSelectionPoint
             End While
 
-            ' TODO : Check if it's a good idea to do this
-            ' TODO : We can't compare which was the first of the two here
-            ' Reorganisate start and end in order to get a logical selection
             ' Return the final result
             If StartPoint.ChildIndex > EndPoint.ChildIndex Then
                 Return False

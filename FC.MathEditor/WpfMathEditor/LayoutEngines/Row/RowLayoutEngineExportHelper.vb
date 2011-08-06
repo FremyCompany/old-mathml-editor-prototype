@@ -1,4 +1,5 @@
-﻿Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
+﻿' TODO : Don't polluate the global namespace with intern class implementation by using subclasses
+Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
 
     Public Sub New(This As MathElement)
         MyBase.New(This)
@@ -24,7 +25,7 @@
         ' TODO: Implement MathML for "mrow" elements
     End Sub
 
-    Public Overrides Sub Draw(DG As System.Windows.Media.DrawingContext)
+    Protected Overrides Sub Draw_Internal(DG As System.Windows.Media.DrawingContext)
         ' TODO: Draw element list
         PerformLayout()
         For Each G In This.Children
@@ -95,5 +96,13 @@
         Me.OM = New Thickness(0, OMT, 0, OMB)
 
     End Sub
+
+    Protected Overrides Function GetMinABH() As Double
+        Return This.Children.Select(Function(x) x.Export.MinABH).Max()
+    End Function
+
+    Protected Overrides Function GetMinBBH() As Double
+        Return This.Children.Select(Function(x) x.Export.MinBBH).Max()
+    End Function
 
 End Class

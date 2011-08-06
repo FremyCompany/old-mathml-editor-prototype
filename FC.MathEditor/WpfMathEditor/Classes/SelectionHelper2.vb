@@ -199,8 +199,8 @@
     Public Function GetPoint(PointToRetreive As SelectionPointType) As SelectionPoint
         Select Case PointToRetreive
             Case SelectionPointType.Selection
-                ' TODO: Check if it's not better to throw an exception here
-                Return ApparentSEP
+                If IsCollapsed Then Return ApparentSEP
+                Throw New InvalidOperationException("It's not possible to get a single point from a non-collapsed selection")
             Case SelectionPointType.StartPoint
                 Return SSP
             Case SelectionPointType.EndPoint

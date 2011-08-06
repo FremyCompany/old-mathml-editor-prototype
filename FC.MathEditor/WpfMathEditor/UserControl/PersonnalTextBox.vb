@@ -28,8 +28,6 @@
 
     Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
 
-        ' TODO : 123{del} don't work anymore!!!
-
         ' Handle the typed key, if it's a special key
         Select Case e.Key
             Case Key.Left

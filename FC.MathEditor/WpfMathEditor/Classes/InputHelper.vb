@@ -418,7 +418,6 @@
 
     End Function
 
-    ' TODO : Check those functions (LeftKey, from right) are actually used
     Public Overridable Function ProcessLeftKey_FromRight_Internal(Ctrl As Boolean, Alt As Boolean, Shift As Boolean) As Boolean
         Return False
     End Function

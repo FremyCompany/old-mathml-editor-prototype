@@ -34,7 +34,26 @@
     Public MustOverride Sub AppendLaTeX(SB As System.Text.StringBuilder)
     Public MustOverride Sub AppendMathML(SB As System.Text.StringBuilder)
 
-    Public MustOverride Sub Draw(DG As DrawingContext)
+    Protected MustOverride Sub Draw_Internal(DG As DrawingContext)
+    Public Sub Draw(DG As DrawingContext)
+
+        ' Draw background
+        If Background <> Colors.Transparent Then
+            DG.DrawRectangle(New SolidColorBrush(Background), Nothing, SizeRect)
+        End If
+
+        ' Shift the drawing zone using the inner margin
+        ' TODO : Initially, I saw 0*IM.Left here. Maybe is there a reason... but I can't remember!
+        DG.PushTransform(New TranslateTransform(0 * IM.Left, IM.Top))
+
+        ' Draw content
+        Draw_Internal(DG)
+
+        ' Unshift the drawing zone
+        DG.Pop()
+
+    End Sub
+
 
     Private Property _IsLayoutToDate As Boolean
     Protected Overridable ReadOnly Property IsLayoutToDate As Boolean
@@ -43,14 +62,24 @@
         End Get
     End Property
 
-    Public Sub InvalidateLayout()
+    Public Sub InvalidateLayout(Optional ByVal ForwardToParent As Boolean = False)
+
+        ' Notify the layout should be recomputed
         _IsLayoutToDate = False
+        Cached_MinABH = Double.NaN
+
+        ' Forward to parent element
+        If ForwardToParent AndAlso This.ParentElement IsNot Nothing Then
+            This.ParentElement.Export.InvalidateLayout(True)
+        End If
+
     End Sub
 
     Public Property LayoutOptions As LayoutOptions
 
     Protected Sub PerformLayout()
         If Not IsLayoutToDate Then
+            ' Compute the minimum size before generating the layout
             GenerateLayout() : _IsLayoutToDate = True
         End If
     End Sub
@@ -74,6 +103,53 @@
     ''' Selection margin: used to define a margin outside the black box that it's used to compute the element selectable area.
     ''' </summary>
     Protected SM As Thickness
+
+    '++
+    '++ PrepareLayout phase
+    '++
+
+    Private Cached_MinABH As Double = Double.NaN
+    Protected MustOverride Function GetMinABH() As Double
+
+    ''' <summary>
+    ''' Returns the minimum size of this element (above base line). If this element is fenced, it may be higher (but not smaller) than this size at render time.
+    ''' </summary>
+    Public ReadOnly Property MinABH As Double
+        Get
+            If Double.IsNaN(Cached_MinABH) Then Cached_MinABH = GetMinABH()
+            Return Cached_MinABH
+        End Get
+    End Property
+
+
+
+    Private Cached_MinBBH As Double = Double.NaN
+    Protected MustOverride Function GetMinBBH() As Double
+
+    ''' <summary>
+    ''' Returns the minimum size of this element (below base line). If this element is fenced, it may be higher (but not smaller) than this size at render time.
+    ''' </summary>
+    Public ReadOnly Property MinBBH As Double
+        Get
+            If Double.IsNaN(Cached_MinBBH) Then Cached_MinBBH = GetMinBBH()
+            Return Cached_MinBBH
+        End Get
+    End Property
+
+
+    ''' <summary>
+    ''' Allows the element to invalidate its layout based on available height
+    ''' </summary>
+    ''' <param name="AvailABH">Available height above baseline</param>
+    ''' <param name="AvailBBH">Available height below baseline</param>
+    ''' <remarks></remarks>
+    Public MustOverride Sub PrepareLayout(AvailABH As Double, AvailBBH As Double)
+
+
+    '++
+    '++ Other Properties & Methods
+    '++
+
 
     Public ReadOnly Property Width As Double
         Get
