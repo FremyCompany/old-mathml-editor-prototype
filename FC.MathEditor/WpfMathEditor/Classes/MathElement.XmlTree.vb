@@ -192,17 +192,27 @@ Partial Public MustInherit Class MathElement
     End Function
 
     Public Function Clone(Optional CloneChildren As Boolean = True) As MathElement
-        Clone = Me.Clone_Internal(CloneChildren)
-        If _IsFontStretchDefined Then Clone.FontStretch = Me.FontStretch
-        If _IsFontWeightDefined Then Clone.FontWeight = Me.FontWeight
-        If _IsFontStyleDefined Then Clone.FontStyle = Me.FontStyle
-        If _IsFontFamilyDefined Then Clone.FontFamily = Me.FontFamily
-        If _IsFontSizeDefined Then Clone.FontSize = Me.FontSize
-        If _IsForegroundDefined Then Clone.Foreground = Me.Foreground
-        If _IsBackgroundDefined Then Clone.Background = Me.Background
+
+        ' Clone content
+        Clone = Me.Clone_Internal()
+
+        ' Clone children
+        If CloneChildren Then
+            For Each Child In Children
+                Clone.AddChild(Child.Clone())
+            Next
+        End If
+
+        ' Clone Attributes
+        For Each Att In Atts
+            Clone.SetAttribute(Att.Key, Att.Value)
+        Next
+
+        ' Return result
         Return Clone
+
     End Function
-    Public MustOverride Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
+    Public MustOverride Function Clone_Internal() As MathElement
 
     '++
     '++ XML Children
@@ -219,9 +229,9 @@ Partial Public MustInherit Class MathElement
         Children.Add(NewChild)
     End Sub
 
-    Public Sub RemoveChild(OldChild As MathElement)
-        Children.Remove(OldChild)
-    End Sub
+    Public Function RemoveChild(OldChild As MathElement) As Boolean
+        Return Children.Remove(OldChild)
+    End Function
 
     Public Sub ReplaceChild(OldChild As MathElement, NewChild As MathElement)
         Children.Replace(OldChild, NewChild)
@@ -275,6 +285,220 @@ Partial Public MustInherit Class MathElement
     End Function
 
     '++
+    '++ XML Attributes
+    '++
+
+    Private Atts As New Dictionary(Of String, String)
+
+    ''' <summary>
+    ''' Gets or sets the attribute values.
+    ''' </summary>
+    Default Public Property Attributes(AttributeName As String) As String
+        Get
+            Attributes = Nothing
+            Atts.TryGetValue(AttributeName, Attributes)
+        End Get
+        Set(value As String)
+            If Atts.ContainsKey(AttributeName) Then
+                Atts(AttributeName) = value
+            Else
+                Atts.Add(AttributeName, value)
+            End If
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Gets the attribute value.
+    ''' </summary>
+    ''' <param name="AttributeName">Name of the attribute.</param><returns></returns>
+    Public Function GetAttribute(AttributeName As String) As String
+        Return Attributes(AttributeName)
+    End Function
+
+    ''' <summary>
+    ''' Tries to get attribute value.
+    ''' </summary>
+    ''' <param name="AttributeName">Name of the attribute.</param>
+    ''' <param name="Result">The result.</param><returns></returns>
+    Public Function TryGetAttribute(AttributeName As String, ByRef Result As String) As Boolean
+        Return Atts.TryGetValue(AttributeName, Result)
+    End Function
+
+    ''' <summary>
+    ''' Sets the attribute value.
+    ''' </summary>
+    ''' <param name="AttributeName">Name of the attribute.</param>
+    ''' <param name="AttributeValue">The attribute value.</param>
+    Public Sub SetAttribute(AttributeName As String, AttributeValue As String)
+        Attributes(AttributeName) = AttributeValue
+        RaiseChanged()
+    End Sub
+
+    ''' <summary>
+    ''' Removes the specified attribute.
+    ''' </summary>
+    ''' <param name="AttributeName">Name of the attribute</param>
+    ''' <returns>True if the attribute was deleted, false otherwise</returns>
+    Public Function RemoveAttribute(AttributeName As String) As Boolean
+        Dim ReturnValue = Atts.Remove(AttributeName) : RaiseChanged()
+        Return ReturnValue
+    End Function
+
+    Public Function GetInheritedAttribute(AttributeName As String) As String
+
+        ' Init the recursion
+        Dim ReturnValue As String = Nothing, El As MathElement = Me
+
+        ' Walk parents from top
+        While El IsNot Nothing
+            ReturnValue = El.GetAttribute(AttributeName)
+            If ReturnValue IsNot Nothing Then Return ReturnValue
+        End While
+
+        ' Returns nothing to notify no attribute was found
+        Return Nothing
+
+    End Function
+
+    Public Function GetDefaultAttribute(AttributeName As String) As Object
+        Dim Result As Object = Nothing
+        If TryGetDefaultAttribute(AttributeName, Result) Then
+            Return Result
+        Else
+            Return Nothing
+        End If
+    End Function
+
+    Public Overridable Function TryGetDefaultAttribute(AttributeName As String, ByRef Result As String) As Boolean
+        Return False
+    End Function
+
+    Public Function GetProperty(AttributeName As String, Parser As PropertyParser) As Object
+
+        Dim Result As Object = Nothing
+        If TryGetProperty(AttributeName, Parser, Result) Then
+            Return Result
+        Else
+            Return Nothing
+        End If
+
+    End Function
+
+    Public Sub SetProperty(AttributeName As String, Parser As PropertyParser, ByVal value As Object)
+
+        Dim Result As Object = Nothing
+        SetAttribute(AttributeName, Parser.Serialize(value, Me))
+
+    End Sub
+
+    Public Function TryGetProperty(AttributeName As String, Parser As PropertyParser, ByRef Result As Object) As Boolean
+
+        If Me.TryGetAttribute(AttributeName, Result) Then
+            If (Parser Is Nothing) OrElse (Parser.TryParse(Result, Me, Result)) Then
+                Return True
+            End If
+        End If
+
+        If Me.TryGetDefaultAttribute(AttributeName, Result) Then
+            If (Parser Is Nothing) OrElse (Parser.TryParse(Result, Me, Result)) Then
+                Return True
+            End If
+        End If
+
+        Return False
+
+    End Function
+
+    Public Function GetInheritedProperty(AttributeName As String, Parser As PropertyParser) As Object
+
+        Dim Result As Object = Nothing
+        If TryGetInheritedProperty(AttributeName, Parser, Result) Then
+            Return Result
+        Else
+            Return Nothing
+        End If
+
+    End Function
+
+    Public Function TryGetInheritedProperty(AttributeName As String, Parser As PropertyParser, ByRef Result As Object) As Boolean
+
+        Dim El As MathElement = Me
+
+        While El IsNot Nothing
+
+            If El.TryGetProperty(AttributeName, Parser, Result) Then Return True
+            El = El.ParentElement
+
+        End While
+
+        Return False
+
+    End Function
+
+#Region " Mutlti-attributes properties "
+    Public Function GetProperty(AttributeNames() As String, Parser As PropertyParser) As Object
+
+        Dim Result As Object = Nothing
+        If TryGetProperty(AttributeNames, Parser, Result) Then
+            Return Result
+        Else
+            Return Nothing
+        End If
+
+    End Function
+
+    Private Function TryGetProperty(AttributeNames() As String, Parser As PropertyParser, ByRef Result As Object) As Boolean
+
+        For Each AttributeName In AttributeNames
+            If Me.TryGetAttribute(AttributeName, Result) Then
+                If (Parser Is Nothing) OrElse (Parser.TryParse(Result, Me, Result)) Then
+                    Return True
+                End If
+            End If
+        Next
+
+        For Each AttributeName In AttributeNames
+            If Me.TryGetDefaultAttribute(AttributeName, Result) Then
+                If (Parser Is Nothing) OrElse (Parser.TryParse(Result, Me, Result)) Then
+                    Return True
+                End If
+            End If
+        Next
+
+        Return False
+
+    End Function
+
+    Public Function GetInheritedProperty(AttributeNames() As String, Parser As PropertyParser) As Object
+
+        Dim Result As Object = Nothing
+        If TryGetInheritedProperty(AttributeNames, Parser, Result) Then
+            Return Result
+        Else
+            Return Nothing
+        End If
+
+    End Function
+
+    Public Function TryGetInheritedProperty(AttributeNames() As String, Parser As PropertyParser, ByRef Result As Object) As Boolean
+
+        Dim El As MathElement = Me
+
+        While El IsNot Nothing
+
+            For Each AttributeName In AttributeNames
+                If El.TryGetProperty(AttributeName, Parser, Result) Then Return True
+            Next
+            El = El.ParentElement
+
+        End While
+
+        Return False
+
+    End Function
+#End Region
+
+    '++
     '++ XML Events
     '++
 
@@ -293,18 +517,29 @@ Partial Public MustInherit Class MathElement
         End If
     End Sub
 
-    ' TODO: Use StartBatchProcess in the current code
     Private ShouldRaiseChanged, ChangePendings As Integer
+
+    ''' <summary>
+    ''' Start a new batch process. While a batch process is opened, no Changed event is risen.
+    ''' </summary>
+    ''' <remarks></remarks>
     Public Sub StartBatchProcess()
         ShouldRaiseChanged += 1
     End Sub
 
+    ''' <summary>
+    ''' Put an end to the latest batch opened batch process
+    ''' </summary>
     Public Sub StopBatchProcess()
+
         ShouldRaiseChanged -= 1
+        If ShouldRaiseChanged <> 0 Then Exit Sub
+
         If ChangePendings <> 0 Then
             ChangePendings = 0
             RaiseChanged()
         End If
+
     End Sub
 
 #If DEBUG Then
@@ -411,4 +646,5 @@ Partial Public MustInherit Class MathElement
     Private Sub MathElement_SubTreeModified(sender As Object, e As TreeEventArgs) Handles Me.SubTreeModified
         If Me.ParentElement IsNot Nothing Then Me.ParentElement.RaiseSubTreeModified(e)
     End Sub
+
 End Class

@@ -1,5 +1,9 @@
 ﻿Partial Public Class UnicodeGlyph : Inherits MathElement
 
+    Public Sub New(C As Char)
+        Me.New(AscW(C))
+    End Sub
+
     Public Sub New(C As Integer)
         Me.New(C, Nothing, Nothing)
     End Sub
@@ -17,7 +21,7 @@
         End If
 
         If S IsNot Nothing Then
-            Me._FontSize = S : Me._IsFontSizeDefined = True
+            Me.FontSize = S
         End If
 
     End Sub
@@ -29,7 +33,7 @@
         End Get
     End Property
 
-    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
+    Public Overrides Function Clone_Internal() As MathElement
         Return New UnicodeGlyph(C)
     End Function
 

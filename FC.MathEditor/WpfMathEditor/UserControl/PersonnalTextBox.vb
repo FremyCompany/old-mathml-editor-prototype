@@ -72,6 +72,11 @@
                     Keyboard.IsKeyDown(Key.LeftAlt) OrElse Keyboard.IsKeyDown(Key.RightAlt),
                     Keyboard.IsKeyDown(Key.LeftShift) OrElse Keyboard.IsKeyDown(Key.RightShift)
                 )
+            Case Key.D6
+                X.Selection.ReplaceContents(New TestGlyph())
+            Case Key.D7
+                Dim op As OperatorTextEdit = New OperatorTextEdit(New MathElement() {New UnicodeGlyph("∑"c)})
+                X.Selection.ReplaceContents(op)
             Case Else
                 Exit Sub
         End Select

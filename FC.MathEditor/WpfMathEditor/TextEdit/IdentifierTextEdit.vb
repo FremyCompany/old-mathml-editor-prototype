@@ -1,8 +1,7 @@
 ﻿Public Class IdentifierTextEdit : Inherits TextEdit
 
-    Public Shared Shadows DefaultFontStyle As FontStyle = FontStyles.Italic
     Public Sub New()
-        Me.FontStyle = DefaultFontStyle
+        ' Do nothing
     End Sub
 
     Public Sub New(Children As IEnumerable(Of MathElement))
@@ -12,16 +11,23 @@
         Next
     End Sub
 
-    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
-        Dim Clone As New IdentifierTextEdit()
+    Public Overrides Function TryGetDefaultAttribute(AttributeName As String, ByRef Result As String) As Boolean
+        Select Case AttributeName
+            Case "fontstyle"
+                ' Default style for a single char identifier is "italic"
+                If Children.HasMany Then
+                    Result = "normal"
+                Else
+                    Result = "italic"
+                End If
+                Return True
+            Case Else
+                Return MyBase.TryGetDefaultAttribute(AttributeName, Result)
+        End Select
+    End Function
 
-        If CloneChildren Then
-            For Each C In Children
-                Clone.Children.Add(C.Clone())
-            Next
-        End If
-
-        Return Clone
+    Public Overrides Function Clone_Internal() As MathElement
+        Return New IdentifierTextEdit()
     End Function
 
     Public Overrides ReadOnly Property ElementName As String

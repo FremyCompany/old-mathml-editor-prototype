@@ -118,6 +118,7 @@
     <Compile Include="Classes\SelectionHelper2.vb" />
     <Compile Include="Classes\SiblingEnumerator.vb" />
     <Compile Include="Glyphs\GlyphChildrenHelper.vb" />
+    <Compile Include="Glyphs\TestGlyph.vb" />
     <Compile Include="Glyphs\UnicodeGlyph.ExportHelper.vb" />
     <Compile Include="Glyphs\UnicodeGlyph.vb" />
     <Compile Include="Glyphs\UnicodeGlyphInputHelper.vb" />
@@ -128,6 +129,12 @@
     <Compile Include="LayoutEngines\Row\RowLayoutEngine.vb" />
     <Compile Include="LayoutEngines\Row\RowLayoutEngineExportHelper.vb" />
     <Compile Include="LayoutEngines\Row\RowLayoutEngineInputHelper.vb" />
+    <Compile Include="Parsers\Properties\BooleanParser.vb" />
+    <Compile Include="Parsers\Properties\ColorParser.vb" />
+    <Compile Include="Parsers\Properties\FontFamilyParser.vb" />
+    <Compile Include="Parsers\Properties\FontStyleParser.vb" />
+    <Compile Include="Parsers\Properties\FontWeightParser.vb" />
+    <Compile Include="Parsers\Properties\PropertyParser.vb" />
     <Compile Include="TextEdit\IdentifierTextEdit.vb" />
     <Compile Include="TextEdit\NumberTextEdit.vb" />
     <Compile Include="TextEdit\OperatorTextEdit.vb" />
@@ -215,9 +222,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Classes\Properties\" />
     <Folder Include="Formatters\" />
     <Folder Include="Parsers\Elements\" />
-    <Folder Include="Parsers\Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

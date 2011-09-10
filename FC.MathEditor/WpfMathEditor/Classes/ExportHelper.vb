@@ -66,7 +66,12 @@
 
         ' Notify the layout should be recomputed
         _IsLayoutToDate = False
-        Cached_MinABH = Double.NaN
+        MinABH = Double.NaN
+        MinBBH = Double.NaN
+
+        ' Reset layout status
+        _LayoutCompletion = LayoutCompletionState.None
+
 
         ' Forward to parent element
         If ForwardToParent AndAlso This.ParentElement IsNot Nothing Then
@@ -75,12 +80,34 @@
 
     End Sub
 
-    Public Property LayoutOptions As LayoutOptions
+    Public ReadOnly Property LayoutOptions As LayoutOptions
+        Get
+            If This.ParentDocument Is Nothing Then Return MathEditor.LayoutOptions.Block
+            Return This.ParentDocument.LayoutOptions
+        End Get
+    End Property
+
+    Public MustOverride ReadOnly Property PreferInlineContent_Interal As Boolean
+    Public ReadOnly Property PreferInlineContent As Boolean
+        Get
+            Return PreferInlineContent_Interal OrElse (This.ParentElement IsNot Nothing AndAlso This.ParentElement.Export.PreferInlineContent)
+        End Get
+    End Property
+
+    Public ReadOnly Property CurrentLayoutStyle As LayoutOptions
+        Get
+            If LayoutOptions <> MathEditor.LayoutOptions.InlineBlock Then Return LayoutOptions
+            If This.ParentElement IsNot Nothing Then Return If(This.ParentElement.Export.PreferInlineContent, MathEditor.LayoutOptions.InlineBlock, MathEditor.LayoutOptions.Block)
+            Return MathEditor.LayoutOptions.Block
+        End Get
+    End Property
 
     Protected Sub PerformLayout()
         If Not IsLayoutToDate Then
-            ' Compute the minimum size before generating the layout
+
+            ' Regenerate layout completely
             GenerateLayout() : _IsLayoutToDate = True
+
         End If
     End Sub
 
@@ -108,31 +135,53 @@
     '++ PrepareLayout phase
     '++
 
-    Private Cached_MinABH As Double = Double.NaN
-    Protected MustOverride Function GetMinABH() As Double
+    Private __LayoutCompletion As LayoutCompletionState = LayoutCompletionState.None
+    Private Property _LayoutCompletion As LayoutCompletionState
+        Get
+            Return __LayoutCompletion
+        End Get
+        Set(value As LayoutCompletionState)
+            __LayoutCompletion = value
+            If (value <> LayoutCompletionState.Completed) Then _IsLayoutToDate = False
+        End Set
+    End Property
+    Public ReadOnly Property LayoutCompletion As LayoutCompletionState
+        Get
+            Return _LayoutCompletion
+        End Get
+    End Property
+
+    Protected MustOverride Sub CalculateMinHeight_Internal()
+    Protected Sub CalculateMinHeight()
+        CalculateMinHeight_Internal()
+        AvailABH = Math.Max(AvailABH, MinABH) : AvailBBH = Math.Max(AvailBBH, MinBBH)
+        _LayoutCompletion = LayoutCompletionState.MinHeight
+    End Sub
+
+
+    Protected MinABH As Double = Double.NaN
 
     ''' <summary>
     ''' Returns the minimum size of this element (above base line). If this element is fenced, it may be higher (but not smaller) than this size at render time.
     ''' </summary>
-    Public ReadOnly Property MinABH As Double
+    Public ReadOnly Property MinimumABH As Double
         Get
-            If Double.IsNaN(Cached_MinABH) Then Cached_MinABH = GetMinABH()
-            Return Cached_MinABH
+            If LayoutCompletion < LayoutCompletionState.MinHeight Then CalculateMinHeight()
+            Return MinABH
         End Get
     End Property
 
 
 
-    Private Cached_MinBBH As Double = Double.NaN
-    Protected MustOverride Function GetMinBBH() As Double
+    Protected MinBBH As Double = Double.NaN
 
     ''' <summary>
     ''' Returns the minimum size of this element (below base line). If this element is fenced, it may be higher (but not smaller) than this size at render time.
     ''' </summary>
-    Public ReadOnly Property MinBBH As Double
+    Public ReadOnly Property MinimumBBH As Double
         Get
-            If Double.IsNaN(Cached_MinBBH) Then Cached_MinBBH = GetMinBBH()
-            Return Cached_MinBBH
+            If LayoutCompletion < LayoutCompletionState.MinHeight Then CalculateMinHeight()
+            Return MinBBH
         End Get
     End Property
 
@@ -143,7 +192,15 @@
     ''' <param name="AvailABH">Available height above baseline</param>
     ''' <param name="AvailBBH">Available height below baseline</param>
     ''' <remarks></remarks>
-    Public MustOverride Sub PrepareLayout(AvailABH As Double, AvailBBH As Double)
+    Public Sub PrepareLayout(AvailABH As Double, AvailBBH As Double)
+        If LayoutCompletion < LayoutCompletionState.MinHeight Then CalculateMinHeight()
+        PrepareLayout_Internal(AvailABH, AvailBBH)
+        Me.AvailABH = Math.Max(AvailABH, MinABH)
+        Me.AvailBBH = Math.Max(AvailBBH, MinBBH)
+        _LayoutCompletion = LayoutCompletionState.Prepared
+    End Sub
+
+    Protected MustOverride Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
 
 
     '++
@@ -261,7 +318,9 @@
 
     Public Property Foreground As Color
         Get
-            Return This.Foreground
+            Dim X = This.Foreground
+            If X.HasValue Then Return X.Value
+            Return Colors.Black
         End Get
         Set(value As Color)
             This.Foreground = value
@@ -270,7 +329,9 @@
 
     Public Property Background As Color
         Get
-            Return This.Background
+            Dim X = This.Background
+            If X.HasValue Then Return X.Value
+            Return Colors.Transparent
         End Get
         Set(value As Color)
             This.Background = value
@@ -327,17 +388,74 @@
         End Get
     End Property
 
-    Public MustOverride Sub GenerateLayout()
+    Private AvailABH, AvailBBH As Double
+    Public ReadOnly Property AvailableABH As Double
+        Get
+            If LayoutCompletion <= LayoutCompletionState.MinHeight Then CalculateMinHeight()
+            Return AvailABH
+        End Get
+    End Property
+    Public ReadOnly Property AvailableBBH As Double
+        Get
+            If LayoutCompletion <= LayoutCompletionState.MinHeight Then CalculateMinHeight()
+            Return AvailBBH
+        End Get
+    End Property
+
+    Protected MustOverride Sub GenerateLayout_Internal()
+    Public Sub GenerateLayout()
+        Select Case LayoutCompletion
+            Case LayoutCompletionState.None
+None:           ' Start by calculating the minimum height
+                CalculateMinHeight()
+                GoTo MinHeight
+            Case LayoutCompletionState.MinHeight
+MinHeight:      ' Continue by preparing the layout
+                PrepareLayout(AvailABH, AvailBBH)
+                GoTo Prepared
+            Case LayoutCompletionState.Prepared
+Prepared:       ' Continue by generating the layout
+                GenerateLayout_Internal()
+                GoTo Generated
+            Case LayoutCompletionState.Generated
+Generated:      ' Continue by completing the layout
+                CompleteLayout()
+                GoTo Completed
+            Case Else
+Completed:      ' Do nothing
+        End Select
+    End Sub
+
+    Protected Overridable Sub CompleteLayout()
+        ' Do nothing. May do some operations and then reperform GenerateLayout in the future.
+    End Sub
 
     Private Sub This_Changed(sender As Object, e As System.EventArgs) Handles This.Changed
-        _IsLayoutToDate = False
+        InvalidateLayout()
     End Sub
+
 End Class
 
 Public Enum LayoutOptions
 
-    Inline = 2 ^ 0          ' Force inline if not  specified otherwhise
-    InlineBlock = 2 ^ 1     ' Use inline if it's computed as beautiful
+    None = 0
+
+    Inline = 2 ^ 0          ' Force inline if not specified otherwhise
+    InlineBlock = 2 ^ 1     ' Use inline if it's more harmonious
     Block = 2 ^ 2           ' Use block if not specified otherwhise
+
+    IBMode = Inline Or InlineBlock Or Block
+
+    PreferInlineInside = 2 ^ 10 ' In the context of an InlineBlock element, specify to use the Inline style.
+
+End Enum
+
+Public Enum LayoutCompletionState
+
+    None = 0
+    MinHeight = 1
+    Prepared = 2
+    Generated = 3
+    Completed = 4
 
 End Enum

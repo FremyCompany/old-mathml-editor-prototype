@@ -63,7 +63,7 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
         End Get
     End Property
 
-    Public Overrides Sub GenerateLayout()
+    Protected Overrides Sub GenerateLayout_Internal()
 
         Dim BBH As Double = InitialBelowBaseLineHeight
         Dim ABH As Double = InitialAboveBaseLineHeight
@@ -73,6 +73,9 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
         For Each C In This.Children
             BBH = Math.Max(BBH, C.Export.BelowBaseLineHeight)
             ABH = Math.Max(ABH, C.Export.AboveBaseLineHeight)
+
+            ' TODO : fix that; if a small element has a big margin, 
+            ' the big margin is applied on the big element that's sibling to him
             OMT = Math.Max(OMT, C.Export.OuterMargin.Top)
             OMB = Math.Max(OMB, C.Export.OuterMargin.Bottom)
         Next
@@ -97,12 +100,26 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
 
     End Sub
 
-    Protected Overrides Function GetMinABH() As Double
-        Return This.Children.Select(Function(x) x.Export.MinABH).Max()
-    End Function
+    Protected Overrides Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
+        For Each Child In This.Children
+            Child.Export.PrepareLayout(AvailABH, AvailBBH)
+        Next
+    End Sub
 
-    Protected Overrides Function GetMinBBH() As Double
-        Return This.Children.Select(Function(x) x.Export.MinBBH).Max()
-    End Function
+    Protected Overrides Sub CalculateMinHeight_Internal()
+        If This.Children.HasAny Then
+            MinABH = This.Children.Select(Function(x) x.Export.MinimumABH).Max()
+            MinBBH = This.Children.Select(Function(x) x.Export.MinimumBBH).Max()
+        Else
+            MinABH = InitialAboveBaseLineHeight
+            MinBBH = InitialBelowBaseLineHeight
+        End If
+    End Sub
+
+    Public Overrides ReadOnly Property PreferInlineContent_Interal As Boolean
+        Get
+            Return False
+        End Get
+    End Property
 
 End Class

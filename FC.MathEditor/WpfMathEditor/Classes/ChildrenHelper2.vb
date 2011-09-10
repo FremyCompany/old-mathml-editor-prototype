@@ -58,6 +58,15 @@
         End Get
     End Property
 
+    Default Public Property Item(i As Integer) As MathElement
+        Get
+            Return Elms(i)
+        End Get
+        Set(value As MathElement)
+            RemoveAt(i) : InsertAt(value, i)
+        End Set
+    End Property
+
     ''' <summary>
     ''' Returns True if the element can be inserted in this children list
     ''' </summary>
@@ -376,22 +385,31 @@
 
     End Sub
 
-    Public Sub Remove(OldElement As MathElement)
+    Public Function Remove(OldElement As MathElement) As Boolean
 
         ' Validate
         ValidateOldElement(OldElement)
-
         Dim Index = OldElement.ChildIndex
         ValidateRemove(Index)
 
-        ' Perform
-        Elms.RemoveAt(Index)
-        OldElement.RaiseDetachedFromParent()
+        Try
+
+            ' Perform
+            Elms.RemoveAt(Index)
+            OldElement.RaiseDetachedFromParent()
+
+        Catch ex As Exception
+
+            Return False
+
+        End Try
 
         ' Raise events
         This.RaiseChildRemoved(OldElement, Index)
 
-    End Sub
+        Return True
+
+    End Function
 
     Public Sub RemoveAt(Index As Integer)
 
@@ -536,5 +554,13 @@
     Private Function GetGenericEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
         Return GetEnumerator()
     End Function
+
+    Sub Clear()
+        This.StartBatchProcess()
+        While Elms.Count <> 0
+            RemoveAt(0)
+        End While
+        This.StopBatchProcess()
+    End Sub
 
 End Class

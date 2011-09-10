@@ -4,16 +4,10 @@
         MyBase.New() : Sel = New SelectionHelper(Me)
     End Sub
 
-    Public Overrides Function Clone_Internal(Optional ByVal CloneChildren As Boolean = True) As MathElement
-        Dim X As New MathDocument()
+    Public Property LayoutOptions As LayoutOptions = MathEditor.LayoutOptions.InlineBlock
 
-        If CloneChildren Then
-            For Each Child In Me.Children
-                X.AddChild(Child.Clone())
-            Next
-        End If
-
-        Return X
+    Public Overrides Function Clone_Internal() As MathElement
+        Return New MathDocument()
     End Function
 
     Private Sel As SelectionHelper

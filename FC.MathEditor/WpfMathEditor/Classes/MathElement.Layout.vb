@@ -3,267 +3,269 @@
     Public Event SizeChanged As EventHandler
     Public Event VisualChanged As EventHandler
 
-    ' Palatino Linotype, 
-    Public FM1 As New FontFamily("Candara")
-    Public FM2 As New FontFamily("Cambria Math")
-    Public FM3 As New FontFamily("Cambria")
-    Public Overridable ReadOnly Property DefaultFontFamily As FontFamily
-        Get
-            Return FM1
-        End Get
-    End Property
+    '++
+    '++ Default Fonts
+    '++
 
-    Public Overridable ReadOnly Property DefaultMathFontFamily As FontFamily
-        Get
-            Return FM2
-        End Get
-    End Property
+    Public Shared DefaultFonts As New Dictionary(Of FontTypes, List(Of FontFamily)) From {
+        {
+            FontTypes.SansSerif, New List(Of FontFamily) From {
+                New FontFamily("Candara"), New FontFamily("Segoe UI"), New FontFamily("Verdana"), New FontFamily("Arial"), New FontFamily("Arial Unicode MS"), New FontFamily("Cambria Math"), New FontFamily("Cambria"), New FontFamily("STIXGeneral")
+            }
+        },
+        {
+            FontTypes.Serif, New List(Of FontFamily) From {
+                New FontFamily("Cambria Math"), New FontFamily("Cambria"), New FontFamily("STIXGeneral")
+            }
+        },
+        {
+            FontTypes.DoubleStruck, New List(Of FontFamily) From {
+                New FontFamily("Colonna MT"), New FontFamily("Cambria Math"), New FontFamily("Cambria"), New FontFamily("STIXGeneral")
+            }
+        },
+        {
+            FontTypes.Fraktur, New List(Of FontFamily) From {
+                New FontFamily("Old English Text"), New FontFamily("Cambria Math"), New FontFamily("Cambria"), New FontFamily("STIXGeneral")
+            }
+        },
+        {
+            FontTypes.Monospace, New List(Of FontFamily) From {
+                New FontFamily("Consolas"), New FontFamily("Courier New"), New FontFamily("Courier"), New FontFamily("Cambria Math"), New FontFamily("Cambria"), New FontFamily("STIXGeneral")
+            }
+        },
+        {
+            FontTypes.Script, New List(Of FontFamily) From {
+                New FontFamily("MV Boli"), New FontFamily("Segoe Print"), New FontFamily("Lindsey"), New FontFamily("Cambria Math"), New FontFamily("Cambria"), New FontFamily("STIXGeneral")
+            }
+        }
+    }
 
-    Public Overridable ReadOnly Property DefaultMathFontFamily2 As FontFamily
-        Get
-            Return FM3
-        End Get
-    End Property
+    '++
+    '++ Font properties
+    '++
 
+    Public Sub ClearFontCache() Handles Me.Changed
 
-    Public Overridable ReadOnly Property DefaultFontStyle As FontStyle
-        Get
-            Return FontStyles.Normal
-        End Get
-    End Property
+        _Font = Nothing : For Each Child In Me.Children
+            Child.ClearFontCache()
+        Next
 
-    Public Overridable ReadOnly Property DefaultFontWeight As FontWeight
-        Get
-            Return FontWeights.Normal
-        End Get
-    End Property
-
-    Public Overridable ReadOnly Property DefaultFontStretch As FontStretch
-        Get
-            Return FontStretches.Normal
-        End Get
-    End Property
+    End Sub
 
     Private _Font As Typeface
     Public Property Font As Typeface
         Get
-            If _Font Is Nothing Then _Font = New Typeface(FontFamily, FontStyle, FontWeight, FontStretch)
+
+            If _Font Is Nothing Then _Font = New Typeface(FontFamily, FontStyle, FontWeight, FontStretches.Normal)
             Return _Font
+
         End Get
         Set(value As Typeface)
-            ' TODO: Implement font setting
+
+            ' Setting a font is not possible, we are setting the sub properties instead
+            ' It is probable that the result font will be different than the set value in some cases.
+
+            FontFamily = value.FontFamily
+            FontWeight = value.Weight
+            FontStyle = value.Style
+            ClearFontCache()
+
         End Set
     End Property
 
-    Protected _FontFamily As FontFamily, _IsFontFamilyDefined As Boolean = False
+    Public Enum FontTypes
+        SansSerif
+        Serif
+        Fraktur
+        DoubleStruck
+        Script
+        Monospace
+    End Enum
+
+    Public Overridable ReadOnly Property FontType() As FontTypes
+        Get
+            Dim El As MathElement = Me, Att As String = Nothing
+
+            Do
+                If El.TryGetAttribute("mathvariant", Att) Then
+                    If Att.Contains("monospace") Then Return FontTypes.Monospace
+                    If Att.Contains("sans-serif") Then Return FontTypes.SansSerif
+                    If Att.Contains("fraktur") Then Return FontTypes.Fraktur
+                    If Att.Contains("script") Then Return FontTypes.Script
+                    If Att.Contains("serif") Then Return FontTypes.Serif
+                End If
+
+                If El.TryGetAttribute("fontfamily", Att) Then
+                    If Att.Contains("monospace") Then Return FontTypes.Monospace
+                    If Att.Contains("sans-serif") Then Return FontTypes.SansSerif
+                    If Att.Contains("fraktur") Then Return FontTypes.Fraktur
+                    If Att.Contains("script") Then Return FontTypes.Script
+                    If Att.Contains("serif") Then Return FontTypes.Serif
+                End If
+
+                If El.TryGetDefaultAttribute("mathvariant", Att) Then
+                    If Att.Contains("monospace") Then Return FontTypes.Monospace
+                    If Att.Contains("sans-serif") Then Return FontTypes.SansSerif
+                    If Att.Contains("fraktur") Then Return FontTypes.Fraktur
+                    If Att.Contains("script") Then Return FontTypes.Script
+                    If Att.Contains("serif") Then Return FontTypes.Serif
+                End If
+
+                If El.TryGetDefaultAttribute("fontfamily", Att) Then
+                    If Att.Contains("monospace") Then Return FontTypes.Monospace
+                    If Att.Contains("sans-serif") Then Return FontTypes.SansSerif
+                    If Att.Contains("fraktur") Then Return FontTypes.Fraktur
+                    If Att.Contains("script") Then Return FontTypes.Script
+                    If Att.Contains("serif") Then Return FontTypes.Serif
+                End If
+
+                El = El.ParentElement
+            Loop Until El Is Nothing
+
+
+            Return FontTypes.SansSerif
+        End Get
+    End Property
+
     Public Property FontFamily As FontFamily
         Get
-            If _FontFamily Is Nothing Then
-                If ParentElement Is Nothing Then
-                    Return DefaultFontFamily
-                Else
-                    _FontFamily = ParentElement.FontFamily
-                    Return _FontFamily
-                End If
-            Else
-                Return _FontFamily
+
+            Dim Result As Object = Nothing
+            If TryGetInheritedProperty("fontfamily", Parsers.ForFontFamily, Result) Then
+                Return Result
             End If
+
+            Return DefaultFonts(FontType).First()
+
         End Get
         Set(value As FontFamily)
-            SetFontFamily(value, True)
-        End Set
-    End Property
 
-    Private Sub SetFontFamily(value As FontFamily, DefineProperty As Boolean)
-        If (DefineProperty) OrElse (Not _IsFontFamilyDefined) Then
-            _FontFamily = value
-            _IsFontFamilyDefined = DefineProperty AndAlso (value IsNot Nothing)
-            For Each C In Me.Children
-                C.SetFontFamily(value, False)
-            Next
-            Export.InvalidateLayout()
-        End If
-    End Sub
-
-    Protected _FontStretch As FontStretch?, _IsFontStretchDefined As Boolean = False
-    Public Property FontStretch As FontStretch?
-        Get
-            If _FontStretch Is Nothing Then
-                If ParentElement Is Nothing Then
-                    Return DefaultFontStretch
-                Else
-                    _FontStretch = ParentElement.FontStretch
-                    Return _FontStretch
-                End If
+            If value Is Nothing Then
+                RemoveAttribute("fontfamily")
             Else
-                Return _FontStretch
+                SetAttribute("fontfamily", value.ToString())
             End If
-        End Get
-        Set(value As FontStretch?)
-            SetFontStretch(value, True)
+
         End Set
     End Property
 
-    Private Sub SetFontStretch(value As FontStretch?, DefineProperty As Boolean)
-        If (DefineProperty) OrElse (Not _IsFontStretchDefined) Then
-            _FontStretch = value
-            _IsFontStretchDefined = DefineProperty AndAlso (value IsNot Nothing)
-            For Each C In Me.Children
-                C.SetFontStretch(value, False)
-            Next
-            Export.InvalidateLayout()
+    Public Sub SetMathVariant(ByVal value As String)
+        If value Is Nothing Then
+            RemoveAttribute("mathvariant")
+        Else
+            SetAttribute("mathvariant", value)
         End If
     End Sub
 
-    Protected _FontStyle As FontStyle?, _IsFontStyleDefined As Boolean = False
     Public Property FontStyle As FontStyle?
         Get
-            If _FontStyle Is Nothing Then
-                If ParentElement Is Nothing Then
-                    Return DefaultFontStyle
-                Else
-                    _FontStyle = ParentElement.FontStyle
-                    Return _FontStyle
+
+            Dim Result As Object = Nothing
+            Dim El As MathElement = Me
+
+            While El IsNot Nothing
+
+                If TryGetProperty("fontstyle", Parsers.ForFontStyle, Result) Then
+                    Return Result
                 End If
-            Else
-                Return _FontStyle
-            End If
+
+                If TryGetAttribute("mathvariant", Result) Then
+                    If Result.ToString().Contains("italic") Then Return FontStyles.Italic
+                    If Result.ToString().Contains("oblique") Then Return FontStyles.Oblique
+                    If Result.ToString().Contains("normal") Then Return FontStyles.Normal
+                End If
+
+                El = El.ParentElement
+
+            End While
+
+            Return FontStyles.Normal
+
         End Get
         Set(value As FontStyle?)
-            SetFontStyle(value, True)
+
+            If value Is Nothing Then
+                RemoveAttribute("fontstyle")
+            Else
+                SetProperty("fontstyle", Parsers.ForFontStyle, value)
+            End If
+
         End Set
     End Property
 
-    Private Sub SetFontStyle(value As FontStyle?, DefineProperty As Boolean)
-        If (DefineProperty) OrElse (Not _IsFontStyleDefined) Then
-            _FontStyle = value
-            _IsFontStyleDefined = DefineProperty AndAlso (value IsNot Nothing)
-            For Each C In Me.Children
-                C.SetFontStyle(value, False)
-            Next
-            Export.InvalidateLayout()
-        End If
-    End Sub
-
-    Protected _FontWeight As FontWeight?, _IsFontWeightDefined As Boolean = False
     Public Property FontWeight As FontWeight?
         Get
-            If _FontWeight Is Nothing Then
-                If ParentElement Is Nothing Then
-                    Return DefaultFontWeight
-                Else
-                    _FontWeight = ParentElement.FontWeight
-                    Return _FontWeight
+
+            Dim Result As Object = Nothing
+            Dim El As MathElement = Me
+
+            While El IsNot Nothing
+
+                If TryGetProperty("fontweight", Parsers.ForFontWeight, Result) Then
+                    Return Result
                 End If
-            Else
-                Return _FontWeight
-            End If
+
+                If TryGetAttribute("mathvariant", Result) Then
+                    If Result.ToString().Contains("bold") Then Return FontWeights.Bold
+                    If Result.ToString().Contains("normal") Then Return FontWeights.Normal
+                End If
+
+                El = El.ParentElement
+
+            End While
+
+            Return FontWeights.Normal
+
+            Return FontWeights.Normal
         End Get
         Set(value As FontWeight?)
-            SetFontWeight(value, True)
+
+            If value Is Nothing Then
+                RemoveAttribute("fontweight")
+            Else
+                SetProperty("fontweight", Parsers.ForFontWeight, value)
+            End If
+
         End Set
     End Property
 
-    Private Sub SetFontWeight(value As FontWeight?, DefineProperty As Boolean)
-        If (DefineProperty) OrElse (Not _IsFontWeightDefined) Then
-            _FontWeight = value
-            _IsFontWeightDefined = DefineProperty AndAlso (value IsNot Nothing)
-            For Each C In Me.Children
-                C.SetFontWeight(value, False)
-            Next
-            Export.InvalidateLayout()
-        End If
-    End Sub
-
-
-    Protected _Foreground As Color?, _IsForegroundDefined As Boolean
     Public Property Foreground As Color?
         Get
-            If _Foreground Is Nothing Then
-                If ParentElement Is Nothing Then
-                    Return SystemColors.WindowTextColor
-                Else
-                    _Foreground = ParentElement.Foreground
-                    Return _Foreground
-                End If
-            Else
-                Return _Foreground
+
+            Dim Result As Object = Nothing
+            If TryGetInheritedProperty(New String() {"color", "mathcolor"}, Parsers.ForColor, Result) Then
+                Return Result
             End If
+
         End Get
         Set(value As Color?)
-            SetForeground(value, True)
+
+            If value Is Nothing Then
+                RemoveAttribute("color") : RemoveAttribute("mathcolor")
+            Else
+                RemoveAttribute("color") : SetProperty("mathcolor", Parsers.ForColor, value)
+            End If
+
         End Set
     End Property
 
-    Private Sub SetForeground(value As Color?, DefineProperty As Boolean)
-        If (DefineProperty) OrElse (Not _IsForegroundDefined) Then
-            _Foreground = value
-            _IsForegroundDefined = DefineProperty AndAlso (value IsNot Nothing)
-            For Each C In Me.Children
-                C.SetForeground(value, False)
-            Next
-            Export.InvalidateLayout()
-        End If
-    End Sub
-
-    Protected _FontSize As Double?, _IsFontSizeDefined As Boolean
     Public Property FontSize As Double?
         Get
-            If _FontSize Is Nothing Then
-                If ParentElement Is Nothing Then
-                    Return 20
-                Else
-                    _FontSize = ParentElement.FontSize
-                    Return _FontSize
-                End If
-            Else
-                Return _FontSize
-            End If
+            ' TODO : Implement font size
+            Return 12 / 72 * 96
         End Get
         Set(value As Double?)
-            SetFontSize(value, True)
+
         End Set
     End Property
 
-    Private Sub SetFontSize(value As Double?, DefineProperty As Boolean)
-        If (DefineProperty) OrElse (Not _IsFontSizeDefined) Then
-            _FontSize = value
-            _IsFontSizeDefined = DefineProperty AndAlso (value IsNot Nothing)
-            For Each C In Me.Children
-                C.SetFontSize(value, False)
-            Next
-            Export.InvalidateLayout()
-        End If
-    End Sub
-
-    Protected _Background As Color?, _IsBackgroundDefined As Boolean
     Public Property Background As Color?
         Get
-            If _Background Is Nothing Then
-                If ParentElement Is Nothing Then
-                    Return Colors.Transparent
-                Else
-                    _Background = ParentElement.Background
-                    Return _Background
-                End If
-            Else
-                Return _Background
-            End If
+            ' TODO : Implement background
         End Get
         Set(value As Color?)
-            SetBackground(value, True)
+
         End Set
     End Property
-
-    Private Sub SetBackground(value As Color?, DefineProperty As Boolean)
-        If (DefineProperty) OrElse (Not _IsBackgroundDefined) Then
-            _Background = value
-            _IsBackgroundDefined = DefineProperty AndAlso (value IsNot Nothing)
-            For Each C In Me.Children
-                C.SetBackground(value, False)
-            Next
-            Export.InvalidateLayout()
-        End If
-    End Sub
 
 End Class
