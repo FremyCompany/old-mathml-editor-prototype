@@ -3,6 +3,7 @@
     Public Class FontFamilyParser : Inherits PropertyParser
 
         Public Overrides Function Serialize(Value As Object, Context As MathElement) As String
+            If Not (TypeOf Value Is FontFamily) Then Return Nothing
             Return Value.ToString()
         End Function
 

@@ -5,6 +5,12 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
         MyBase.New(This)
     End Sub
 
+    Public Overrides Sub AppendSimpleText(SB As System.Text.StringBuilder)
+        For Each Child In This.Children
+            Child.Export.AppendSimpleText(SB)
+        Next
+    End Sub
+
     Public Overrides Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
         SB.Append("(")
         For Each Child In This.Children

@@ -31,7 +31,7 @@
         ElseIf _
         ( _
             (Char.IsDigit(Char.ConvertFromUtf32(InputChar))) OrElse
-            ((InputChar = Asc("-") OrElse InputChar = Asc("+")) AndAlso (This IsNot Nothing) AndAlso (This.Selection IsNot Nothing) AndAlso TryCast(This.Selection.PreviousSibling, OperatorTextEdit) IsNot Nothing) _
+            ((InputChar = Asc("-") OrElse InputChar = Asc("+")) AndAlso (This IsNot Nothing) AndAlso (This.Selection IsNot Nothing) AndAlso TryCast(This.Selection.PreviousSibling, OperatorTextEdit) IsNot Nothing AndAlso DirectCast(This.Selection.PreviousSibling, OperatorTextEdit).IsOperator) _
         ) Then
             TextEdit = New NumberTextEdit()
         Else

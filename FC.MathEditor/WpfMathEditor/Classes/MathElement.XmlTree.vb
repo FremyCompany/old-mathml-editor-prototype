@@ -194,7 +194,7 @@ Partial Public MustInherit Class MathElement
     Public Function Clone(Optional CloneChildren As Boolean = True) As MathElement
 
         ' Clone content
-        Clone = Me.Clone_Internal()
+        Clone = Me.Clone_Internal(CloneChildren)
 
         ' Clone children
         If CloneChildren Then
@@ -212,7 +212,7 @@ Partial Public MustInherit Class MathElement
         Return Clone
 
     End Function
-    Public MustOverride Function Clone_Internal() As MathElement
+    Protected MustOverride Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
 
     '++
     '++ XML Children
@@ -393,18 +393,20 @@ Partial Public MustInherit Class MathElement
 
     Public Function TryGetProperty(AttributeName As String, Parser As PropertyParser, ByRef Result As Object) As Boolean
 
-        If Me.TryGetAttribute(AttributeName, Result) Then
-            If (Parser Is Nothing) OrElse (Parser.TryParse(Result, Me, Result)) Then
+        Dim xResult As String = Nothing
+        If Me.TryGetAttribute(AttributeName, xResult) Then
+            If (Parser Is Nothing) OrElse (Parser.TryParse(xResult, Me, Result)) Then
                 Return True
             End If
         End If
 
-        If Me.TryGetDefaultAttribute(AttributeName, Result) Then
-            If (Parser Is Nothing) OrElse (Parser.TryParse(Result, Me, Result)) Then
+        If Me.TryGetDefaultAttribute(AttributeName, xResult) Then
+            If (Parser Is Nothing) OrElse (Parser.TryParse(xResult, Me, Result)) Then
                 Return True
             End If
         End If
 
+        Result = Nothing
         Return False
 
     End Function

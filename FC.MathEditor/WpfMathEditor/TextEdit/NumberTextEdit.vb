@@ -7,14 +7,14 @@
     Public Overrides Function TryGetDefaultAttribute(AttributeName As String, ByRef Result As String) As Boolean
         Select Case AttributeName
             Case "fontfamily"
-                Result = "Calibri" : Return True
+                Result = "Cambria" : Return True
             Case Else
                 Return MyBase.TryGetDefaultAttribute(AttributeName, Result)
         End Select
     End Function
 
-    Public Overrides Function Clone_Internal() As MathElement
-        Return New OperatorTextEdit()
+    Protected Overrides Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
+        Return New NumberTextEdit()
     End Function
 
     Public Overrides ReadOnly Property ElementName As String

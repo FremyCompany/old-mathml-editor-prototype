@@ -26,7 +26,7 @@
             Dim NewElement = New UnicodeGlyph(InputChar)
 
             This.Selection.ParentElement.Children.InsertAfter(NewElement, This.Selection.PreviousSibling)
-            This.Selection.SetPoint(NewElement.GetSelectionAfter())
+            This.Selection.SetPoint(This.GetSelectionAfter())
 
             Return True
 
@@ -88,7 +88,7 @@
 
             Dim C = New UnicodeGlyph(InputChar)
             This.AddChild(C)
-            This.Selection.SetPoint(C.GetSelectionAfter())
+            This.Selection.SetPoint(This.GetSelectionAfter())
             Return True
 
         Else

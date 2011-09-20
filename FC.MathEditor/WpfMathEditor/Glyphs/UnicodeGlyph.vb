@@ -27,18 +27,14 @@
     End Sub
 
     Private C As Integer ' UnicodeGlyphChar
-    Public ReadOnly Property DisplayCharacter() As String
+    Public ReadOnly Property DisplayChar() As String
         Get
             Return Char.ConvertFromUtf32(C)
         End Get
     End Property
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Protected Overrides Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
         Return New UnicodeGlyph(C)
-    End Function
-
-    Public Overrides Function ToString() As String
-        Return C
     End Function
 
     Protected Overrides Function GetInitialChildrenHelper() As ChildrenHelper

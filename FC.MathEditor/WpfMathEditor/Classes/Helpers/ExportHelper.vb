@@ -23,6 +23,12 @@
         Return SB.ToString()
     End Function
 
+    Public Function ToSimpleText() As String
+        Dim SB As New System.Text.StringBuilder()
+        AppendSimpleText(SB)
+        Return SB.ToString()
+    End Function
+
     Public Function ToBitmap() As DrawingImage
         Dim DV As New DrawingVisual()
         Dim DG = DV.RenderOpen()
@@ -30,9 +36,16 @@
         Return New DrawingImage(DV.Drawing)
     End Function
 
+    Public Overrides Function ToString() As String
+        Dim SB As New System.Text.StringBuilder()
+        AppendSimpleText(SB)
+        Return SB.ToString()
+    End Function
+
     Public MustOverride Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
     Public MustOverride Sub AppendLaTeX(SB As System.Text.StringBuilder)
     Public MustOverride Sub AppendMathML(SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendSimpleText(SB As System.Text.StringBuilder)
 
     Protected MustOverride Sub Draw_Internal(DG As DrawingContext)
     Public Sub Draw(DG As DrawingContext)
@@ -55,17 +68,16 @@
     End Sub
 
 
-    Private Property _IsLayoutToDate As Boolean
     Protected Overridable ReadOnly Property IsLayoutToDate As Boolean
         Get
-            Return _IsLayoutToDate
+            Return LayoutCompletion = LayoutCompletionState.Completed
         End Get
     End Property
 
     Public Sub InvalidateLayout(Optional ByVal ForwardToParent As Boolean = False)
 
         ' Notify the layout should be recomputed
-        _IsLayoutToDate = False
+        LayoutCompletion = LayoutCompletionState.None
         MinABH = Double.NaN
         MinBBH = Double.NaN
 
@@ -103,10 +115,10 @@
     End Property
 
     Protected Sub PerformLayout()
-        If Not IsLayoutToDate Then
+        If (Not IsLayoutToDate) Then
 
             ' Regenerate layout completely
-            GenerateLayout() : _IsLayoutToDate = True
+            GenerateLayout()
 
         End If
     End Sub
@@ -135,27 +147,27 @@
     '++ PrepareLayout phase
     '++
 
-    Private __LayoutCompletion As LayoutCompletionState = LayoutCompletionState.None
-    Private Property _LayoutCompletion As LayoutCompletionState
-        Get
-            Return __LayoutCompletion
-        End Get
-        Set(value As LayoutCompletionState)
-            __LayoutCompletion = value
-            If (value <> LayoutCompletionState.Completed) Then _IsLayoutToDate = False
-        End Set
-    End Property
-    Public ReadOnly Property LayoutCompletion As LayoutCompletionState
+    Private _LayoutCompletion As LayoutCompletionState = LayoutCompletionState.None
+    Public Property LayoutCompletion As LayoutCompletionState
         Get
             Return _LayoutCompletion
         End Get
+        Private Set(value As LayoutCompletionState)
+            _LayoutCompletion = value
+        End Set
     End Property
 
     Protected MustOverride Sub CalculateMinHeight_Internal()
     Protected Sub CalculateMinHeight()
+
+        ' Avoid to recompute multiptle time the same thing
+        If LayoutCompletion >= LayoutCompletionState.MinHeight Then Exit Sub
+
+        ' Perform the operation and set the state
         CalculateMinHeight_Internal()
         AvailABH = Math.Max(AvailABH, MinABH) : AvailBBH = Math.Max(AvailBBH, MinBBH)
         _LayoutCompletion = LayoutCompletionState.MinHeight
+
     End Sub
 
 
@@ -166,7 +178,7 @@
     ''' </summary>
     Public ReadOnly Property MinimumABH As Double
         Get
-            If LayoutCompletion < LayoutCompletionState.MinHeight Then CalculateMinHeight()
+            CalculateMinHeight()
             Return MinABH
         End Get
     End Property
@@ -180,7 +192,7 @@
     ''' </summary>
     Public ReadOnly Property MinimumBBH As Double
         Get
-            If LayoutCompletion < LayoutCompletionState.MinHeight Then CalculateMinHeight()
+            CalculateMinHeight()
             Return MinBBH
         End Get
     End Property
@@ -193,7 +205,7 @@
     ''' <param name="AvailBBH">Available height below baseline</param>
     ''' <remarks></remarks>
     Public Sub PrepareLayout(AvailABH As Double, AvailBBH As Double)
-        If LayoutCompletion < LayoutCompletionState.MinHeight Then CalculateMinHeight()
+        CalculateMinHeight()
         PrepareLayout_Internal(AvailABH, AvailBBH)
         Me.AvailABH = Math.Max(AvailABH, MinABH)
         Me.AvailBBH = Math.Max(AvailBBH, MinBBH)
@@ -416,6 +428,7 @@ MinHeight:      ' Continue by preparing the layout
             Case LayoutCompletionState.Prepared
 Prepared:       ' Continue by generating the layout
                 GenerateLayout_Internal()
+                LayoutCompletion = LayoutCompletionState.Generated
                 GoTo Generated
             Case LayoutCompletionState.Generated
 Generated:      ' Continue by completing the layout
@@ -429,6 +442,28 @@ Completed:      ' Do nothing
     Protected Overridable Sub CompleteLayout()
         ' Do nothing. May do some operations and then reperform GenerateLayout in the future.
     End Sub
+
+    Public Function ProposeMoreSpace(ByRef AvailWidth As Double) As Boolean
+
+        ' Perform the real process
+        If ProposeMoreSpace_Internal(AvailWidth) Then
+
+            ' Reset the layout to the "prepared" state
+            LayoutCompletion = LayoutCompletionState.Prepared
+            Return True
+
+        Else : Return False : End If
+
+    End Function
+
+    ''' <summary>
+    ''' Adapts your layout if you're given more space to use by the parent
+    ''' </summary>
+    ''' <param name="AvailWidth">Space available to grow</param>
+    ''' <returns>True if the layout changed, False otherwhite</returns>
+    Protected Overridable Function ProposeMoreSpace_Internal(ByRef AvailWidth As Double) As Boolean
+        Return False
+    End Function
 
     Private Sub This_Changed(sender As Object, e As System.EventArgs) Handles This.Changed
         InvalidateLayout()

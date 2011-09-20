@@ -54,6 +54,7 @@ Namespace Parsers
         Public ForFontFamily As New FontFamilyParser()
         Public ForColor As New ColorParser()
         Public ForBoolean As New BooleanParser()
+        Public ForLength As New LengthParser()
 
     End Module
 End Namespace

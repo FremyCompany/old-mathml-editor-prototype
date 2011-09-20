@@ -1,6 +1,6 @@
 ﻿Partial Public Class TestGlyph : Inherits MathElement
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Protected Overrides Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
         Return New TestGlyph()
     End Function
 
@@ -35,7 +35,7 @@
         End Sub
 
         Protected Overrides Sub CalculateMinHeight_Internal()
-            MinBBH = 0
+            MinBBH = 20 - FontSize * 0.4
             MinABH = 40 - MinBBH
         End Sub
 
@@ -62,6 +62,10 @@
         End Property
 
         Protected Overrides Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
+            '
+        End Sub
+
+        Public Overrides Sub AppendSimpleText(SB As System.Text.StringBuilder)
             '
         End Sub
     End Class

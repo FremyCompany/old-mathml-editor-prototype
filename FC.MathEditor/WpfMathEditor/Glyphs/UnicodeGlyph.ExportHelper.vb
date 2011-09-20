@@ -3,21 +3,6 @@
     Public Class UnicodeGlyphExportHelper : Inherits ExportHelper
 
         '++
-        '++ DICS
-        '++
-
-        Public Shared ReadOnly OperatorDic_fence As New Dictionary(Of Integer, Boolean) From {
-            {AscW("("c), True},
-            {AscW(")"c), True},
-            {AscW("∑"c), True}
-        }
-
-        Public Shared ReadOnly OperatorDic_stretchy As New Dictionary(Of Integer, Boolean) From {
-            {AscW("("c), True},
-            {AscW(")"c), True}
-        }
-
-        '++
         '++ Code
         '++
 
@@ -31,8 +16,12 @@
             End Get
         End Property
 
+        Public Overrides Sub AppendSimpleText(SB As System.Text.StringBuilder)
+            SB.Append(This.DisplayChar)
+        End Sub
+
         Public Overrides Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
-            SB.Append(This.DisplayCharacter)
+            SB.Append(This.DisplayChar)
         End Sub
 
         Public Overrides Sub AppendLaTeX(SB As System.Text.StringBuilder)
@@ -45,12 +34,12 @@
 
         Protected Overrides Sub Draw_Internal(DG As System.Windows.Media.DrawingContext)
 
-            If IsStretchy Then
+            If IsSymmetric Then
+                DG.DrawGlyphRun(New SolidColorBrush(Foreground), GlyphRun)
+            Else
                 DG.PushTransform(New ScaleTransform(1, StretchRelative, 0, 0))
                 DG.DrawGlyphRun(New SolidColorBrush(Foreground), GlyphRun)
                 DG.Pop()
-            Else
-                DG.DrawGlyphRun(New SolidColorBrush(Foreground), GlyphRun)
             End If
 
         End Sub
@@ -127,52 +116,62 @@
             BH = GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(GlyphIndex) * S + BottomExtension + TopExtension
 
             ' Compute the position of the baseline
-            If IsStretchy Then
+            If IsSymmetric Then
+
+                ' Inner margin (blackbox vs charbox)
+                IM = New Thickness(GlyphMargin.Left, 0, GlyphMargin.Right, 0)
+
+                ' Outer margin (none by default)
+                OM = New Thickness(0)
+
+                ' Selection margin (linebox vs charbox)
+                SM = New Thickness(0, GlyphFont.Baseline * S - GlyphHeight + BH, 0, (Font.FontFamily.LineSpacing - GlyphFont.Baseline) * S - BH)
+
+            Else
+
                 StretchRelative = (AvailableABH + AvailableBBH) / H
                 H = AvailableABH + AvailableBBH : BH = AvailableBBH
+
+                ' Inner margin (blackbox vs charbox)
+                IM = New Thickness(GlyphMargin.Left, 0, GlyphMargin.Right, 0)
+
+                ' Outer margin (none by default)
+                OM = New Thickness(0)
+
+                ' Selection margin (only charbox)
+                SM = New Thickness(0, 0, 0, 0)
+
             End If
-
-            IM = New Thickness(GlyphMargin.Left, 0, GlyphMargin.Right, 0)
-            OM = New Thickness(0)
-
-            SM = New Thickness(0, GlyphFont.Baseline * S - GlyphHeight + BH, 0, (Font.FontFamily.LineSpacing - GlyphFont.Baseline) * S - BH)
 
         End Sub
 
-        Dim IsFence As Boolean = False
         Dim IsStretchy As Boolean = False
+        Dim IsSymmetric As Boolean = False
         Private FontSizeRelative, StretchRelative As Double
         Protected Overrides Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
 
 
-            ' If the char is fenced
-            If (
-                (
-                    (This.ParentElement IsNot Nothing) AndAlso (This.ParentElement.TryGetProperty("fence", Parsers.ForBoolean, IsFence) AndAlso IsFence)
-                ) OrElse (
-                    (OperatorDic_fence.TryGetValue(This.C, IsFence) AndAlso IsFence)
-                )
-            ) Then
+            ' If the char is stretchy
+            If (This.ParentElement IsNot Nothing) AndAlso
+                (TypeOf This.ParentElement Is OperatorTextEdit) AndAlso
+                DirectCast(This.ParentElement, OperatorTextEdit).IsStretchy Then
 
-                If (
-                    (
-                        (This.ParentElement IsNot Nothing) AndAlso (This.ParentElement.TryGetProperty("stretchy", Parsers.ForBoolean, IsStretchy) AndAlso IsStretchy)
-                    ) OrElse (
-                        (OperatorDic_stretchy.TryGetValue(This.C, IsStretchy) AndAlso IsStretchy)
-                    )
-                ) Then
+                ' If the char should grow symetrically
+                If DirectCast(This.ParentElement, OperatorTextEdit).IsSymmetric Then
 
-                    ' Stretchy layout
-                    PrepareLayout_Stretchy(AvailABH, AvailBBH)
+
+                    ' Symetric stretchy layout
+                    PrepareLayout_SymStretchy(AvailABH, AvailBBH)
 
                 Else
 
-                    ' Fence layout
-                    PrepareLayout_Fenced(AvailABH, AvailBBH)
+                    ' Asymetric stretchy layout
+                    PrepareLayout_AsymStretchy(AvailABH, AvailBBH)
 
                 End If
 
             Else
+
 
                 ' Classic layout
                 PrepareLayout_Classic()
@@ -181,30 +180,39 @@
 
         End Sub
 
+        Private _LastFont As Typeface
         Private Sub GetGlyph()
 
-            ' Find the first typeface (fallback, if needed) that contains a valid glyph for the current char
-            Font.TryGetGlyphTypeface(GlyphFont)
-            If (GlyphFont Is Nothing) OrElse (Not GlyphFont.CharacterToGlyphMap.ContainsKey(This.C)) Then
+            ' Check if font has changed since last execution
+            If Font IsNot _LastFont Then
 
-                ' Walk fonts for the specified Font Type
-                For Each xFontFamily In DefaultFonts(This.FontType)
-                    Call New Typeface(xFontFamily, This.FontStyle, This.FontWeight, FontStretches.Normal).TryGetGlyphTypeface(GlyphFont)
+                ' Save state from next time
+                _LastFont = Font
+
+                ' Find the first typeface (fallback, if needed) that contains a valid glyph for the current char
+                Font.TryGetGlyphTypeface(GlyphFont)
+                If (GlyphFont Is Nothing) OrElse (Not GlyphFont.CharacterToGlyphMap.ContainsKey(This.C)) Then
+
+                    ' Walk fonts for the specified Font Type
+                    For Each xFontFamily In DefaultFonts(This.FontType)
+                        Call New Typeface(xFontFamily, This.FontStyle, This.FontWeight, FontStretches.Normal).TryGetGlyphTypeface(GlyphFont)
+                        If (GlyphFont Is Nothing) OrElse (GlyphFont.CharacterToGlyphMap.ContainsKey(This.C)) Then
+                            Continue For
+                        Else
+                            Exit For
+                        End If
+                    Next
+
+                    ' Fallback to null char if not font has been found
                     If (GlyphFont Is Nothing) OrElse (GlyphFont.CharacterToGlyphMap.ContainsKey(This.C)) Then
-                        Continue For
-                    Else
-                        Exit For
+                        Font.TryGetGlyphTypeface(GlyphFont)
+                        GlyphIndex = 0 : Exit Sub
                     End If
-                Next
-
-                ' Fallback to null char if not font has been found
-                If (GlyphFont Is Nothing) OrElse (GlyphFont.CharacterToGlyphMap.ContainsKey(This.C)) Then
-                    Font.TryGetGlyphTypeface(GlyphFont)
-                    GlyphIndex = 0 : Exit Sub
                 End If
-            End If
 
-            GlyphIndex = GlyphFont.CharacterToGlyphMap(This.C)
+                GlyphIndex = GlyphFont.CharacterToGlyphMap(This.C)
+
+            End If
 
         End Sub
 
@@ -216,21 +224,21 @@
 
         Private Sub PrepareLayout_Classic()
             FontSizeRelative = 1
-            IsFence = False
             IsStretchy = False
+            IsSymmetric = True
         End Sub
 
-        Private Sub PrepareLayout_Fenced(AvailABH As Double, AvailBBH As Double)
+        Private Sub PrepareLayout_SymStretchy(AvailABH As Double, AvailBBH As Double)
             FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimumABH, AvailBBH / MinimumBBH))
-            IsFence = True
-            IsStretchy = False
+            IsStretchy = True
+            IsSymmetric = True
         End Sub
 
-        Private Sub PrepareLayout_Stretchy(AvailABH As Double, AvailBBH As Double)
+        Private Sub PrepareLayout_AsymStretchy(AvailABH As Double, AvailBBH As Double)
             FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimumABH, AvailBBH / MinimumBBH))
             'FontSizeRelative = Math.Max(1, (AvailABH + AvailBBH) / (MinimumABH + MinimumBBH))
-            IsFence = True
             IsStretchy = True
+            IsSymmetric = False
         End Sub
 
     End Class

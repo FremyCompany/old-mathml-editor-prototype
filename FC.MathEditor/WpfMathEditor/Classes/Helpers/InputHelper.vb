@@ -40,7 +40,16 @@
     Shared StartBlockChars As String = "├([{"
     Shared EndBlockChars As String = "┤)]}"
 
+    Shared InputReplaceSource As Integer() = {&H2D}
+    Shared InputReplaceDestination As Integer() = {&H2212}
+
     Public Sub ProcessChar(InputChar As Integer)
+
+
+        ' Replace typed characters by native chars
+        Dim IIndex As Integer = Array.IndexOf(InputReplaceSource, InputChar)
+        If IIndex <> -1 Then InputChar = InputReplaceDestination(IIndex)
+
 
         ' Can't process char if not currently selected
         If This.Selection.ParentElement IsNot This Then

@@ -1,13 +1,17 @@
 ﻿Partial Public Class MathElement
 
+    Public Overrides Function ToString() As String
+        Return Export.ToString()
+    End Function
+
     Public Event SizeChanged As EventHandler
     Public Event VisualChanged As EventHandler
 
     '++
     '++ Default Fonts
     '++
-
-    Public Shared DefaultFonts As New Dictionary(Of FontTypes, List(Of FontFamily)) From {
+    Public Shared ReadOnly DefaultFontSize As Double = 12 * 96 / 72
+    Public Shared ReadOnly DefaultFonts As New Dictionary(Of FontTypes, List(Of FontFamily)) From {
         {
             FontTypes.SansSerif, New List(Of FontFamily) From {
                 New FontFamily("Candara"), New FontFamily("Segoe UI"), New FontFamily("Verdana"), New FontFamily("Arial"), New FontFamily("Arial Unicode MS"), New FontFamily("Cambria Math"), New FontFamily("Cambria"), New FontFamily("STIXGeneral")
@@ -123,7 +127,7 @@
             Loop Until El Is Nothing
 
 
-            Return FontTypes.SansSerif
+            Return FontTypes.Serif
         End Get
     End Property
 
@@ -251,11 +255,22 @@
 
     Public Property FontSize As Double?
         Get
-            ' TODO : Implement font size
-            Return 12 / 72 * 96
+            Dim Len As Length = Nothing
+            If TryGetInheritedProperty("fontsize", Parsers.ForLength, Len) Then
+                If ParentElement IsNot Nothing Then
+                    Return Len.ToPixels(ParentElement.FontSize, ParentElement.FontSize)
+                Else
+                    Return Len.ToPixels(MathElement.DefaultFontSize, MathElement.DefaultFontSize)
+                End If
+            End If
+                Return DefaultFontSize
         End Get
         Set(value As Double?)
-
+            If value Is Nothing Then
+                RemoveAttribute("fontsize")
+            Else
+                SetAttribute("fontsize", value & "px")
+            End If
         End Set
     End Property
 

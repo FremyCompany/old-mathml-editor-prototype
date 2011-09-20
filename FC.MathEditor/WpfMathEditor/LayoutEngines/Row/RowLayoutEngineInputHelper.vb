@@ -16,9 +16,8 @@
 
         This.Selection.ReplaceContents(TextEdit)
 
-        ' Change the selection to the TextEdit
-        ' TODO: Determine if it wouldn't be better to put the selection in RLE instead
-        This.Selection.SetPoint(TextEdit.GetSelectionAtEnd())
+        ' Set the selection after the TextEdit
+        This.Selection.SetPoint(TextEdit.GetSelectionAfter())
 
         Return True
 

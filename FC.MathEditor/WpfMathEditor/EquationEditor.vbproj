@@ -103,20 +103,24 @@
       <DependentUpon>Application.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\ChildrenHelper2.vb" />
-    <Compile Include="Classes\EmptyInputHelper.vb" />
-    <Compile Include="Classes\ExportHelper.vb" />
-    <Compile Include="Classes\InputHelper.vb" />
+    <Compile Include="Classes\Helpers\ChildrenHelper2.vb" />
+    <Compile Include="Classes\Helpers\EmptyInputHelper.vb" />
+    <Compile Include="Classes\Helpers\ExportHelper.vb" />
+    <Compile Include="Classes\Helpers\InputHelper.vb" />
     <Compile Include="Classes\MathDocument.vb" />
     <Compile Include="Classes\MathElement.Input.vb" />
     <Compile Include="Classes\MathElement.Layout.vb" />
     <Compile Include="Classes\MathElement.XmlTree.vb" />
     <Compile Include="Classes\MathElement.Type.vb" />
-    <Compile Include="Classes\QualityControl.vb" />
-    <Compile Include="Classes\SelectionHelper2.Actions.vb" />
-    <Compile Include="Classes\SelectionHelper2.SubTypes.vb" />
-    <Compile Include="Classes\SelectionHelper2.vb" />
-    <Compile Include="Classes\SiblingEnumerator.vb" />
+    <Compile Include="Classes\Types\Length.vb" />
+    <Compile Include="Formatters\FormatterChildrenHelper.vb" />
+    <Compile Include="Formatters\FractionFormatter.vb" />
+    <Compile Include="Formatters\FractionFormatterExportHelper.vb" />
+    <Compile Include="QualityControl.vb" />
+    <Compile Include="Classes\Helpers\SelectionHelper2.Actions.vb" />
+    <Compile Include="Classes\Helpers\SelectionHelper2.SubTypes.vb" />
+    <Compile Include="Classes\Helpers\SelectionHelper2.vb" />
+    <Compile Include="Classes\Types\SiblingEnumerator.vb" />
     <Compile Include="Glyphs\GlyphChildrenHelper.vb" />
     <Compile Include="Glyphs\TestGlyph.vb" />
     <Compile Include="Glyphs\UnicodeGlyph.ExportHelper.vb" />
@@ -134,9 +138,11 @@
     <Compile Include="Parsers\Properties\FontFamilyParser.vb" />
     <Compile Include="Parsers\Properties\FontStyleParser.vb" />
     <Compile Include="Parsers\Properties\FontWeightParser.vb" />
+    <Compile Include="Parsers\Properties\LengthParser.vb" />
     <Compile Include="Parsers\Properties\PropertyParser.vb" />
     <Compile Include="TextEdit\IdentifierTextEdit.vb" />
     <Compile Include="TextEdit\NumberTextEdit.vb" />
+    <Compile Include="TextEdit\OperatorTextEdit.Dics.vb" />
     <Compile Include="TextEdit\OperatorTextEdit.vb" />
     <Compile Include="TextEdit\TextEdit.vb" />
     <Compile Include="TextEdit\TextEditChildrenHelper.vb" />
@@ -223,7 +229,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Properties\" />
-    <Folder Include="Formatters\" />
     <Folder Include="Parsers\Elements\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

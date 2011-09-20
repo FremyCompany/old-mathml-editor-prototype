@@ -10,7 +10,7 @@
         Next
     End Sub
 
-    Public Overrides Function Clone_Internal() As MathElement
+    Protected Overrides Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
         Return New RowLayoutEngine()
     End Function
 
