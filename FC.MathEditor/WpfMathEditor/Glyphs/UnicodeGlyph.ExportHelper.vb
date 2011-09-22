@@ -229,13 +229,13 @@
         End Sub
 
         Private Sub PrepareLayout_SymStretchy(AvailABH As Double, AvailBBH As Double)
-            FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimumABH, AvailBBH / MinimumBBH))
+            FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimalABH, AvailBBH / MinimalBBH))
             IsStretchy = True
             IsSymmetric = True
         End Sub
 
-        Private Sub PrepareLayout_AsymStretchy(AvailABH As Double, AvailBBH As Double)
-            FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimumABH, AvailBBH / MinimumBBH))
+        Private Sub PrepareLayout_AsymStretchy(ByVal AvailABH As Double, ByVal AvailBBH As Double)
+            FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimalABH, AvailBBH / MinimalBBH))
             'FontSizeRelative = Math.Max(1, (AvailABH + AvailBBH) / (MinimumABH + MinimumBBH))
             IsStretchy = True
             IsSymmetric = False

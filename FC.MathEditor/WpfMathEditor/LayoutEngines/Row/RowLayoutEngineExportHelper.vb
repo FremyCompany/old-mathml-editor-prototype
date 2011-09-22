@@ -41,6 +41,9 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
             Dim ScaleX As Double = G.Export.LocationInParent.Width / G.Export.Width
             Dim ScaleY As Double = G.Export.LocationInParent.Height / G.Export.Height
 
+            If Double.IsNaN(ScaleX) Then ScaleX = 1
+            If Double.IsNaN(ScaleY) Then ScaleY = 1
+
             If ScaleX <> 1 OrElse ScaleY <> 1 Then
                 DG.PushTransform(New ScaleTransform(
                     ScaleX,
@@ -106,6 +109,19 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
 
     End Sub
 
+    Protected Overrides Function ProposeMoreSpace_Internal(ByRef AvailWidth As Double) As Boolean
+        Dim HasChanged As Boolean = False
+
+        For Each El In This.Children
+            If El.Export.ProposeMoreSpace(AvailWidth) Then
+                LayoutCompletion = LayoutCompletionState.Prepared : HasChanged = True
+                If AvailWidth = 0 Then Return True
+            End If
+        Next
+
+        Return HasChanged
+    End Function
+
     Protected Overrides Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
         For Each Child In This.Children
             Child.Export.PrepareLayout(AvailABH, AvailBBH)
@@ -114,8 +130,8 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
 
     Protected Overrides Sub CalculateMinHeight_Internal()
         If This.Children.HasAny Then
-            MinABH = This.Children.Select(Function(x) x.Export.MinimumABH).Max()
-            MinBBH = This.Children.Select(Function(x) x.Export.MinimumBBH).Max()
+            MinABH = This.Children.Select(Function(x) x.Export.MinimalABH).Max()
+            MinBBH = This.Children.Select(Function(x) x.Export.MinimalBBH).Max()
         Else
             MinABH = InitialAboveBaseLineHeight
             MinBBH = InitialBelowBaseLineHeight

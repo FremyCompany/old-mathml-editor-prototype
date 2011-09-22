@@ -40,12 +40,12 @@
         End Sub
 
         Protected Overrides Sub Draw_Internal(DG As System.Windows.Media.DrawingContext)
-            DG.DrawRectangle(Brushes.Black, Nothing, New Rect(0, 0, 40, 40))
+            DG.DrawRectangle(Brushes.Black, Nothing, New Rect(0, 0, InternalWidth, 40))
         End Sub
 
         Protected Overrides Sub GenerateLayout_Internal()
 
-            W = 40
+            W = InternalWidth
             H = 40
             BH = MinBBH
             IM = New Thickness(0, 0, 0, 0)
@@ -62,12 +62,19 @@
         End Property
 
         Protected Overrides Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
-            '
+            InternalWidth = 40
         End Sub
 
         Public Overrides Sub AppendSimpleText(SB As System.Text.StringBuilder)
-            '
+            SB.Append("#")
         End Sub
+
+        Private InternalWidth As Double = 40
+        Protected Overrides Function ProposeMoreSpace_Internal(ByRef AvailWidth As Double) As Boolean
+            Me.InternalWidth += AvailWidth : AvailWidth = 0
+            Return True
+        End Function
+
     End Class
 
 End Class

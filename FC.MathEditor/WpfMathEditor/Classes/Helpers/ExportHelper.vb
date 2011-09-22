@@ -5,6 +5,12 @@
         Me.This = This
     End Sub
 
+    Public ReadOnly Property MinimalHeight As Double
+        Get
+            Return MinimalABH + MinimalBBH
+        End Get
+    End Property
+
     Public Function ToKeyboardInput() As String
         Dim SB As New System.Text.StringBuilder()
         AppendKeyboardInput(SB)
@@ -42,13 +48,13 @@
         Return SB.ToString()
     End Function
 
-    Public MustOverride Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendLaTeX(SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendMathML(SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendSimpleText(SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendKeyboardInput(ByVal SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendLaTeX(ByVal SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendMathML(ByVal SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendSimpleText(ByVal SB As System.Text.StringBuilder)
 
-    Protected MustOverride Sub Draw_Internal(DG As DrawingContext)
-    Public Sub Draw(DG As DrawingContext)
+    Protected MustOverride Sub Draw_Internal(ByVal DG As DrawingContext)
+    Public Sub Draw(ByVal DG As DrawingContext)
 
         ' Draw background
         If Background <> Colors.Transparent Then
@@ -152,7 +158,7 @@
         Get
             Return _LayoutCompletion
         End Get
-        Private Set(value As LayoutCompletionState)
+        Protected Set(ByVal value As LayoutCompletionState)
             _LayoutCompletion = value
         End Set
     End Property
@@ -176,7 +182,7 @@
     ''' <summary>
     ''' Returns the minimum size of this element (above base line). If this element is fenced, it may be higher (but not smaller) than this size at render time.
     ''' </summary>
-    Public ReadOnly Property MinimumABH As Double
+    Public ReadOnly Property MinimalABH As Double
         Get
             CalculateMinHeight()
             Return MinABH
@@ -190,7 +196,7 @@
     ''' <summary>
     ''' Returns the minimum size of this element (below base line). If this element is fenced, it may be higher (but not smaller) than this size at render time.
     ''' </summary>
-    Public ReadOnly Property MinimumBBH As Double
+    Public ReadOnly Property MinimalBBH As Double
         Get
             CalculateMinHeight()
             Return MinBBH
@@ -384,6 +390,7 @@
             Else
                 This.ParentElement.Export.PerformLayout()
                 Dim L = _LocationInParent : Dim Zw = _LocationInParent.Width / SizeRect.Width : Dim Zh = _LocationInParent.Height / SizeRect.Height
+                If Double.IsNaN(Zw) Then Zw = 1 : If Double.IsNaN(Zh) Then Zh = 1
                 Return New Rect(L.X - SM.Left * Zw, L.Y - SM.Top * Zh, L.Width + (SM.Left + SM.Right) * Zw, L.Height + (SM.Top + SM.Bottom) * Zh)
             End If
 

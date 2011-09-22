@@ -6,6 +6,10 @@
         If Numerator Is Nothing Then Numerator = New RowLayoutEngine()
         If Denominator Is Nothing Then Denominator = New RowLayoutEngine()
 
+        Children.Add(Numerator)
+        Children.Add(Denominator)
+        DirectCast(Children, FormatterChildrenHelper).Freeze()
+
     End Sub
 
     Public Property Numerator As RowLayoutEngine
@@ -39,15 +43,15 @@
     End Function
 
     Protected Overrides Function GetInitialChildrenHelper() As ChildrenHelper
-        Return New FormatterChildrenHelper()
+        Return New FormatterChildrenHelper(Me)
     End Function
 
     Protected Overrides Function GetInitialExportHelper() As ExportHelper
-        Return New FractionFormatterExportHelper()
+        Return New FractionFormatterExportHelper(Me)
     End Function
 
     Protected Overrides Function GetInitialInputHelper() As InputHelper
         ' TODO: Change that
-        Return New EmptyInputHelper()
+        Return New EmptyInputHelper(Me)
     End Function
 End Class
