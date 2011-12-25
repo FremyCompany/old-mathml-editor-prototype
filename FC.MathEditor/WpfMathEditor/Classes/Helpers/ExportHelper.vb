@@ -56,17 +56,34 @@
     Protected MustOverride Sub Draw_Internal(ByVal DG As DrawingContext)
     Public Sub Draw(ByVal DG As DrawingContext)
 
-        ' Draw background
-        If Background <> Colors.Transparent Then
-            DG.DrawRectangle(New SolidColorBrush(Background), Nothing, SizeRect)
-        End If
 
         ' Shift the drawing zone using the inner margin
         ' TODO : Initially, I saw 0*IM.Left here. Maybe is there a reason... but I can't remember!
-        DG.PushTransform(New TranslateTransform(0 * IM.Left, IM.Top))
+        DG.PushTransform(New TranslateTransform(IM.Left, IM.Top))
+
+        ' Align on physical pixels
+        If This.ElementType = MathElement.Type.Glyph Then
+            Dim DPIMatrix = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformToDevice
+            Dim trABH = AboveBaseLineHeight
+            Try : Console.WriteLine(DirectCast(This, UnicodeGlyph).DisplayChar & "; " & AboveBaseLineHeight & "; " & BelowBaseLineHeight)
+            Catch : End Try
+            Dim gl As New GuidelineSet(New Double() {0 * +0.5 / DPIMatrix.M11}, New Double() {trABH - IM.Top + 0 * 0.5 / DPIMatrix.M22})
+            DG.PushGuidelineSet(gl)
+        End If
+
+        ' Draw background
+        If Background <> Colors.Transparent Then
+            Dim bgRect = SizeRect : bgRect.Offset(-IM.Left, -IM.Right)
+            DG.DrawRectangle(New SolidColorBrush(Background), Nothing, bgRect)
+        End If
 
         ' Draw content
         Draw_Internal(DG)
+
+        ' Stop aligning on a pixel grid
+        If This.ElementType = MathElement.Type.Glyph Then
+            DG.Pop()
+        End If
 
         ' Unshift the drawing zone
         DG.Pop()

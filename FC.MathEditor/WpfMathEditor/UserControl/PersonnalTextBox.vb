@@ -11,6 +11,9 @@
 
     Protected Overrides Sub OnRender(drawingContext As System.Windows.Media.DrawingContext)
         drawingContext.DrawRectangle(Brushes.White, Nothing, New Rect(RenderSize))
+
+        drawingContext.PushTransform(New TranslateTransform(1, 0))
+
         For Each El In X.Selection
             drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 0, 148, 255)), Nothing, El.Export.SelectionRectInRoot)
         Next
@@ -23,6 +26,9 @@
             drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 0, 255, 0)), Nothing, X.Selection.NextSibling.Export.SelectionRectInRoot)
         End If
 
+        drawingContext.Pop()
+
+        RenderOptions.SetEdgeMode(Me, EdgeMode.Aliased)
         X.Export.Draw(drawingContext)
     End Sub
 
@@ -89,7 +95,14 @@
 
     Private Sub PersonnalTextBox_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
 
-        Dim CHL = New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}
+        'Dim CHL = New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}
+        Dim CHL As New List(Of MathElement)
+        For X As Double = 0 To 5 Step 0.25
+            Dim Xo = New UnicodeGlyph("x"c)
+            DirectCast(Xo.Export, UnicodeGlyph.UnicodeGlyphExportHelper).__DEBUG__AdditionnalABH = X
+            CHL.Add(Xo)
+        Next
+
         Dim EL = New IdentifierTextEdit(CHL)
 
         Dim Den = New RowLayoutEngine(New MathElement() {EL})

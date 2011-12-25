@@ -89,6 +89,7 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
             OMB = Math.Max(OMB, C.Export.OuterMargin.Bottom)
         Next
 
+        ' TODO : Removed to fix Fraction formatter blur problem
         ABH = Math.Ceiling(ABH)
         BBH = Math.Ceiling(BBH)
 

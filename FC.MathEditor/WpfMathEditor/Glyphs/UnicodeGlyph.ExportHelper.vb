@@ -82,6 +82,9 @@
 
         End Sub
 
+        '' DEBUG CODE
+        Public __DEBUG__AdditionnalABH As Double
+
         Protected Overrides Sub GenerateLayout_Internal()
             Dim S = FontSize * FontSizeRelative
 
@@ -112,14 +115,14 @@
             Dim BottomExtension = If(GlyphMargin.Bottom < 0, -GlyphMargin.Bottom, 0)
 
             W = GlyphAvWidth
-            H = GlyphHeight + TopExtension + BottomExtension
+            H = GlyphHeight + TopExtension + BottomExtension + __DEBUG__AdditionnalABH
             BH = GlyphFont.DistancesFromHorizontalBaselineToBlackBoxBottom(GlyphIndex) * S + BottomExtension + TopExtension
 
             ' Compute the position of the baseline
             If IsSymmetric Then
 
                 ' Inner margin (blackbox vs charbox)
-                IM = New Thickness(GlyphMargin.Left, 0, GlyphMargin.Right, 0)
+                IM = New Thickness(GlyphMargin.Left, __DEBUG__AdditionnalABH, GlyphMargin.Right, 0)
 
                 ' Outer margin (none by default)
                 OM = New Thickness(0)

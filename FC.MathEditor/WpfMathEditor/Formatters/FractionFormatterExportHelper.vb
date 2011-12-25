@@ -51,6 +51,7 @@
         For Each G In This.Children
 
             DG.PushTransform(New TranslateTransform(G.Export.LocationInParent.X, G.Export.LocationInParent.Y))
+            'DG.PushTransform(New TranslateTransform(Math.Round(G.Export.LocationInParent.X), Math.Round(G.Export.LocationInParent.Y)))
 
             Dim ScaleX As Double = G.Export.LocationInParent.Width / G.Export.Width
             Dim ScaleY As Double = G.Export.LocationInParent.Height / G.Export.Height
