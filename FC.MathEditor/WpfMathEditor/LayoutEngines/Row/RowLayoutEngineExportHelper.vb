@@ -139,7 +139,7 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
         End If
     End Sub
 
-    Public Overrides ReadOnly Property PreferInlineContent_Interal As Boolean
+    Public Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
         Get
             Return False
         End Get

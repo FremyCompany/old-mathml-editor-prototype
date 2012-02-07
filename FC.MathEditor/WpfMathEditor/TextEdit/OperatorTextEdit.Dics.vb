@@ -14,8 +14,9 @@
     }
 
     Public Shared ReadOnly OperatorDic_accent As New Dictionary(Of String, Boolean) From {
-        {"(", True},
-        {")", True}
+        {"´", True},
+        {"`", True},
+        {"̇", True}
     }
 
     Public Shared ReadOnly OperatorDic_largeop As New Dictionary(Of String, Boolean) From {

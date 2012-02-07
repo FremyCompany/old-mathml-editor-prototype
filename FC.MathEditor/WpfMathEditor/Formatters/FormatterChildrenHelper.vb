@@ -48,7 +48,7 @@ Public Class FormatterChildrenHelper : Inherits ChildrenHelper
 
     Protected Overrides Sub ValidateNewElement_Internal(ByVal NewElement As MathElement)
         MyBase.ValidateNewElement_Internal(NewElement)
-        If Not (TypeOf NewElement Is RowLayoutEngine) Then Throw New ArgumentException("Une fraction ne peut avoir que des RowLayoutEngine pour enfant.")
+        If Not (TypeOf NewElement Is RowLayoutEngine) Then Throw New ArgumentException("Un élément au design fixé (" & Me.GetType().Name & ") ne peut avoir que des RowLayoutEngine pour enfant.")
     End Sub
 
     Public Overrides ReadOnly Property CanSwap As Boolean

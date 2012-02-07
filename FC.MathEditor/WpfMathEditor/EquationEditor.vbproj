@@ -113,9 +113,12 @@
     <Compile Include="Classes\MathElement.XmlTree.vb" />
     <Compile Include="Classes\MathElement.Type.vb" />
     <Compile Include="Classes\Types\Length.vb" />
+    <Compile Include="Classes\UserCallableAttribute.vb" />
     <Compile Include="Formatters\FormatterChildrenHelper.vb" />
-    <Compile Include="Formatters\FractionFormatter.vb" />
-    <Compile Include="Formatters\FractionFormatterExportHelper.vb" />
+    <Compile Include="Formatters\Fraction\FractionFormatter.vb" />
+    <Compile Include="Formatters\Fraction\FractionFormatterExportHelper.vb" />
+    <Compile Include="Formatters\Root\RootFormatter.vb" />
+    <Compile Include="Formatters\Root\RootFormatterExportHelper.vb" />
     <Compile Include="QualityControl.vb" />
     <Compile Include="Classes\Helpers\SelectionHelper2.Actions.vb" />
     <Compile Include="Classes\Helpers\SelectionHelper2.SubTypes.vb" />

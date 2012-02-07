@@ -10,6 +10,7 @@
     '++
     '++ Default Fonts
     '++
+    Public Shared ReadOnly DefaultLineHeight As Double = 1
     Public Shared ReadOnly DefaultFontSize As Double = 12 * 96 / 72
     Public Shared ReadOnly DefaultFonts As New Dictionary(Of FontTypes, List(Of FontFamily)) From {
         {

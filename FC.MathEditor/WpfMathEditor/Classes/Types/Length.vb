@@ -4,6 +4,12 @@
     Public Unit As LengthUnit
     Public Context As MathElement
 
+    ''' <summary>
+    ''' Convert an unit to pixel
+    ''' </summary>
+    ''' <param name="RelativeUnit">The value to return if '100%' is converted</param>
+    ''' <param name="FontUnit">The value to return if '1em' is converted</param>
+
     Public Function ToPixels(Optional RelativeUnit As Double = 1, Optional FontUnit As Double = Double.NaN) As Double
         Select Case Unit
 

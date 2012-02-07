@@ -30,50 +30,54 @@
         SB.Append(")")
     End Sub
 
+    ''' <summary>
+    ''' Tickness of the whitespace at the bottom/top of the fraction line (in pixels)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private ReadOnly Property SepGap As Double
+        Get
+            ' Todo: Return This.SepGap
+            Return 1 * LineHeight
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Tickness of the fraction line (in pixels)
+    ''' </summary>
     Private ReadOnly Property SepHeight As Double
         Get
             ' TODO: Return This.SepLine + 3
-            Return 1
+            Return 1 * LineHeight
         End Get
     End Property
 
     Protected Overrides Sub CalculateMinHeight_Internal()
 
-        ' NOTE: Baseline aligned at the fraction line
-        MinABH = This.Numerator.Export.MinimalHeight + 1 + SepHeight / 2
-        MinBBH = SepHeight / 2 + 1 + This.Denominator.Export.MinimalHeight
+        ' NOTE: Baseline aligned at the middle of the fraction line
+
+        MinABH = (
+            This.Numerator.Export.MinimalHeight + _
+            SepGap +
+            SepHeight / 2
+        )
+
+        MinBBH = (
+            SepHeight / 2 +
+            SepGap +
+            This.Denominator.Export.MinimalHeight
+        )
 
     End Sub
 
     Protected Overrides Sub Draw_Internal(DG As System.Windows.Media.DrawingContext)
 
         PerformLayout()
-        For Each G In This.Children
 
-            DG.PushTransform(New TranslateTransform(G.Export.LocationInParent.X, G.Export.LocationInParent.Y))
-            'DG.PushTransform(New TranslateTransform(Math.Round(G.Export.LocationInParent.X), Math.Round(G.Export.LocationInParent.Y)))
+        DG.DrawLine(New Pen(New SolidColorBrush(Foreground), LineHeight), New Point(0, AboveBaseLineHeight), New Point(W, AboveBaseLineHeight))
 
-            Dim ScaleX As Double = G.Export.LocationInParent.Width / G.Export.Width
-            Dim ScaleY As Double = G.Export.LocationInParent.Height / G.Export.Height
-
-            If Double.IsNaN(ScaleX) Then ScaleX = 1
-            If Double.IsNaN(ScaleY) Then ScaleY = 1
-
-            If ScaleX <> 1 OrElse ScaleY <> 1 Then
-                DG.PushTransform(New ScaleTransform(
-                    ScaleX,
-                    ScaleY
-                ))
-                G.Export.Draw(DG)
-                DG.Pop()
-            Else
-                G.Export.Draw(DG)
-            End If
-
-            DG.Pop()
-        Next
-
-        ' TODO : Draw line
+        DrawChildren(DG)
 
     End Sub
 
@@ -114,7 +118,7 @@
 
     End Sub
 
-    Public Overrides ReadOnly Property PreferInlineContent_Interal As Boolean
+    Public Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
         Get
             Return True
         End Get

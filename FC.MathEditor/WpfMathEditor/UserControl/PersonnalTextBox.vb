@@ -12,8 +12,9 @@
     Protected Overrides Sub OnRender(drawingContext As System.Windows.Media.DrawingContext)
         drawingContext.DrawRectangle(Brushes.White, Nothing, New Rect(RenderSize))
 
-        drawingContext.PushTransform(New TranslateTransform(1, 0))
+        drawingContext.PushTransform(New TranslateTransform(3, 3))
 
+        ' TODO: Draw containing bound selection instead (+1px outer margin)
         For Each El In X.Selection
             drawingContext.DrawRectangle(New SolidColorBrush(Color.FromArgb(50, 0, 148, 255)), Nothing, El.Export.SelectionRectInRoot)
         Next
@@ -28,8 +29,11 @@
 
         drawingContext.Pop()
 
-        RenderOptions.SetEdgeMode(Me, EdgeMode.Aliased)
+        'To test blur issues
+        'RenderOptions.SetEdgeMode(Me, EdgeMode.Aliased)
+        drawingContext.PushTransform(New TranslateTransform(3, 3))
         X.Export.Draw(drawingContext)
+        drawingContext.Pop()
     End Sub
 
     Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
@@ -96,19 +100,41 @@
     Private Sub PersonnalTextBox_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
 
         'Dim CHL = New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}
-        Dim CHL As New List(Of MathElement)
-        For X As Double = 0 To 5 Step 0.25
-            Dim Xo = New UnicodeGlyph("x"c)
-            DirectCast(Xo.Export, UnicodeGlyph.UnicodeGlyphExportHelper).__DEBUG__AdditionnalABH = X
-            CHL.Add(Xo)
-        Next
 
-        Dim EL = New IdentifierTextEdit(CHL)
+        'Dim CHL As New List(Of MathElement)
+        'For X As Double = 0 To 5 Step 0.25
+        '    Dim Xo = New UnicodeGlyph("x"c)
+        '    DirectCast(Xo.Export, UnicodeGlyph.UnicodeGlyphExportHelper).__DEBUG__AdditionnalABH = X
+        '    CHL.Add(Xo)
+        'Next
 
-        Dim Den = New RowLayoutEngine(New MathElement() {EL})
-        Dim Num As New RowLayoutEngine(New MathElement() {New TestGlyph()})
+        'Dim EL = New IdentifierTextEdit(CHL)
 
-        X.AddChild(New FractionFormatter(Num, Den))
+        'Dim Den = New RowLayoutEngine(New MathElement() {EL})
+        'Dim Num As New RowLayoutEngine(New MathElement() {New TestGlyph()})
+
+        'X.AddChild(New FractionFormatter(Num, Den))
+        Try
+            X.AddChild(
+                New RootFormatter(
+                    New RowLayoutEngine(
+                        New MathElement() {
+                            New UnicodeGlyph(AscW("x"))
+                        }
+                    ),
+                    New RowLayoutEngine(
+                        New MathElement() {
+                            New UnicodeGlyph(Asc("3"))
+                        }
+                    )
+                )
+            )
+        Catch ex As Exception
+
+            Console.WriteLine(ex.ToString())
+
+        End Try
+
         Me.InvalidateVisual()
 
         Me.Focus() : Keyboard.Focus(Me)

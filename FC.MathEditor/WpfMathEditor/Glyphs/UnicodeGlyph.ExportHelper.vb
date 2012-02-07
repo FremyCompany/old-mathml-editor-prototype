@@ -219,7 +219,7 @@
 
         End Sub
 
-        Public Overrides ReadOnly Property PreferInlineContent_Interal As Boolean
+        Public Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
             Get
                 Return False
             End Get
@@ -232,14 +232,32 @@
         End Sub
 
         Private Sub PrepareLayout_SymStretchy(AvailABH As Double, AvailBBH As Double)
-            FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimalABH, AvailBBH / MinimalBBH))
+
+            ' (1/1+1/2) will look like that :
+
+            '   (            )
+            '  (       1      )
+            ' (================)
+            '  (    1 +  1    )
+            '   (        2   )
+
+            FontSizeRelative = Math.Max(1, Math.Max(AvailABH / MinimalABH, AvailBBH / MinimalBBH))
             IsStretchy = True
             IsSymmetric = True
+
         End Sub
 
         Private Sub PrepareLayout_AsymStretchy(ByVal AvailABH As Double, ByVal AvailBBH As Double)
+
+
+            ' (1/1+1/2) will look like that :
+
+            '  (       1      )
+            ' (================)
+            ' (     1 +  1     )
+            '  (         2    )
+
             FontSizeRelative = Math.Max(1, Math.Min(AvailABH / MinimalABH, AvailBBH / MinimalBBH))
-            'FontSizeRelative = Math.Max(1, (AvailABH + AvailBBH) / (MinimumABH + MinimumBBH))
             IsStretchy = True
             IsSymmetric = False
         End Sub

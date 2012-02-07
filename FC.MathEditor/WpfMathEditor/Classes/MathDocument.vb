@@ -4,7 +4,7 @@
         MyBase.New() : Sel = New SelectionHelper(Me)
     End Sub
 
-    Public Property LayoutOptions As LayoutOptions = MathEditor.LayoutOptions.InlineBlock
+    Public Property LayoutStyle As LayoutModes = MathEditor.LayoutModes.Block
 
     Protected Overrides Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
         Return New MathDocument()

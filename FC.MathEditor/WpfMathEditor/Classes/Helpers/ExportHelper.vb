@@ -90,13 +90,50 @@
 
     End Sub
 
+    ''' <summary>
+    ''' Draw all children on their specified location
+    ''' </summary>
+    ''' <param name="DG">The surface to draw on</param>
+    Protected Sub DrawChildren(DG As DrawingContext)
+        For Each G In This.Children
 
+            DG.PushTransform(New TranslateTransform(G.Export.LocationInParent.X, G.Export.LocationInParent.Y))
+            'DG.PushTransform(New TranslateTransform(Math.Round(G.Export.LocationInParent.X), Math.Round(G.Export.LocationInParent.Y)))
+
+            Dim ScaleX As Double = G.Export.LocationInParent.Width / G.Export.Width
+            Dim ScaleY As Double = G.Export.LocationInParent.Height / G.Export.Height
+
+            If Double.IsNaN(ScaleX) Then ScaleX = 1
+            If Double.IsNaN(ScaleY) Then ScaleY = 1
+
+            If ScaleX <> 1 OrElse ScaleY <> 1 Then
+                DG.PushTransform(New ScaleTransform(
+                    ScaleX,
+                    ScaleY
+                ))
+                G.Export.Draw(DG)
+                DG.Pop()
+            Else
+                G.Export.Draw(DG)
+            End If
+
+            DG.Pop()
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Returns a value indicating whether layout state is "Completed".
+    ''' </summary>
     Protected Overridable ReadOnly Property IsLayoutToDate As Boolean
         Get
             Return LayoutCompletion = LayoutCompletionState.Completed
         End Get
     End Property
 
+    ''' <summary>
+    ''' Reset layout state to None in order to trigger relayout on next use.
+    ''' </summary>
+    ''' <param name="ForwardToParent">If True, indicates that the parent element should be reset, too.</param>
     Public Sub InvalidateLayout(Optional ByVal ForwardToParent As Boolean = False)
 
         ' Notify the layout should be recomputed
@@ -115,25 +152,39 @@
 
     End Sub
 
-    Public ReadOnly Property LayoutOptions As LayoutOptions
+    ''' <summary>
+    ''' Specify whether the element should be rendered using its Block or Inline style
+    ''' </summary>
+    Public ReadOnly Property LayoutStyle As LayoutModes
         Get
-            If This.ParentDocument Is Nothing Then Return MathEditor.LayoutOptions.Block
-            Return This.ParentDocument.LayoutOptions
+            If This.ParentElement Is Nothing Then
+
+                ' By default, an element should use its prefered layout style
+                Return MathEditor.LayoutModes.Block
+
+            Else
+
+                ' Unless there's a restriction inherited from parent
+                Return This.ParentElement.Export.LayoutStyleOfChildren
+
+            End If
         End Get
     End Property
 
-    Public MustOverride ReadOnly Property PreferInlineContent_Interal As Boolean
+    Public MustOverride ReadOnly Property PreferInlineContent_Internal As Boolean
     Public ReadOnly Property PreferInlineContent As Boolean
         Get
-            Return PreferInlineContent_Interal OrElse (This.ParentElement IsNot Nothing AndAlso This.ParentElement.Export.PreferInlineContent)
+            Return PreferInlineContent_Internal ' OrElse (This.ParentElement IsNot Nothing AndAlso This.ParentElement.Export.PreferInlineContent)
         End Get
     End Property
 
-    Public ReadOnly Property CurrentLayoutStyle As LayoutOptions
+    Public ReadOnly Property LayoutStyleOfChildren As LayoutModes
         Get
-            If LayoutOptions <> MathEditor.LayoutOptions.InlineBlock Then Return LayoutOptions
-            If This.ParentElement IsNot Nothing Then Return If(This.ParentElement.Export.PreferInlineContent, MathEditor.LayoutOptions.InlineBlock, MathEditor.LayoutOptions.Block)
-            Return MathEditor.LayoutOptions.Block
+
+            ' Either return current layout style or inline if preferred
+            If Me.PreferInlineContent Then Return LayoutModes.Inline _
+            Else Return Me.LayoutStyle
+
         End Get
     End Property
 
@@ -342,6 +393,9 @@
         End Set
     End Property
 
+    ''' <summary>
+    ''' Returns the font size (in pixels) that should be used for the rendering
+    ''' </summary>
     Public Property FontSize As Double
         Get
             Return This.FontSize
@@ -349,6 +403,16 @@
         Set(value As Double)
             This.FontSize = value
         End Set
+    End Property
+
+    ''' <summary>
+    ''' Returns the line' tickness (in pixels) that should be used for the rendering (based on font size)
+    ''' </summary>
+    ''' <remarks>Should return a value of MathElement.DefaultLineHeight (1px?) at the default font size (MathElement.DefaultFontSize)</remarks>
+    Public ReadOnly Property LineHeight As Double
+        Get
+            Return MathElement.DefaultLineHeight * (FontSize / MathElement.DefaultFontSize)
+        End Get
     End Property
 
     Public Property Foreground As Color
@@ -495,17 +559,22 @@ Completed:      ' Do nothing
 
 End Class
 
-Public Enum LayoutOptions
+Public Enum LayoutModes
 
+    ''' <summary>The element supports no display mode</summary>
     None = 0
 
-    Inline = 2 ^ 0          ' Force inline if not specified otherwhise
-    InlineBlock = 2 ^ 1     ' Use inline if it's more harmonious
-    Block = 2 ^ 2           ' Use block if not specified otherwhise
+    ''' <summary>The element supports the Inline display mode</summary>
+    Inline = 2 ^ 0
 
-    IBMode = Inline Or InlineBlock Or Block
+    ''' <summary>The element supports the Block display mode</summary>
+    Block = 2 ^ 1
 
-    PreferInlineInside = 2 ^ 10 ' In the context of an InlineBlock element, specify to use the Inline style.
+    ''' <summary>The element supports both display modes</summary>
+    InlineOrBlock = Inline Or Block
+
+    ''' <summary>Mask that can be used</summary>
+    MODE_MASK = Inline Or Block
 
 End Enum
 

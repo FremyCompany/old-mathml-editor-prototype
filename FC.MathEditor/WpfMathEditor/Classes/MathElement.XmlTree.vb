@@ -212,7 +212,7 @@ Partial Public MustInherit Class MathElement
         Return Clone
 
     End Function
-    Protected MustOverride Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
+    Protected MustOverride Function Clone_Internal(ByRef ShouldStillCloneChildren As Boolean) As MathElement
 
     '++
     '++ XML Children

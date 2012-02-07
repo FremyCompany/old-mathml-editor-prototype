@@ -55,7 +55,7 @@
     '++ Methods
     '++
 
-    Public Overrides Function Clone_Internal(Optional CloneChildren As Boolean = True) As MathElement
+    Public Overrides Function Clone_Internal(Optional ShouldStillCloneChildren As Boolean = True) As MathElement
         Return New FencedLayoutEngine(OpenAttribute, CloseAttribute, SeparatorsAttribute)
     End Function
 
