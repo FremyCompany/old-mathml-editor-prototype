@@ -40,8 +40,8 @@
     Shared StartBlockChars As String = "├([{"
     Shared EndBlockChars As String = "┤)]}"
 
-    Shared InputReplaceSource As Integer() = {&H2D}
-    Shared InputReplaceDestination As Integer() = {&H2212}
+    Shared InputReplaceSource As Integer() = {} '{&H2D}
+    Shared InputReplaceDestination As Integer() = {} '{&H2212}
 
     Public Sub ProcessChar(InputChar As Integer)
 

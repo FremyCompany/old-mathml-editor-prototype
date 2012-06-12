@@ -28,14 +28,25 @@
         ' Guess the correct text edit from the context
         If Char.IsLetter(Char.ConvertFromUtf32(InputChar)) Then
             TextEdit = New IdentifierTextEdit()
+
         ElseIf _
         ( _
             (Char.IsDigit(Char.ConvertFromUtf32(InputChar))) OrElse
             ((InputChar = Asc("-") OrElse InputChar = Asc("+")) AndAlso (This IsNot Nothing) AndAlso (This.Selection IsNot Nothing) AndAlso TryCast(This.Selection.PreviousSibling, OperatorTextEdit) IsNot Nothing AndAlso DirectCast(This.Selection.PreviousSibling, OperatorTextEdit).IsOperator) _
         ) Then
             TextEdit = New NumberTextEdit()
+
         Else
+
+            ' Transform some "-" in mathematical minus
+            If InputChar = &H2D Then InputChar = &H2212
+
+            ' Transform "*" in middle dot
+            If InputChar = &H2A Then InputChar = &HB7
+
+            ' Create operator box
             TextEdit = New OperatorTextEdit()
+
         End If
 
         ' Append the newly created char to the textedit

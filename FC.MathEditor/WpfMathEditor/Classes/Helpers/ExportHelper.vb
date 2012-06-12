@@ -67,7 +67,7 @@
             Dim trABH = AboveBaseLineHeight
             Try : Console.WriteLine(DirectCast(This, UnicodeGlyph).DisplayChar & "; " & AboveBaseLineHeight & "; " & BelowBaseLineHeight)
             Catch : End Try
-            Dim gl As New GuidelineSet(New Double() {0 * +0.5 / DPIMatrix.M11}, New Double() {trABH - IM.Top + 0 * 0.5 / DPIMatrix.M22})
+            Dim gl As New GuidelineSet(New Double() {-0.5 / DPIMatrix.M11}, New Double() {trABH - IM.Top + 0 * 0.5 / DPIMatrix.M22})
             DG.PushGuidelineSet(gl)
         End If
 
@@ -171,7 +171,7 @@
         End Get
     End Property
 
-    Public MustOverride ReadOnly Property PreferInlineContent_Internal As Boolean
+    Protected MustOverride ReadOnly Property PreferInlineContent_Internal As Boolean
     Public ReadOnly Property PreferInlineContent As Boolean
         Get
             Return PreferInlineContent_Internal ' OrElse (This.ParentElement IsNot Nothing AndAlso This.ParentElement.Export.PreferInlineContent)

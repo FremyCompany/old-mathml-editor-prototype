@@ -11,15 +11,24 @@
     End Property
 
     Public Overrides Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
-        ' TODO
+        SB.Append("("c)
+        This.Numerator.Export.AppendKeyboardInput(SB)
+        SB.Append(")/(")
+        This.Denominator.Export.AppendKeyboardInput(SB)
+        SB.Append(")"c)
     End Sub
 
     Public Overrides Sub AppendLaTeX(SB As System.Text.StringBuilder)
-        ' TODO
+        SB.Append("\frac")
+        This.Numerator.Export.AppendLaTeX(SB)
+        This.Denominator.Export.AppendLaTeX(SB)
     End Sub
 
     Public Overrides Sub AppendMathML(SB As System.Text.StringBuilder)
-        ' TODO
+        SB.Append("<mfrac>")
+        This.Numerator.Export.AppendMathML(SB)
+        This.Denominator.Export.AppendMathML(SB)
+        SB.Append("</mfrac>")
     End Sub
 
     Public Overrides Sub AppendSimpleText(SB As System.Text.StringBuilder)
@@ -27,7 +36,7 @@
         This.Numerator.Export.AppendSimpleText(SB)
         SB.Append(")/(")
         This.Denominator.Export.AppendSimpleText(SB)
-        SB.Append(")")
+        SB.Append(")"c)
     End Sub
 
     ''' <summary>
@@ -118,7 +127,7 @@
 
     End Sub
 
-    Public Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
+    Protected Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
         Get
             Return True
         End Get

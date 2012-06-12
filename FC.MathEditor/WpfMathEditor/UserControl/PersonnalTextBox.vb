@@ -12,6 +12,12 @@
     Protected Overrides Sub OnRender(drawingContext As System.Windows.Media.DrawingContext)
         drawingContext.DrawRectangle(Brushes.White, Nothing, New Rect(RenderSize))
 
+        Dim INTS(CInt(Math.Ceiling(RenderSize.Width))) As Double
+        For i As Integer = 0 To INTS.Length - 1
+            INTS(i) = CDbl(i)
+        Next
+        drawingContext.PushGuidelineSet(New GuidelineSet(INTS, INTS))
+
         drawingContext.PushTransform(New TranslateTransform(3, 3))
 
         ' TODO: Draw containing bound selection instead (+1px outer margin)
@@ -34,6 +40,8 @@
         drawingContext.PushTransform(New TranslateTransform(3, 3))
         X.Export.Draw(drawingContext)
         drawingContext.Pop()
+
+        drawingContext.Pop() ' end guidelineset
     End Sub
 
     Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
@@ -143,6 +151,23 @@
 
     Private Sub PersonnalTextBox_MouseDown(sender As Object, e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseDown
         Me.Focus() : Keyboard.Focus(Me)
+
+        ' Test for the hit-targeting export helper
+        Dim HitResult = X.GetElementFromRelativePoint(e.GetPosition(Me) - New Vector(3, 3))
+
+        MsgBox(
+            "Before: " &
+            If(HitResult.PreviousSibling Is Nothing,
+               "Nothing",
+               HitResult.PreviousSibling.ToString()
+            ) & vbCrLf &
+            "After: " &
+            If(HitResult.NextSibling Is Nothing,
+               "Nothing",
+               HitResult.NextSibling.ToString()
+            )
+        )
+
     End Sub
 
     Private Sub PersonnalTextBox_TextInput(sender As Object, e As System.Windows.Input.TextCompositionEventArgs) Handles Me.TextInput

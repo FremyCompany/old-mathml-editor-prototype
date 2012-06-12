@@ -55,7 +55,7 @@
 
         End Sub
 
-        Public Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
+        Protected Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
             Get
                 Return True
             End Get

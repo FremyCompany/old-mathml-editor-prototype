@@ -104,12 +104,12 @@
             Else
 
                 SB.Append("["c)
-                This.Exponent.Export.AppendKeyboardInput(SB)
+                This.Exponent.Export.AppendSimpleText(SB)
                 SB.Append("]√(")
 
             End If
 
-            This.Content.Export.AppendKeyboardInput(SB)
+            This.Content.Export.AppendSimpleText(SB)
             SB.Append(")"c)
 
         Else
@@ -117,7 +117,7 @@
             ' Appends a simple square root
             SB.Append("√"c)
             SB.Append("("c)
-            This.Content.Export.AppendKeyboardInput(SB)
+            This.Content.Export.AppendSimpleText(SB)
             SB.Append(")"c)
 
         End If
@@ -281,7 +281,7 @@
     ' TODO: Some classes (Fraction...) don't use LineHeight as base unit for now. Should be fixed
     '
 
-    Public Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
+    Protected Overrides ReadOnly Property PreferInlineContent_Internal As Boolean
         Get
             Return False
         End Get

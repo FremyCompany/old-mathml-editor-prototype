@@ -4,6 +4,58 @@
         Return Export.ToString()
     End Function
 
+    Public Overridable Function GetElementFromRelativePoint(ByVal Location As Point) As SelectionHelper.SelectionPoint
+
+        '
+        ' Initialize variables for algorithm
+        '
+        Dim BestElement As MathElement = Nothing
+        Dim BestIsIncluded As Boolean = False
+        Dim BestHDistance As Double = Double.MaxValue
+        Dim BestVDistance As Double = Double.MaxValue
+
+        '
+        ' Loop through every elements for best match
+        '
+        For Each Element In Children
+
+            ' Gather information
+            Dim CurrentIsIncluded As Boolean = Element.Export.LocationInParent.Contains(Location)
+            Dim CurrentHDistance As Double = Math.Abs(Location.X - (Element.Export.LocationInParent.Left + Element.Export.LocationInParent.Right) / 2)
+            Dim CurrentVDistance As Double = Math.Abs(Location.Y - (Element.Export.LocationInParent.Top + Element.Export.LocationInParent.Bottom) / 2)
+
+            ' Check IsIncluded
+            If Not BestIsIncluded And CurrentIsIncluded Then GoTo NewBestFound
+            If BestIsIncluded And Not CurrentIsIncluded Then Continue For
+
+            ' Check horizontal distance
+            If CurrentHDistance < BestHDistance Then GoTo NewBestFound
+            If CurrentHDistance > BestHDistance Then Continue For
+
+            ' Check vertical distance
+            If CurrentVDistance > BestVDistance Then Continue For
+
+NewBestFound:
+            ' Replace best element by current element
+            BestElement = Element
+            BestIsIncluded = CurrentIsIncluded
+            BestHDistance = CurrentHDistance
+            BestVDistance = CurrentVDistance
+
+        Next
+
+        '
+        ' Create selection point from element
+        '
+        Dim TrueHDistance As Double = Location.X - (BestElement.Export.LocationInParent.Left + BestElement.Export.LocationInParent.Right) / 2
+        If TrueHDistance >= 0 Then
+            Return BestElement.GetSelectionAfter()
+        Else
+            Return BestElement.GetSelectionBefore()
+        End If
+
+    End Function
+
     Public Event SizeChanged As EventHandler
     Public Event VisualChanged As EventHandler
 
