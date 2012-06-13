@@ -10,7 +10,7 @@
         Return New MathDocument()
     End Function
 
-    Private Sel As SelectionHelper
+    Private WithEvents Sel As SelectionHelper
     Public Overloads ReadOnly Property Selection As SelectionHelper
         Get
             Return Sel
@@ -23,5 +23,14 @@
         End Get
     End Property
 
+    Public Event SelectionChanged As EventHandler
+    Public Event SelectionChanging As EventHandler(Of SelectionHelper.SelectionChangedEventArgs)
 
+    Private Sub Sel_Changed(sender As Object, e As System.EventArgs) Handles Sel.Changed
+        RaiseEvent SelectionChanged(Me, e)
+    End Sub
+
+    Private Sub Sel_Changing(sender As Object, e As SelectionHelper.SelectionChangedEventArgs) Handles Sel.Changing
+        RaiseEvent SelectionChanging(Me, e)
+    End Sub
 End Class

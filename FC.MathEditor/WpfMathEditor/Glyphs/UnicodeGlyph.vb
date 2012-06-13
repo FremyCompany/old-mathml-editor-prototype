@@ -32,6 +32,11 @@
             Return Char.ConvertFromUtf32(C)
         End Get
     End Property
+    Public ReadOnly Property DisplayCharCode() As Integer
+        Get
+            Return C
+        End Get
+    End Property
 
     Protected Overrides Function Clone_Internal(ByRef ShouldCloneChildren As Boolean) As MathElement
         Return New UnicodeGlyph(C)

@@ -10,7 +10,7 @@
         Return New TextEditExportHelper(Me)
     End Function
 
-    Public MustOverride Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
+    Public MustOverride Function IsCharAccepted(C As Integer, Position As Integer) As Boolean
     Protected Overrides Function GetInitialInputHelper() As InputHelper
         Return New TextEditInputHelper(Me)
     End Function

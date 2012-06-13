@@ -198,8 +198,8 @@
         End Get
     End Property
 
-    Public Overrides Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
-        Return IsFirst
+    Public Overrides Function IsCharAccepted(C As Integer, Position As Integer) As Boolean
+        Return (Position = 0)
     End Function
 
     Public Overrides ReadOnly Property EatInputByDefault As Boolean

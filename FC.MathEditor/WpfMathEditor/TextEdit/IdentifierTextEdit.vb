@@ -36,8 +36,9 @@
         End Get
     End Property
 
-    Public Overrides Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
-        Return Char.IsLetter(Char.ConvertFromUtf32(C)) OrElse (Not IsFirst AndAlso C = Asc("_"))
+    Public Overrides Function IsCharAccepted(C As Integer, Position As Integer) As Boolean
+        Dim IsFirst = (Position = 0)
+        Return Char.IsLetter(Char.ConvertFromUtf32(C)) 'OrElse (Not IsFirst AndAlso C = Asc("_"))
     End Function
 
     ''' <summary>
