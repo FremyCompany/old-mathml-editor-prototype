@@ -33,7 +33,7 @@
     ''' <summary>
     ''' Called when the selection end or start point is being invalidated
     ''' </summary>
-    Private Sub SP_Invalidated(ByVal sender As Object, ByVal e As System.EventArgs) Handles SEP.Invalidated, SSP.Invalidated
+    Private Sub SP_Invalidated(sender As Object, e As System.EventArgs) Handles SEP.Invalidated, SSP.Invalidated
         SetSelection(SSP.FirstValidParent, SEP.FirstValidParent)
     End Sub
 

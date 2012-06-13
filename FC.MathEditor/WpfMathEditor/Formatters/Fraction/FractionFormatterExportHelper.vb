@@ -133,7 +133,7 @@
         End Get
     End Property
 
-    Protected Overrides Sub PrepareLayout_Internal(ByVal AvailABH As Double, ByVal AvailBBH As Double)
+    Protected Overrides Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
         ' Do nothing. We will never use height stretching.
     End Sub
 End Class

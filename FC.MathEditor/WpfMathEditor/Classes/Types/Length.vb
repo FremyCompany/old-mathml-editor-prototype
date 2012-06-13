@@ -64,7 +64,7 @@
         End Select
     End Function
 
-    Public Function ToRoundPixels(Optional ByVal RelativeUnit As Double = 1) As Integer
+    Public Function ToRoundPixels(Optional RelativeUnit As Double = 1) As Integer
         Return Math.Round(ToPixels(RelativeUnit))
     End Function
 

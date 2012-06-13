@@ -263,7 +263,23 @@ Partial Public MustInherit Class MathElement
         Return GetCommonAncestrorBetween(el1, Me)
     End Function
 
+    ''' <summary>
+    ''' Returns the first element that's an ancestror of both el1 and el2 (bubbling).
+    ''' </summary>
+    ''' <param name="el1">The first element.</param>
+    ''' <param name="el2">The second element.</param>
     Public Shared Function GetCommonAncestrorBetween(el1 As MathElement, el2 As MathElement) As MathElement
+
+        '
+        ' Check that the two elements belong to the same tree
+        '
+        If el1 Is Nothing Then Throw New ArgumentNullException("el1")
+        If el1 Is Nothing Then Throw New ArgumentNullException("el2")
+        If el1.Root IsNot el2.Root Then Throw New ArgumentException("It is impossible to find a common ancestror between el1 <" & el1.ToString() & "> and el2 <" & el2.ToString() & "> because they don't belong to the same tree.")
+
+        '
+        ' Find common ancestror
+        '
 
         Dim Delta As Integer = el2.TreeDepht - el1.TreeDepht
         If Delta > 0 Then
@@ -384,7 +400,7 @@ Partial Public MustInherit Class MathElement
 
     End Function
 
-    Public Sub SetProperty(AttributeName As String, Parser As PropertyParser, ByVal value As Object)
+    Public Sub SetProperty(AttributeName As String, Parser As PropertyParser, value As Object)
 
         Dim Result As Object = Nothing
         SetAttribute(AttributeName, Parser.Serialize(value, Me))

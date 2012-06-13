@@ -32,15 +32,17 @@
         Return New SelectionHelper.SelectionPoint(Me, Me.Children.Count)
     End Function
 
-    Public Function GetSelectionAt(ByVal Index As Integer) As SelectionHelper.SelectionPoint
+    Public Function GetSelectionAt(Index As Integer) As SelectionHelper.SelectionPoint
         Return New SelectionHelper.SelectionPoint(Me, Index)
     End Function
 
     Public Function GetSelectionAfter() As SelectionHelper.SelectionPoint
+        If ParentElement Is Nothing Then Return GetSelectionAtEnd()
         Return New SelectionHelper.SelectionPoint(ParentElement, Me.ChildIndex + 1)
     End Function
 
     Public Function GetSelectionBefore() As SelectionHelper.SelectionPoint
+        If ParentElement Is Nothing Then Return GetSelectionAtOrigin()
         Return New SelectionHelper.SelectionPoint(ParentElement, Me.ChildIndex)
     End Function
 

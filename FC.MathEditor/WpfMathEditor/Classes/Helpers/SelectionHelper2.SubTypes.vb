@@ -65,7 +65,7 @@
         Private WithEvents _Parent As SelectionPoint
         Private Valid As Boolean = True
 
-        Protected Sub ValidateIndex(ByVal ChildIndex As Integer)
+        Protected Sub ValidateIndex(ChildIndex As Integer)
             If ChildIndex < 0 Then Throw New ArgumentException("ChildIndex can't be negative. It should be a positive number between 0 and SelectionHost.Children.Count.")
             If ChildIndex > ParentElement.Children.Count Then Throw New ArgumentException("ChildIndex can't be superior to the number of children. It should be a positive number between 0 and SelectionHost.Children.Count.")
         End Sub
@@ -74,7 +74,7 @@
             Get
                 Return __Index
             End Get
-            Set(ByVal value As Integer)
+            Set(value As Integer)
 
                 If Index <> value Then
 
@@ -272,6 +272,37 @@
                 GetParentPoint(EndPoint, EndPointAdvanced)
             End While
 
+            ' EXCEPTION: Selecting full content inside a text edit select the text edit itself
+            If StartPoint.ParentElement.IsTextEdit Then
+                If StartPoint.IsAtOrigin AndAlso StartPoint.IsAtEnd Then
+                    ' First case: Left to Right order
+                    StartPoint = StartPoint.ParentElement.GetSelectionBefore()
+                    EndPoint = StartPoint.Increment(1)
+                    StartPointAdvanced = False
+                    EndPointAdvanced = False
+                ElseIf StartPoint.IsAtEnd AndAlso EndPoint.IsAtOrigin Then
+                    ' Second case: Right to left order
+                    EndPoint = StartPoint.ParentElement.GetSelectionBefore()
+                    StartPoint = EndPoint.Increment(1)
+                    StartPointAdvanced = False
+                    EndPointAdvanced = False
+                ElseIf StartPoint = EndPoint Then
+                    If StartPoint.IsAtOrigin Then
+                        ' Third case: Both at left
+                        StartPoint = StartPoint.ParentElement.GetSelectionBefore()
+                        EndPoint = StartPoint
+                        StartPointAdvanced = False
+                        EndPointAdvanced = False
+                    ElseIf StartPoint.IsAtEnd Then
+                        ' Fourth case: Both at right
+                        StartPoint = StartPoint.ParentElement.GetSelectionAfter()
+                        EndPoint = StartPoint
+                        StartPointAdvanced = False
+                        EndPointAdvanced = False
+                    End If
+                End If
+            End If
+
             ' Return the final result
             If StartPoint.ChildIndex < EndPoint.ChildIndex Then
                 If EndPointAdvanced Then
@@ -315,14 +346,14 @@
         '++ Detect changes
         '++
 
-        Private Sub Host_ChildAdded(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles _Host.ChildAdded
+        Private Sub Host_ChildAdded(sender As Object, e As MathElement.TreeEventArgs) Handles _Host.ChildAdded
             ' NOTE : < is not possible because the insertion point should move after the inserted element in the input flow
             If e.ChildIndex <= Me.ChildIndex Then
                 Me.Index += 1
             End If
         End Sub
 
-        Private Sub Host_ChildRemoved(ByVal sender As Object, ByVal e As MathElement.TreeEventArgs) Handles _Host.ChildRemoved
+        Private Sub Host_ChildRemoved(sender As Object, e As MathElement.TreeEventArgs) Handles _Host.ChildRemoved
             ' NOTE : <= is not possible because, when the selection content is deleted, end and start point should be egal
             If e.ChildIndex < Me.ChildIndex Then
                 Me.Index -= 1

@@ -44,7 +44,7 @@
         drawingContext.Pop() ' end guidelineset
     End Sub
 
-    Private Sub PersonnalTextBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
+    Private Sub PersonnalTextBox_KeyDown(sender As Object, e As System.Windows.Input.KeyEventArgs) Handles Me.KeyDown
 
         ' Handle the typed key, if it's a special key
         Select Case e.Key
@@ -105,7 +105,7 @@
 
     End Sub
 
-    Private Sub PersonnalTextBox_Loaded(ByVal sender As Object, ByVal e As System.Windows.RoutedEventArgs) Handles Me.Loaded
+    Private Sub PersonnalTextBox_Loaded(sender As Object, e As System.Windows.RoutedEventArgs) Handles Me.Loaded
 
         'Dim CHL = New MathElement() {New UnicodeGlyph(AscW("x"), F), New UnicodeGlyph(AscW("y"), F), New UnicodeGlyph(AscW("f"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(120002 + 0 * 8747, Nothing), New UnicodeGlyph(AscW("s"), F), New UnicodeGlyph(AscW("i"), F), New UnicodeGlyph(AscW("n"), F), New UnicodeGlyph(AscW(" "), F), New UnicodeGlyph(AscW("x"), Nothing)}
 
@@ -153,20 +153,8 @@
         Me.Focus() : Keyboard.Focus(Me)
 
         ' Test for the hit-targeting export helper
-        Dim HitResult = X.GetElementFromRelativePoint(e.GetPosition(Me) - New Vector(3, 3))
-
-        MsgBox(
-            "Before: " &
-            If(HitResult.PreviousSibling Is Nothing,
-               "Nothing",
-               HitResult.PreviousSibling.ToString()
-            ) & vbCrLf &
-            "After: " &
-            If(HitResult.NextSibling Is Nothing,
-               "Nothing",
-               HitResult.NextSibling.ToString()
-            )
-        )
+        Dim HitResult = X.GetSelectionPointFromRelativePoint(e.GetPosition(Me) - New Vector(3, 3))
+        X.Selection.SetPoint(HitResult)
 
     End Sub
 
@@ -178,4 +166,7 @@
         Me.InvalidateVisual()
     End Sub
 
+    Private Sub X_SelectionChanged(sender As Object, e As System.EventArgs) Handles X.SelectionChanged
+        Me.InvalidateVisual()
+    End Sub
 End Class

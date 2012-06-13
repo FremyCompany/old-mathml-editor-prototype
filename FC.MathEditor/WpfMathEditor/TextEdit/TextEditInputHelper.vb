@@ -1,6 +1,6 @@
 ﻿Public Class TextEditInputHelper : Inherits InputHelper
 
-    Private IsAccepted As Func(Of Integer, Boolean, Boolean) = Function(C, F) This.IsAccepted(C, F)
+    Private IsCharAccepted As Func(Of Integer, Integer, Boolean) = Function(C, F) This.IsCharAccepted(C, F)
     Public Sub New(This As TextEdit)
         MyBase.New(This)
     End Sub
@@ -19,38 +19,77 @@
         ' or by splitting itself in two parts and by inserting the unaccepted
         ' char in a new text-edit between the two
 
-        If IsAccepted(InputChar, This.Selection.PreviousSibling Is Nothing) _
+        If IsCharAccepted(InputChar, This.Selection.StartPoint.ChildIndex) _
             AndAlso (This.EatInputByDefault OrElse Not (This.Selection.LogicalEndPoint.IsAtEnd Or This.Selection.LogicalEndPoint.IsAtOrigin)) _
             AndAlso (This.Children.CanAdd) Then
 
+            ' Insert a new unicode glyph for the car
+            ' HYPOTHESE: the selection has already been deleted
             Dim NewElement = New UnicodeGlyph(InputChar)
-
             This.Selection.ParentElement.Children.InsertAfter(NewElement, This.Selection.PreviousSibling)
-            This.Selection.SetPoint(This.GetSelectionAfter())
+
+            ' Set the selection point after the text edit (if insertion happens at end)
+            ' or after the inserted char (if insertion happens anywhere else)
+            If NewElement.NextSibling Is Nothing Then
+                This.Selection.SetPoint(This.GetSelectionAfter())
+            Else
+                This.Selection.SetPoint(NewElement.GetSelectionAfter())
+            End If
 
             Return True
 
         ElseIf (This.Selection.NextSibling IsNot Nothing) AndAlso (This.Selection.PreviousSibling IsNot Nothing) Then
 
-            Dim FirstPart As TextEdit = This.Clone(False)
-            Dim SecondPart As TextEdit = This.Clone(False)
+            ' Generate the new element, and perform the split
+            Dim NewTextEdit As TextEdit = TextEdit.FromChar(InputChar, This)
+            Dim FirstPart As TextEdit
+            Dim SecondPart As TextEdit
 
-            For Each child In This.Children
-                If child.ChildIndex < This.Selection.GetPoint(SelectionHelper.SelectionPointType.Selection).ChildIndex Then
-                    FirstPart.AddChild(child.Clone())
-                Else
-                    SecondPart.AddChild(child.Clone())
-                End If
-            Next
+            Select Case This.Selection.StartPoint.ChildIndex
+                Case 1
+                    FirstPart = TextEdit.FromChar(CType(This.FirstChild, UnicodeGlyph).DisplayCharCode)
+                    SecondPart = This.Clone(False)
 
-            Dim TextEdit As TextEdit = TextEdit.FromChar(InputChar, This)
+                    For Each child In This.Children
+                        If child.ChildIndex > 0 Then
+                            SecondPart.AddChild(child.Clone())
+                        End If
+                    Next
+                Case This.Children.Count
+                    FirstPart = This.Clone(False)
+                    SecondPart = TextEdit.FromChar(CType(This.LastChild, UnicodeGlyph).DisplayCharCode)
 
+                    For Each child In This.Children
+                        If child.ChildIndex < This.Children.Count - 1 Then
+                            FirstPart.AddChild(child.Clone())
+                        End If
+                    Next
+
+                Case Else
+                    FirstPart = This.Clone(False)
+                    SecondPart = This.Clone(False)
+
+                    For Each child In This.Children
+                        If child.ChildIndex < This.Selection.GetPoint(SelectionHelper.SelectionPointType.Selection).ChildIndex Then
+                            FirstPart.AddChild(child.Clone())
+                        Else
+                            SecondPart.AddChild(child.Clone())
+                        End If
+                    Next
+            End Select
+
+
+
+            ' Insert the new elements (two before & one after, to preserve SelectionPoint order)
+            This.ParentElement.Children.InsertBefore(FirstPart, This)
+            This.ParentElement.Children.InsertBefore(NewTextEdit, This)
             This.ParentElement.Children.InsertAfter(SecondPart, This)
-            This.ParentElement.Children.InsertAfter(TextEdit, This)
-            This.ParentElement.Children.InsertAfter(FirstPart, This)
+
+            ' Remove the old one
             This.RemoveFromParent()
 
-            TextEdit.Selection.SetPoint(TextEdit.GetSelectionAfter())
+            ' Set the selection after the new text edit
+            NewTextEdit.Selection.SetPoint(NewTextEdit.GetSelectionAfter())
 
             Return True
 
@@ -63,7 +102,7 @@
 
     Public Overrides Function ProcessChar_FromLeft_Internal(InputChar As Integer) As Boolean
 
-        If IsAccepted(InputChar, True) AndAlso This.EatInputByDefault AndAlso This.Children.CanAdd Then
+        If IsCharAccepted(InputChar, 0) AndAlso This.EatInputByDefault AndAlso This.Children.CanAdd Then
 
             This.Selection.DeleteContents()
 
@@ -82,7 +121,7 @@
 
     Public Overrides Function ProcessChar_FromRight_Internal(InputChar As Integer) As Boolean
 
-        If IsAccepted(InputChar, False) AndAlso This.EatInputByDefault AndAlso This.Children.CanAdd Then
+        If IsCharAccepted(InputChar, This.Children.Count) AndAlso This.EatInputByDefault AndAlso This.Children.CanAdd Then
 
             This.Selection.DeleteContents()
 

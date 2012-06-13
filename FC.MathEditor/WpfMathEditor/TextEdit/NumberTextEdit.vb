@@ -24,8 +24,28 @@
         End Get
     End Property
 
-    Public Overrides Function IsAccepted(C As Integer, IsFirst As Boolean) As Boolean
-        Return Char.IsDigit(Char.ConvertFromUtf32(C)) OrElse (IsFirst AndAlso (C = Asc("-"c) OrElse C = Asc("+"c))) OrElse (Not IsFirst AndAlso (C = Asc("."c) OrElse C = Asc("e"c) OrElse C = Asc("E"c)))
+    Public Overrides Function IsCharAccepted(C As Integer, Position As Integer) As Boolean
+        ' TODO: Change this implementation to avoid +++++0.5 and allow 5e-3
+        Select Case Position
+            Case 0
+                If (C = Asc("-"c) OrElse C = Asc("+"c)) Then
+                    If Char.IsDigit(Me.FirstChild.Export.ToSimpleText()) Then
+                        Return Me.PreviousSibling Is Nothing OrElse TryCast(Me.PreviousSibling, OperatorTextEdit) IsNot Nothing
+                    Else
+                        Return False
+                    End If
+                Else
+                    Return Char.IsDigit(Char.ConvertFromUtf32(C))
+                End If
+            Case Else
+                If C = Asc("-"c) OrElse C = Asc("+") Then
+                    Return Me.Children(Position - 1).Export.ToSimpleText().ToLowerInvariant() = "e"
+                ElseIf C = Asc("."c) Then
+                    Return Char.IsDigit(Me.Children(Position - 1).Export.ToSimpleText())
+                Else
+                    Return Char.IsDigit(Char.ConvertFromUtf32(C)) OrElse (C = Asc("e"c) OrElse C = Asc("E"c))
+                End If
+        End Select
     End Function
 
     Public Overrides ReadOnly Property EatInputByDefault As Boolean

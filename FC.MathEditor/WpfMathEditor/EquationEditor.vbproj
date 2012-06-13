@@ -112,6 +112,7 @@
     <Compile Include="Classes\MathElement.Layout.vb" />
     <Compile Include="Classes\MathElement.XmlTree.vb" />
     <Compile Include="Classes\MathElement.Type.vb" />
+    <Compile Include="Classes\Modules\HelpersModule.vb" />
     <Compile Include="Classes\Types\Length.vb" />
     <Compile Include="Classes\UserCallableAttribute.vb" />
     <Compile Include="Formatters\FormatterChildrenHelper.vb" />

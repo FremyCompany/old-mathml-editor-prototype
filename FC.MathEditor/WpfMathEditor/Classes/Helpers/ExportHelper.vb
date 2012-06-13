@@ -1,6 +1,7 @@
 ﻿Public MustInherit Class ExportHelper
 
     Protected WithEvents This As MathElement
+
     Public Sub New(This As MathElement)
         Me.This = This
     End Sub
@@ -48,13 +49,13 @@
         Return SB.ToString()
     End Function
 
-    Public MustOverride Sub AppendKeyboardInput(ByVal SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendLaTeX(ByVal SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendMathML(ByVal SB As System.Text.StringBuilder)
-    Public MustOverride Sub AppendSimpleText(ByVal SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendLaTeX(SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendMathML(SB As System.Text.StringBuilder)
+    Public MustOverride Sub AppendSimpleText(SB As System.Text.StringBuilder)
 
-    Protected MustOverride Sub Draw_Internal(ByVal DG As DrawingContext)
-    Public Sub Draw(ByVal DG As DrawingContext)
+    Protected MustOverride Sub Draw_Internal(DG As DrawingContext)
+    Public Sub Draw(DG As DrawingContext)
 
 
         ' Shift the drawing zone using the inner margin
@@ -134,7 +135,7 @@
     ''' Reset layout state to None in order to trigger relayout on next use.
     ''' </summary>
     ''' <param name="ForwardToParent">If True, indicates that the parent element should be reset, too.</param>
-    Public Sub InvalidateLayout(Optional ByVal ForwardToParent As Boolean = False)
+    Public Sub InvalidateLayout(Optional ForwardToParent As Boolean = False)
 
         ' Notify the layout should be recomputed
         LayoutCompletion = LayoutCompletionState.None
@@ -226,7 +227,7 @@
         Get
             Return _LayoutCompletion
         End Get
-        Protected Set(ByVal value As LayoutCompletionState)
+        Protected Set(value As LayoutCompletionState)
             _LayoutCompletion = value
         End Set
     End Property
@@ -364,13 +365,6 @@
         End Get
     End Property
 
-    Private Shared Function FitRect(ChildRect As Rect, InitalParentRect As Rect, FinalParentRect As Rect) As Rect
-        ChildRect.Offset(-CType(InitalParentRect.Location, Vector))
-        ChildRect.Scale(FinalParentRect.Width / InitalParentRect.Width, FinalParentRect.Height / InitalParentRect.Height)
-        ChildRect.Offset(FinalParentRect.Location)
-        Return ChildRect
-    End Function
-
     Public ReadOnly Property Size As Size
         Get
             PerformLayout()
@@ -455,10 +449,28 @@
 
     Public ReadOnly Property LocationInRoot As Rect
         Get
+
+            ' Special case
             If This.ParentElement Is Nothing Then Return LocationInParent
 
-            This.Root.Export.PerformLayout()
+            ' Recursive case
+            This.Root.Export.PerformLayout() ' only for recursivity reasons
             Return FitRect(LocationInParent, This.ParentElement.Export.SizeRect, This.ParentElement.Export.LocationInRoot)
+
+        End Get
+    End Property
+
+    Public ReadOnly Property LocationIn(Ancestror As MathElement) As Rect
+        Get
+
+            ' Special cases
+            If This Is Ancestror Then Return SizeRect
+            If This.ParentElement Is Nothing Then Throw New ArgumentException("Ancestror wasn't an ancestror of the element whose LocationIn(Ancestror) has been requested")
+            If This.ParentElement Is Ancestror Then Return LocationInParent
+
+            ' Recursive case
+            This.Root.Export.PerformLayout() ' only for recursivity reasons
+            Return FitRect(LocationInParent, This.ParentElement.Export.SizeRect, This.ParentElement.Export.LocationIn(Ancestror))
 
         End Get
     End Property

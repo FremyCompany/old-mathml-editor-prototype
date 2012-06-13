@@ -247,7 +247,7 @@
 
         End Sub
 
-        Private Sub PrepareLayout_AsymStretchy(ByVal AvailABH As Double, ByVal AvailBBH As Double)
+        Private Sub PrepareLayout_AsymStretchy(AvailABH As Double, AvailBBH As Double)
 
 
             ' (1/1+1/2) will look like that :

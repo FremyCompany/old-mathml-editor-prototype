@@ -4,7 +4,7 @@
         Return Export.ToString()
     End Function
 
-    Public Overridable Function GetElementFromRelativePoint(ByVal Location As Point) As SelectionHelper.SelectionPoint
+    Public Overridable Function GetElementFromRelativePoint(Location As Point, Optional ConsiderOnlyChildren As Boolean = False, Optional ShouldBeIncluded As Boolean = False) As MathElement
 
         '
         ' Initialize variables for algorithm
@@ -45,9 +45,27 @@ NewBestFound:
         Next
 
         '
+        ' Check post conditions and return result
+        '
+        If Not ConsiderOnlyChildren AndAlso BestIsIncluded Then Return BestElement.GetElementFromRelativePoint(BestElement.ConvertPoint(Location, Me), ConsiderOnlyChildren, ShouldBeIncluded)
+        If BestElement Is Nothing Then BestElement = Me : BestIsIncluded = True
+        If ShouldBeIncluded AndAlso Not BestIsIncluded Then BestElement = Me : BestIsIncluded = True
+
+        Return BestElement
+
+    End Function
+
+    Public Function GetSelectionPointFromRelativePoint(Location As Point) As SelectionHelper.SelectionPoint
+
+        '
+        ' Get the best element
+        '
+        Dim BestElement = GetElementFromRelativePoint(Location)
+
+        '
         ' Create selection point from element
         '
-        Dim TrueHDistance As Double = Location.X - (BestElement.Export.LocationInParent.Left + BestElement.Export.LocationInParent.Right) / 2
+        Dim TrueHDistance As Double = Location.X - (BestElement.Export.LocationIn(Me).Left + BestElement.Export.LocationIn(Me).Right) / 2
         If TrueHDistance >= 0 Then
             Return BestElement.GetSelectionAfter()
         Else
@@ -55,6 +73,26 @@ NewBestFound:
         End If
 
     End Function
+
+    ''' <summary>
+    ''' Convert a point relative to another element to a point relative to this element.
+    ''' </summary>
+    ''' <param name="Location">Original location to convert.</param>
+    ''' <param name="RelativeTo">Element this location is relative to.</param>
+    Public Function ConvertPoint(Location As Point, RelativeTo As MathElement) As Point
+        Return ConvertRect(New Rect(Location, Location), RelativeTo).TopLeft
+    End Function
+
+    Public Function ConvertRect(Location As Rect, RelativeTo As MathElement) As Rect
+        ' TODO: Check if this method is correct
+        Dim CA = RelativeTo.GetCommonAncestrorWith(Me)
+        Dim IntermediaryResult = FitRect(Location, RelativeTo.Export.SizeRect, RelativeTo.Export.LocationIn(CA))
+        Return FitRect(IntermediaryResult, Me.Export.LocationIn(CA), Me.Export.SizeRect)
+    End Function
+
+    '++
+    '++ Layout events
+    '++
 
     Public Event SizeChanged As EventHandler
     Public Event VisualChanged As EventHandler
@@ -206,7 +244,7 @@ NewBestFound:
         End Set
     End Property
 
-    Public Sub SetMathVariant(ByVal value As String)
+    Public Sub SetMathVariant(value As String)
         If value Is Nothing Then
             RemoveAttribute("mathvariant")
         Else

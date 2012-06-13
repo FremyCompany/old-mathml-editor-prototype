@@ -1,7 +1,7 @@
 ﻿
 Public Class FormatterChildrenHelper : Inherits ChildrenHelper
 
-    Public Sub New(ByVal El As MathElement)
+    Public Sub New(El As MathElement)
         MyBase.New(El)
     End Sub
 
@@ -46,7 +46,7 @@ Public Class FormatterChildrenHelper : Inherits ChildrenHelper
         End Get
     End Property
 
-    Protected Overrides Sub ValidateNewElement_Internal(ByVal NewElement As MathElement)
+    Protected Overrides Sub ValidateNewElement_Internal(NewElement As MathElement)
         MyBase.ValidateNewElement_Internal(NewElement)
         If Not (TypeOf NewElement Is RowLayoutEngine) Then Throw New ArgumentException("Un élément au design fixé (" & Me.GetType().Name & ") ne peut avoir que des RowLayoutEngine pour enfant.")
     End Sub
