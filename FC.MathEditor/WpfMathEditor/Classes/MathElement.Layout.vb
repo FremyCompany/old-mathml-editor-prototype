@@ -67,9 +67,17 @@ NewBestFound:
         '
         Dim TrueHDistance As Double = Location.X - (BestElement.Export.LocationIn(Me).Left + BestElement.Export.LocationIn(Me).Right) / 2
         If TrueHDistance >= 0 Then
-            Return BestElement.GetSelectionAfter()
+            If BestElement.ParentElement.IsLayoutEngine Then
+                Return BestElement.GetSelectionAfter()
+            Else
+                Return BestElement.GetSelectionAtEnd()
+            End If
         Else
-            Return BestElement.GetSelectionBefore()
+            If BestElement.ParentElement.IsLayoutEngine Then
+                Return BestElement.GetSelectionBefore()
+            Else
+                Return BestElement.GetSelectionAtOrigin()
+            End If
         End If
 
     End Function

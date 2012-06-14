@@ -273,7 +273,7 @@
             End While
 
             ' EXCEPTION: Selecting full content inside a text edit select the text edit itself
-            If StartPoint.ParentElement.IsTextEdit Then
+            If StartPoint.ParentElement.IsTextEdit AndAlso StartPoint.ParentElement.IsLayoutEngine Then
                 If StartPoint.IsAtOrigin AndAlso StartPoint.IsAtEnd Then
                     ' First case: Left to Right order
                     StartPoint = StartPoint.ParentElement.GetSelectionBefore()

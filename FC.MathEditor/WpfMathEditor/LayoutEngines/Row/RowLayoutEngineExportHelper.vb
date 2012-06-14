@@ -83,10 +83,9 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
             BBH = Math.Max(BBH, C.Export.BelowBaseLineHeight)
             ABH = Math.Max(ABH, C.Export.AboveBaseLineHeight)
 
-            ' TODO : fix that; if a small element has a big margin, 
-            ' the big margin is applied on the big element that's sibling to him
-            OMT = Math.Max(OMT, C.Export.OuterMargin.Top)
-            OMB = Math.Max(OMB, C.Export.OuterMargin.Bottom)
+            ' if a small element has a big margin, the big margin should not apply on the big element that's sibling to him
+            OMT = Math.Max(OMT, C.Export.AboveBaseLineHeight + C.Export.OuterMargin.Top)
+            OMB = Math.Max(OMB, C.Export.BelowBaseLineHeight + C.Export.OuterMargin.Bottom)
         Next
 
         ' TODO : Removed to fix Fraction formatter blur problem
@@ -106,7 +105,7 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
         Next
 
         Me.IM = New Thickness(0)
-        Me.OM = New Thickness(0, OMT, 0, OMB)
+        Me.OM = New Thickness(0, OMT - ABH, 0, OMB - BBH)
 
     End Sub
 
@@ -131,8 +130,8 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
 
     Protected Overrides Sub CalculateMinHeight_Internal()
         If This.Children.HasAny Then
-            MinABH = This.Children.Select(Function(x) x.Export.MinimalABH).Max()
-            MinBBH = This.Children.Select(Function(x) x.Export.MinimalBBH).Max()
+            MinABH = Math.Ceiling(Math.Max(This.Children.Select(Function(x) x.Export.MinimalABH).Max(), InitialAboveBaseLineHeight))
+            MinBBH = Math.Ceiling(Math.Max(This.Children.Select(Function(x) x.Export.MinimalBBH).Max(), InitialBelowBaseLineHeight))
         Else
             MinABH = InitialAboveBaseLineHeight
             MinBBH = InitialBelowBaseLineHeight

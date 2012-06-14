@@ -153,7 +153,7 @@
         MinBBH = Math.Max(3, This.Content.Export.MinimalBBH)
 
         ' Hack. Used to align "v(x)" with "x"
-        ContentTop -= 1
+        ' ContentTop -= 1
 
         ' Check if content isn't too small (min 16px)
         Increment = 16 * LineHeight - (MinBBH) - MinABH
@@ -229,8 +229,8 @@
         If This.HasExponent Then
             This.Exponent.Export.SetLocationInParent(New Rect(
                 New Point(
-                    -1,
-                    H - 9 * LineHeight - ExpScaleFactor * This.Exponent.Export.MinimalHeight
+                    If(This.Exponent.Export.Width > 5, -1, 0),
+                    H - 9 * LineHeight - ExpScaleFactor * This.Exponent.Export.Height
                 ),
                 New Size(
                     This.Exponent.Export.Width * ExpScaleFactor,

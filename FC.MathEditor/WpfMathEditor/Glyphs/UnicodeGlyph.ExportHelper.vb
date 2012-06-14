@@ -55,7 +55,7 @@
         Private GlyphRun As GlyphRun
 
         Protected Overrides Sub CalculateMinHeight_Internal()
-            Dim S = FontSize
+            Dim S = FontSize ' * FontSizeRelative ' FontSizeRelative est nul à cet instant précis!
 
             ' Get glyph from char
             GetGlyph()

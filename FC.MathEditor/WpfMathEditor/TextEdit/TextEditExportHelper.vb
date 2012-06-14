@@ -34,4 +34,8 @@
         End Get
     End Property
 
+    Protected Overrides Sub PrepareLayout_Internal(AvailABH As Double, AvailBBH As Double)
+        MyBase.PrepareLayout_Internal(AvailABH, AvailBBH)
+    End Sub
+
 End Class
