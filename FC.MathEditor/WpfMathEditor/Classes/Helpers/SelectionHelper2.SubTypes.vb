@@ -272,8 +272,14 @@
                 GetParentPoint(EndPoint, EndPointAdvanced)
             End While
 
+            ' Now, move to parent until the host accepts selection
+            Do Until StartPoint.ParentElement.IsLayoutEngine OrElse StartPoint.ParentElement.IsTextEdit
+                GetParentPoint(StartPoint, StartPointAdvanced)
+                GetParentPoint(EndPoint, EndPointAdvanced)
+            Loop
+
             ' EXCEPTION: Selecting full content inside a text edit select the text edit itself
-            If StartPoint.ParentElement.IsTextEdit AndAlso StartPoint.ParentElement.IsLayoutEngine Then
+            If (StartPoint.ParentElement.IsTextEdit) AndAlso (StartPoint.ParentElement.ParentElement IsNot Nothing) AndAlso (StartPoint.ParentElement.ParentElement.IsLayoutEngine) Then
                 If StartPoint.IsAtOrigin AndAlso StartPoint.IsAtEnd Then
                     ' First case: Left to Right order
                     StartPoint = StartPoint.ParentElement.GetSelectionBefore()
