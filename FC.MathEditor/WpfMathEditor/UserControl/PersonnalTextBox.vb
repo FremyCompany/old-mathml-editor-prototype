@@ -149,12 +149,42 @@
 
     End Sub
 
+    Private IsMouseDown As Boolean = False
     Private Sub PersonnalTextBox_MouseDown(sender As Object, e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseDown
+
+        ' Give focus to the text box
         Me.Focus() : Keyboard.Focus(Me)
 
-        ' Test for the hit-targeting export helper
+        ' Activate selection mode
+        IsMouseDown = True
+
+        ' Move the selection point to clicked location
         Dim HitResult = X.GetSelectionPointFromRelativePoint(e.GetPosition(Me) - New Vector(3, 3))
         X.Selection.SetPoint(HitResult)
+
+    End Sub
+
+    Private Sub PersonnalTextBox_MouseMove(sender As Object, e As System.Windows.Input.MouseEventArgs) Handles Me.MouseMove
+
+        If IsMouseDown Then
+
+            ' Update the selection end point based on mouse position
+            Dim HitResult = X.GetSelectionPointFromRelativePoint(e.GetPosition(Me) - New Vector(3, 3))
+            X.Selection.SetPoint(HitResult, SelectionHelper.SelectionPointType.EndPoint)
+
+
+        End If
+
+    End Sub
+
+    Private Sub PersonnalTextBox_MouseUp(sender As Object, e As System.Windows.Input.MouseButtonEventArgs) Handles Me.MouseUp
+
+        ' Update the selection end point based on mouse position
+        Dim HitResult = X.GetSelectionPointFromRelativePoint(e.GetPosition(Me) - New Vector(3, 3))
+        X.Selection.SetPoint(HitResult, SelectionHelper.SelectionPointType.EndPoint)
+
+        ' Deactivate selection mode
+        IsMouseDown = False
 
     End Sub
 
