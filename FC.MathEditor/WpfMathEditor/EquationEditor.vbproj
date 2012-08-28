@@ -130,6 +130,7 @@
     <Compile Include="Glyphs\UnicodeGlyph.ExportHelper.vb" />
     <Compile Include="Glyphs\UnicodeGlyph.vb" />
     <Compile Include="Glyphs\UnicodeGlyphInputHelper.vb" />
+    <None Include="ClassDiagram.cd" />
     <None Include="LayoutEngines\Fenced\FencedLayoutEngineExportHelper.vb" />
     <None Include="LayoutEngines\Fenced\FencedLayoutEngineInputHelper.vb" />
     <None Include="LayoutEngines\Fenced\FencedLayoutEngine.vb" />
@@ -233,6 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Properties\" />
+    <Folder Include="Formatters\SubScript\" />
     <Folder Include="Parsers\Elements\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

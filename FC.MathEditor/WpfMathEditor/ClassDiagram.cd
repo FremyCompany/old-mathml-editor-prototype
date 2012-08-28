@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="">
+    <Position X="0.5" Y="4.105" Height="0.291" Width="15.562" />
+  </Comment>
+  <Comment CommentText="">
+    <Position X="0.5" Y="6.794" Height="0.291" Width="15.562" />
+  </Comment>
+  <Comment CommentText="">
+    <Position X="0.5" Y="9.792" Height="0.291" Width="15.562" />
+  </Comment>
+  <Class Name="FC.MathEditor.ChildrenHelper" Collapsed="true">
+    <Position X="3.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FEIgJIUAAIAIFRSAEADABIQMABAFWQwEGGACAARQQCI=</HashCode>
+      <FileName>Classes\Helpers\ChildrenHelper2.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FC.MathEditor.EmptyInputHelper" Collapsed="true">
+    <Position X="6.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Helpers\EmptyInputHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.ExportHelper" Collapsed="true">
+    <Position X="2.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>DQwACjAQnlgIhhAElAM8QmACCGkSAEAWAEJjgU8aAgI=</HashCode>
+      <FileName>Classes\Helpers\ExportHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.FormatterChildrenHelper" Collapsed="true">
+    <Position X="5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAJAQAAAAAAAAAEAAAAAAAAAAASAAAAEAAAAAgACI=</HashCode>
+      <FileName>Formatters\FormatterChildrenHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.FractionFormatter" Collapsed="true">
+    <Position X="12" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAQAAAgAAAIAAEAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Formatters\Fraction\FractionFormatter.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.FractionFormatterExportHelper" Collapsed="true">
+    <Position X="5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAgAIAAAAEAIAAAAGCAQAAAAAAEAAAAIAAAI=</HashCode>
+      <FileName>Formatters\Fraction\FractionFormatterExportHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.GlyphChildrenHelper" Collapsed="true">
+    <Position X="0.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAABAQAAAAAAAAAEAAAAAAAAAAAAAAAAEAIAAAAAAA=</HashCode>
+      <FileName>Glyphs\GlyphChildrenHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.IdentifierTextEdit" Collapsed="true">
+    <Position X="3" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAIAAAAAACAAAABAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>TextEdit\IdentifierTextEdit.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.InputHelper" Collapsed="true">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgKQgCAgAQksgoAVEEQANIAAIJREDSQBKCCICQCQVwE=</HashCode>
+      <FileName>Classes\Helpers\InputHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.LayoutEngineChildrenHelper" Collapsed="true">
+    <Position X="7.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAABAQAAAAAAAAAEAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>LayoutEngines\LayoutEngineChildrenHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.MathDocument" Collapsed="true">
+    <Position X="9.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAABAIAgAABAAAAAAAAAAAACAAARAAAQAA=</HashCode>
+      <FileName>Classes\MathDocument.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.MathElement" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>mUBiNfYRICyYHjMXJEC2xnA61MuQKA5BAMwqAANScDI=</HashCode>
+      <FileName>Classes\MathElement.Input.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.NumberTextEdit" Collapsed="true">
+    <Position X="5.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAIAAAAAACAAAABAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>TextEdit\NumberTextEdit.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.OperatorTextEdit" Collapsed="true">
+    <Position X="7.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAQBAABAAEYAABAAACAAAABECwAAAAIAMAAAAAA=</HashCode>
+      <FileName>TextEdit\OperatorTextEdit.Dics.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.Replacement" Collapsed="true">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Helpers\InputHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.RootFormatter" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAACAAQAAgAAAAIAAEAAAAAAAAAIAAAAEAAAAgAAAAA=</HashCode>
+      <FileName>Formatters\Root\RootFormatter.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.RootFormatterExportHelper" Collapsed="true">
+    <Position X="0.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAgAIAAAAEAIAIAACCAQAAAAAAEAAAAIAACI=</HashCode>
+      <FileName>Formatters\Root\RootFormatterExportHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.RowLayoutEngine" Collapsed="true">
+    <Position X="9.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAQAAAAAAAIAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LayoutEngines\Row\RowLayoutEngine.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.RowLayoutEngineExportHelper" Collapsed="true">
+    <Position X="2.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BQAAAAAAAggAAAAAEAIAAAACCAAAAAAAAEAAAAIAAII=</HashCode>
+      <FileName>LayoutEngines\Row\RowLayoutEngineExportHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.RowLayoutEngineInputHelper" Collapsed="true">
+    <Position X="11.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAEAAIIAAAAQAAQAAAACACACAQAA=</HashCode>
+      <FileName>LayoutEngines\Row\RowLayoutEngineInputHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.SelectionHelper" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAEgIAAIAgoIQFABJCQAAAAQAEoIAQIIQAIKAQRCCAo=</HashCode>
+      <FileName>Classes\Helpers\SelectionHelper2.Actions.vb</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="FC.MathEditor.TextEdit" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAKAAQAAAAAAAAAAEAAACAAAABAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>TextEdit\TextEdit.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.TextEditChildrenHelper" Collapsed="true">
+    <Position X="2.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAABAQAAAAIAAAAEAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>TextEdit\TextEditChildrenHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.TextEditExportHelper" Collapsed="true">
+    <Position X="2.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAIAAAAAAAAAAAACAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>TextEdit\TextEditExportHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.TextEditInputHelper" Collapsed="true">
+    <Position X="9" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQgAAAAAgIAAAEAAAAIKAAIAQEBQAAAAAAAAAAAAA=</HashCode>
+      <FileName>TextEdit\TextEditInputHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.UnicodeGlyph" Collapsed="true">
+    <Position X="14.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAQAAAAAAAIAAEAAAAAAAAAEAAAAAAACgAAAAAA=</HashCode>
+      <FileName>Glyphs\UnicodeGlyph.ExportHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FC.MathEditor.UnicodeGlyphInputHelper" Collapsed="true">
+    <Position X="4.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>Glyphs\UnicodeGlyphInputHelper.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
