@@ -1,6 +1,5 @@
 ﻿Public Class FractionFormatter : Inherits MathElement
 
-
     Public Sub New(Optional Numerator As RowLayoutEngine = Nothing, Optional Denominator As RowLayoutEngine = Nothing)
 
         If Numerator Is Nothing Then Numerator = New RowLayoutEngine()

@@ -175,7 +175,13 @@
     Protected MustOverride ReadOnly Property PreferInlineContent_Internal As Boolean
     Public ReadOnly Property PreferInlineContent As Boolean
         Get
-            Return PreferInlineContent_Internal ' OrElse (This.ParentElement IsNot Nothing AndAlso This.ParentElement.Export.PreferInlineContent)
+            Return PreferInlineContent_Internal OrElse (This.ParentElement IsNot Nothing AndAlso This.ParentElement.Export.PreferInlineContentFor(This))
+        End Get
+    End Property
+
+    Public Overridable ReadOnly Property PreferInlineContentFor(Child As MathElement) As Boolean
+        Get
+            Return PreferInlineContent
         End Get
     End Property
 

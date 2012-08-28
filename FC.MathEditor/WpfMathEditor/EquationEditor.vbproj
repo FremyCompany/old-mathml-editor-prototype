@@ -120,6 +120,8 @@
     <Compile Include="Formatters\Fraction\FractionFormatterExportHelper.vb" />
     <Compile Include="Formatters\Root\RootFormatter.vb" />
     <Compile Include="Formatters\Root\RootFormatterExportHelper.vb" />
+    <Compile Include="Formatters\SubSupScript\SubSupScriptFormatter.vb" />
+    <Compile Include="Formatters\SubSupScript\SubSupScriptFormatterExportHelper.vb" />
     <Compile Include="QualityControl.vb" />
     <Compile Include="Classes\Helpers\SelectionHelper2.Actions.vb" />
     <Compile Include="Classes\Helpers\SelectionHelper2.SubTypes.vb" />
@@ -234,7 +236,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Properties\" />
-    <Folder Include="Formatters\SubScript\" />
     <Folder Include="Parsers\Elements\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

@@ -91,7 +91,20 @@
     End Function
 
     Public Function ProcessChar_FromRight(InputChar As Integer) As Boolean
+
+        ' Process special chars from right
+        Select Case InputChar
+            Case AscW("_"c)
+                If ProcessUnderscore_FromRight() Then Return True
+            Case AscW("/"c)
+                If ProcessFraction_FromRight() Then Return True
+            Case AscW("^"c)
+                If ProcessHat_FromRight() Then Return True
+        End Select
+
+        ' Handle all other cases
         Return ProcessChar_FromRight_Internal(InputChar)
+
     End Function
 
     Public Sub ProcessDelete(Ctrl As Boolean, Alt As Boolean, Shift As Boolean)
@@ -104,23 +117,22 @@
                 Exit Sub
             End If
 
+            ' Perform the classical action for Delete for this element
+            If ProcessDelete_Internal(Ctrl, Alt, Shift) Then
+                Exit Sub
+            End If
+
+            ' If this element didn't respond to the keypress, we may forward the event to another one
+            If This.Selection.NextSibling Is Nothing Then
+                If This.Selection.MoveAfterParent() Then This.Selection.ParentElement.Input.ProcessDelete(Ctrl, Alt, Shift)
+                Exit Sub
+            End If
+
         Else
 
             ' If the selection is not empty, we just need to delete its content
             This.Selection.DeleteContents()
-            Exit Sub
 
-        End If
-
-        ' Perform the classical action for Delete for this element
-        If ProcessDelete_Internal(Ctrl, Alt, Shift) Then
-            Exit Sub
-        End If
-
-        ' If this element didn't respond to the keypress, we may forward the event to another one
-        If This.Selection.NextSibling Is Nothing Then
-            If This.Selection.MoveAfterParent() Then This.Selection.ParentElement.Input.ProcessDelete(Ctrl, Alt, Shift)
-            Exit Sub
         End If
 
     End Sub
@@ -299,7 +311,7 @@
 
     Public Overridable Function ProcessWaitChar(InputChar As Integer) As Boolean
         ' Default wait char processing : eat, and walk to next child
-        WaitChar = Nothing : This.Selection.SetPoint(This.ParentElement.GetSelectionAt(This.ChildIndex + 1))
+        WaitChar = Nothing : This.Selection.SetPoint(This.ParentElement.GetSelectionAfter())
         Return True
     End Function
 
@@ -335,10 +347,9 @@
         ' In case there's no element to delete, forward the call
         If ElementToDelete Is Nothing Then Return False
 
-        ' If there's one element to delete, delete it
+        ' Move selection end point to the right, then clear
         ProcessRightKey(Ctrl, Alt, True)
         This.Selection.DeleteContents()
-        'x ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
 
         ' Inform that the delete key was handled
         Return True
@@ -353,10 +364,9 @@
         ' In case there's no element to delete, forward the call
         If ElementToDelete Is Nothing Then Return False
 
-        ' If there's one element to delete, delete it
+        ' Move selection end point to the left, then clear
         ProcessLeftKey(Ctrl, Alt, True)
         This.Selection.DeleteContents()
-        'x ElementToDelete.ParentElement.RemoveChild(ElementToDelete)
 
         ' Inform that the delete key was handled
         Return True
@@ -443,19 +453,50 @@
         Return False
     End Function
 
+    ' TODO: Override this for RLE to avoid RLE in RLE (+next functions)
     Public Overridable Function ProcessHat_FromRight_Internal() As Boolean
-        ' TODO: ProcessHat
+
+        ' Wrap the element in a script automatically by default
+        Dim Script As New SubSupScriptFormatter()
+        This.ParentElement.ReplaceChild(This, Script)
+        Script.Base.AddChild(This)
+
+        ' Set the selection in the script
+        This.Selection.SetPoint(Script.SuperScript.GetSelectionAtOrigin())
+
+        ' Abort any other steps
         Return True
+
     End Function
 
     Public Overridable Function ProcessUnderscore_FromRight_Internal() As Boolean
-        ' TODO: ProcessUnderscore
+
+        ' Wrap the element in a script automatically by default
+        Dim Script As New SubSupScriptFormatter()
+        This.ParentElement.ReplaceChild(This, Script)
+        Script.Base.AddChild(This)
+
+        ' Set the selection in the script
+        This.Selection.SetPoint(Script.SubScript.GetSelectionAtOrigin())
+
+        ' Abort any other steps
         Return True
+
     End Function
 
     Public Overridable Function ProcessFraction_FromRight_Internal() As Boolean
-        ' TODO: ProcessFraction
+
+        ' Wrap the element in a fraction automatically by default
+        Dim Fraction As New FractionFormatter()
+        This.ParentElement.ReplaceChild(This, Fraction)
+        Fraction.Numerator.AddChild(This)
+
+        ' Set the selection in the script
+        This.Selection.SetPoint(Fraction.Denominator.GetSelectionAtOrigin())
+
+        ' Abort any other steps
         Return True
+
     End Function
 
     Public Event BeforeProcessChar As EventHandler(Of InputEventArgs)

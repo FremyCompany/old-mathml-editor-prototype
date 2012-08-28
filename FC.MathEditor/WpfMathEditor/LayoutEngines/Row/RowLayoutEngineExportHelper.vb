@@ -6,25 +6,57 @@ Public Class RowLayoutEngineExportHelper : Inherits ExportHelper
     End Sub
 
     Public Overrides Sub AppendSimpleText(SB As System.Text.StringBuilder)
-        For Each Child In This.Children
-            Child.Export.AppendSimpleText(SB)
-        Next
+        If This.Children.HasOne AndAlso This.Children.First.IsTextEdit Then
+
+            ' If there's only one child and that it's text, we can simply add it
+            This.Children.First.Export.AppendSimpleText(SB)
+
+        Else
+
+            ' Or else we need parenthesis
+            SB.Append("("c)
+            For Each Child In This.Children
+                Child.Export.AppendSimpleText(SB)
+            Next
+            SB.Append(")"c)
+
+        End If
     End Sub
 
     Public Overrides Sub AppendKeyboardInput(SB As System.Text.StringBuilder)
-        SB.Append("(")
-        For Each Child In This.Children
-            Child.Export.AppendKeyboardInput(SB)
-        Next
-        SB.Append(")")
+        If This.Children.HasOne AndAlso This.Children.First.IsTextEdit Then
+
+            ' If there's only one child and that it's text, we can simply add it
+            This.Children.First.Export.AppendKeyboardInput(SB)
+
+        Else
+
+            ' Or else we need parenthesis
+            SB.Append("("c)
+            For Each Child In This.Children
+                Child.Export.AppendKeyboardInput(SB)
+            Next
+            SB.Append(")"c)
+
+        End If
     End Sub
 
     Public Overrides Sub AppendLaTeX(SB As System.Text.StringBuilder)
-        SB.Append("{")
-        For Each Child In This.Children
-            Child.Export.AppendLaTeX(SB)
-        Next
-        SB.Append("}")
+        If This.Children.HasOne AndAlso This.Children.First.IsTextEdit Then
+
+            ' If there's only one child and that it's text, we can simply add it
+            This.Children.First.Export.AppendLaTeX(SB)
+
+        Else
+
+            ' Or else we need parenthesis
+            SB.Append("{")
+            For Each Child In This.Children
+                Child.Export.AppendLaTeX(SB)
+            Next
+            SB.Append("}")
+
+        End If
     End Sub
 
     Public Overrides Sub AppendMathML(SB As System.Text.StringBuilder)
